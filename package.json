@@ -1,0 +1,21 @@
+{
+  "name": "ethglobal-online-2025",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "biome:format": "npx biome format --write .",
+    "biome:check": "npx biome check --write .",
+    "frontend": "pnpm --filter frontend",
+    "contract": "pnpm --filter contract"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  },
+  "packageManager": "pnpm@10.13.1"
+}
