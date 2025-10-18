@@ -1,2 +1,16 @@
 packages:
-  - 'pkgs/*'
+  - pkgs/*
+
+ignoredBuiltDependencies:
+  - keccak
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - '@tailwindcss/oxide'
+  - bufferutil
+  - esbuild
+  - msgpackr-extract
+  - secp256k1
+  - sharp
+  - simple-git-hooks
+  - utf-8-validate

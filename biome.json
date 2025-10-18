@@ -1,47 +1,24 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": {
-    "enabled": false,
-    "clientKind": "git",
-    "useIgnoreFile": false
-  },
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "vcs": { "enabled": false },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "**/node_modules",
-      "**/build",
-      "**/dist",
-      "**/coverage",
-      "**/temp",
-      "**/tmp",
-      "**/out",
-      "**/target",
-      "**/public",
-      "**/docs",
-      "**/contract/artifacts",
-      "**/contract/cache",
-      "**/contract/typechain-types",
-      "**/contract/ignition/deployments",
-      "**/contract/test"
-    ]
+    "includes": ["**/*"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
   },
-  "organizeImports": {
-    "enabled": true
-  },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true
-    },
-    "ignore": ["**/contract/test/**"]
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/contract/test/**"],
+      "linter": { "enabled": false }
+    }
+  ]
 }
