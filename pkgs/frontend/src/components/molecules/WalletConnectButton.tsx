@@ -1,0 +1,96 @@
+'use client';
+
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useEffect, useState } from 'react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
+import { ConnectButton as ConnectButtonComponent } from './WalletConnectButton/ConnectButton';
+import { UnsupportedChainButton } from './WalletConnectButton/UnsupportedChainButton';
+import { ConnectedWallet } from './WalletConnectButton/ConnectedWallet';
+import type { WalletConnectButtonProps, WalletInfo, ResponsiveConfig } from '@/types';
+
+export default function WalletConnectButton({ onConnectionChange }: WalletConnectButtonProps) {
+  const { isTablet, isMobile, isDesktop, isLargeDesktop } = useMediaQuery();
+  const { isConnected } = useWalletConnection();
+  const [lastConnectedState, setLastConnectedState] = useState<boolean | null>(null);
+
+  const config: ResponsiveConfig = {
+    isMobile,
+    isTablet,
+    isDesktop,
+    isLargeDesktop,
+  };
+
+  // 接続状態の変更を監視
+  useEffect(() => {
+    if (onConnectionChange && isConnected !== lastConnectedState) {
+      setLastConnectedState(isConnected);
+      onConnectionChange(isConnected);
+    }
+  }, [isConnected, lastConnectedState, onConnectionChange]);
+
+  return (
+    <div className="flex items-center">
+      <ConnectButton.Custom>
+        {({
+          account,
+          chain,
+          openAccountModal,
+          openChainModal,
+          openConnectModal,
+          authenticationStatus,
+          mounted,
+        }) => {
+          const ready = mounted && authenticationStatus !== 'loading';
+          const connected =
+            ready &&
+            account &&
+            chain &&
+            (!authenticationStatus || authenticationStatus === 'authenticated');
+
+          const walletInfo: WalletInfo = {
+            address: account?.address,
+            chainId: chain?.id,
+            isConnected: !!connected,
+            chain: chain
+              ? {
+                  id: chain.id,
+                  name: chain.name || 'Unknown',
+                  unsupported: chain.unsupported,
+                  hasIcon: chain.hasIcon,
+                  iconUrl: chain.iconUrl,
+                  iconBackground: chain.iconBackground,
+                }
+              : undefined,
+          };
+
+          return (
+            <div
+              {...(!ready && {
+                'aria-hidden': true,
+                style: {
+                  opacity: 0,
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                },
+              })}
+            >
+              {!connected ? (
+                <ConnectButtonComponent onConnect={openConnectModal} config={config} />
+              ) : chain?.unsupported ? (
+                <UnsupportedChainButton onSwitchChain={openChainModal} config={config} />
+              ) : (
+                <ConnectedWallet
+                  walletInfo={walletInfo}
+                  onSwitchChain={openChainModal}
+                  onOpenAccount={openAccountModal}
+                  config={config}
+                />
+              )}
+            </div>
+          );
+        }}
+      </ConnectButton.Custom>
+    </div>
+  );
+}
