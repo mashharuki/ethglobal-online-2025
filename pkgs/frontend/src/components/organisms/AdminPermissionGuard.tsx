@@ -1,27 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
-import { Button } from "@/components/atoms/Button";
-import { Shield, AlertTriangle, ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { Button } from '@/components/atoms/Button';
+import { Shield, AlertTriangle, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface AdminPermissionGuardProps {
   projectId: string;
   children: React.ReactNode;
 }
 
-export function AdminPermissionGuard({
-  projectId,
-  children,
-}: AdminPermissionGuardProps) {
+export function AdminPermissionGuard({ projectId, children }: AdminPermissionGuardProps) {
   const { address, isConnected } = useAccount();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,12 +28,12 @@ export function AdminPermissionGuard({
       // モック: 実際にはスマートコントラクトで権限確認
       // ここでは管理者アドレスをハードコード（本番では動的に取得）
       const adminAddresses = [
-        "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb", // モック管理者アドレス
-        "0x1234567890123456789012345678901234567890", // 追加管理者
+        '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb', // モック管理者アドレス
+        '0x1234567890123456789012345678901234567890', // 追加管理者
       ];
 
       const hasPermission = adminAddresses.some(
-        (adminAddr) => adminAddr.toLowerCase() === address.toLowerCase(),
+        (adminAddr) => adminAddr.toLowerCase() === address.toLowerCase()
       );
 
       setIsAuthorized(hasPermission);

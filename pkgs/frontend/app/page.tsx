@@ -1,8 +1,24 @@
-import Link from 'next/link';
-import { Button } from '@/components/atoms/Button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/atoms/Card';
-import { ArrowRight, Globe, Shield, Zap, Users, TrendingUp, Sparkles, Coins } from 'lucide-react';
-import { mockProjects } from '@/mockdatas';
+import Link from "next/link";
+import { Button } from "@/components/atoms/Button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/atoms/Card";
+import {
+  ArrowRight,
+  Globe,
+  Shield,
+  Zap,
+  Users,
+  TrendingUp,
+  Sparkles,
+  Coins,
+} from "lucide-react";
+import { mockProjects } from "@/mockdatas";
+import { ProjectList } from "@/components/organisms/ProjectList";
 
 /**
  * CrossDonate Homepage - Exact V0 Design Replica
@@ -20,7 +36,9 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">ETHGlobal Online 2025</span>
+            <span className="text-sm font-semibold text-primary">
+              ETHGlobal Online 2025
+            </span>
           </div>
 
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 text-balance leading-tight">
@@ -63,19 +81,25 @@ export default function HomePage() {
               <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
                 $2.4M+
               </div>
-              <div className="text-sm text-muted-foreground font-medium">総寄付額</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                総寄付額
+              </div>
             </div>
             <div className="glass-effect rounded-2xl p-6 border shadow-lg">
               <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
                 1,200+
               </div>
-              <div className="text-sm text-muted-foreground font-medium">アクティブ寄付者</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                アクティブ寄付者
+              </div>
             </div>
             <div className="glass-effect rounded-2xl p-6 border shadow-lg">
               <div className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
                 45+
               </div>
-              <div className="text-sm text-muted-foreground font-medium">プロジェクト数</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                プロジェクト数
+              </div>
             </div>
           </div>
         </div>
@@ -94,7 +118,7 @@ export default function HomePage() {
                 統一されたアドレスで複数のブロックチェーンから寄付を受け付けます。
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card className="border-0 shadow-xl gradient-card glass-effect">
                 <CardContent className="p-8">
@@ -102,7 +126,7 @@ export default function HomePage() {
                   <ViewUnifiedBalance />
                 </CardContent>
               </Card>
-              
+
               <Card className="border-0 shadow-xl gradient-card glass-effect">
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-bold text-foreground mb-6">クロスチェーン操作</h3>
@@ -149,7 +173,8 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-base leading-relaxed">
-                  Avail Nexus SDKで任意のトークンを指定トークンに自動スワップ・ブリッジ。
+                  Avail Nexus
+                  SDKで任意のトークンを指定トークンに自動スワップ・ブリッジ。
                   手動での変換作業は一切不要です。
                 </CardDescription>
               </CardContent>
@@ -193,10 +218,18 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-5xl font-bold mb-3">アクティブなプロジェクト</h2>
-              <p className="text-xl text-muted-foreground">今すぐ支援できるプロジェクト</p>
+              <h2 className="text-5xl font-bold mb-3">
+                アクティブなプロジェクト
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                今すぐ支援できるプロジェクト
+              </p>
             </div>
-            <Button size="lg" className="gradient-primary text-white shadow-lg" asChild>
+            <Button
+              size="lg"
+              className="gradient-primary text-white shadow-lg"
+              asChild
+            >
               <Link href="/create">新規作成</Link>
             </Button>
           </div>
@@ -212,14 +245,18 @@ export default function HomePage() {
                   <CardTitle className="text-2xl group-hover:text-primary transition-colors">
                     {project.name}
                   </CardTitle>
-                  <CardDescription className="text-base">{project.description}</CardDescription>
+                  <CardDescription className="text-base">
+                    {project.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 rounded-lg bg-primary/5">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium text-muted-foreground">総寄付額</span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          総寄付額
+                        </span>
                       </div>
                       <span className="font-bold text-lg text-primary">
                         {project.totalDonations}
@@ -228,9 +265,13 @@ export default function HomePage() {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-accent/5">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-accent" />
-                        <span className="text-sm font-medium text-muted-foreground">寄付者数</span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          寄付者数
+                        </span>
                       </div>
-                      <span className="font-bold text-lg text-accent">{project.donorCount}人</span>
+                      <span className="font-bold text-lg text-accent">
+                        {project.donorCount}人
+                      </span>
                     </div>
                   </div>
 
@@ -266,6 +307,13 @@ export default function HomePage() {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 作成済みプロジェクト一覧 */}
+      <section className="py-24 px-4 bg-secondary/30">
+        <div className="container mx-auto max-w-6xl">
+          <ProjectList />
         </div>
       </section>
     </div>

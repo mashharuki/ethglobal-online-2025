@@ -1,14 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
-import { RefreshCw, TrendingUp } from "lucide-react";
+import { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { RefreshCw, TrendingUp } from 'lucide-react';
 
 interface Balance {
   chain: string;
@@ -21,9 +15,7 @@ interface RealtimeBalanceDisplayProps {
   initialBalances: Balance[];
 }
 
-export function RealtimeBalanceDisplay({
-  initialBalances,
-}: RealtimeBalanceDisplayProps) {
+export function RealtimeBalanceDisplay({ initialBalances }: RealtimeBalanceDisplayProps) {
   const [balances, setBalances] = useState<Balance[]>(initialBalances);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -38,10 +30,7 @@ export function RealtimeBalanceDisplay({
     setBalances((prevBalances) => {
       const updatedBalances = prevBalances.map((balance) => ({
         ...balance,
-        amount: (
-          parseFloat(balance.amount) +
-          (Math.random() - 0.5) * 0.1
-        ).toFixed(2),
+        amount: (parseFloat(balance.amount) + (Math.random() - 0.5) * 0.1).toFixed(2),
         usdValue: balance.usdValue + (Math.random() - 0.5) * 100,
       }));
       return updatedBalances;
@@ -68,9 +57,7 @@ export function RealtimeBalanceDisplay({
               <TrendingUp className="w-5 h-5 text-accent" />
               チェーン別残高
             </CardTitle>
-            <CardDescription>
-              全チェーンの現在残高をリアルタイム表示
-            </CardDescription>
+            <CardDescription>全チェーンの現在残高をリアルタイム表示</CardDescription>
           </div>
           <button
             type="button"
@@ -79,14 +66,12 @@ export function RealtimeBalanceDisplay({
             className="p-2 rounded-lg hover:bg-accent/10 transition-colors disabled:opacity-50"
             title="残高を更新"
           >
-            <RefreshCw
-              className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
-            />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
         <div className="text-xs text-muted-foreground">
-          最終更新: {lastUpdated.toLocaleTimeString("ja-JP")}
-          {isRefreshing && " (更新中...)"}
+          最終更新: {lastUpdated.toLocaleTimeString('ja-JP')}
+          {isRefreshing && ' (更新中...)'}
         </div>
       </CardHeader>
       <CardContent>
