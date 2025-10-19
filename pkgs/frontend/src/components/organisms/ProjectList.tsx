@@ -1,21 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
-import { Button } from "@/components/atoms/Button";
-import { ExternalLink, Coins, Trash2 } from "lucide-react";
-import {
-  getStoredProjects,
-  deleteProject,
-  type ProjectData,
-} from "@/utils/projectStorage";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { Button } from '@/components/atoms/Button';
+import { ExternalLink, Coins, Trash2 } from 'lucide-react';
+import { getStoredProjects, deleteProject, type ProjectData } from '@/utils/projectStorage';
 
 export function ProjectList() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
@@ -32,19 +22,19 @@ export function ProjectList() {
   }, []);
 
   const handleDeleteProject = (projectId: string) => {
-    if (confirm("このプロジェクトを削除しますか？")) {
+    if (confirm('このプロジェクトを削除しますか？')) {
       deleteProject(projectId);
       setProjects((prev) => prev.filter((p) => p.id !== projectId));
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ja-JP", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -66,9 +56,7 @@ export function ProjectList() {
           <Coins className="w-8 h-8 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-semibold mb-2">プロジェクトがありません</h3>
-        <p className="text-muted-foreground mb-6">
-          新しいプロジェクトを作成して始めましょう
-        </p>
+        <p className="text-muted-foreground mb-6">新しいプロジェクトを作成して始めましょう</p>
         <Button asChild>
           <Link href="/create">プロジェクトを作成</Link>
         </Button>
@@ -93,9 +81,7 @@ export function ProjectList() {
           >
             <CardHeader className="space-y-3">
               <div className="flex items-start justify-between">
-                <CardTitle className="text-xl line-clamp-2">
-                  {project.name}
-                </CardTitle>
+                <CardTitle className="text-xl line-clamp-2">{project.name}</CardTitle>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
@@ -108,7 +94,7 @@ export function ProjectList() {
                 </div>
               </div>
               <CardDescription className="line-clamp-3">
-                {project.description || "説明がありません"}
+                {project.description || '説明がありません'}
               </CardDescription>
             </CardHeader>
 
@@ -125,9 +111,7 @@ export function ProjectList() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">作成日</span>
-                  <span className="font-semibold">
-                    {formatDate(project.createdAt)}
-                  </span>
+                  <span className="font-semibold">{formatDate(project.createdAt)}</span>
                 </div>
               </div>
 
@@ -141,11 +125,7 @@ export function ProjectList() {
 
               {/* アクションボタン */}
               <div className="flex gap-2 pt-2">
-                <Button
-                  size="sm"
-                  className="flex-1 gradient-primary text-white"
-                  asChild
-                >
+                <Button size="sm" className="flex-1 gradient-primary text-white" asChild>
                   <Link href={`/admin/${project.id}`}>
                     管理
                     <ExternalLink className="w-3 h-3 ml-1" />
