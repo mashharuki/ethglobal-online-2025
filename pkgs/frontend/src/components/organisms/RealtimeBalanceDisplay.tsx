@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -28,32 +28,34 @@ export function RealtimeBalanceDisplay({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const refreshBalances = async () => {
+  const refreshBalances = useCallback(async () => {
     setIsRefreshing(true);
 
     // モック: 実際にはAPIから最新の残高を取得
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // モック: 残高にランダムな変動を加える
-    const updatedBalances = balances.map((balance) => ({
-      ...balance,
-      amount: (
-        parseFloat(balance.amount) +
-        (Math.random() - 0.5) * 0.1
-      ).toFixed(2),
-      usdValue: balance.usdValue + (Math.random() - 0.5) * 100,
-    }));
+    setBalances((prevBalances) => {
+      const updatedBalances = prevBalances.map((balance) => ({
+        ...balance,
+        amount: (
+          parseFloat(balance.amount) +
+          (Math.random() - 0.5) * 0.1
+        ).toFixed(2),
+        usdValue: balance.usdValue + (Math.random() - 0.5) * 100,
+      }));
+      return updatedBalances;
+    });
 
-    setBalances(updatedBalances);
     setLastUpdated(new Date());
     setIsRefreshing(false);
-  };
+  }, []);
 
   // 30秒ごとに自動更新
   useEffect(() => {
     const interval = setInterval(refreshBalances, 30000);
     return () => clearInterval(interval);
-  }, [balances]);
+  }, [refreshBalances]);
 
   const totalUsdValue = balances.reduce((sum, b) => sum + b.usdValue, 0);
 

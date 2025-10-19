@@ -7,14 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/Card";
-import {
-  Wallet,
-  TrendingUp,
-  Users,
-  ExternalLink,
-  Shield,
-  AlertTriangle,
-} from "lucide-react";
+import { Wallet, TrendingUp, Users, ExternalLink } from "lucide-react";
 import { AdminConversionCard } from "@/components/organisms/AdminConversionCard";
 import { RealtimeBalanceDisplay } from "@/components/organisms/RealtimeBalanceDisplay";
 import { getProjectById, mockBalances, mockTransactions } from "@/mockdatas";

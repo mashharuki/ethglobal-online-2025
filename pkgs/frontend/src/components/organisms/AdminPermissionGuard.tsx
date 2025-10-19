@@ -50,7 +50,7 @@ export function AdminPermissionGuard({
     };
 
     checkPermission();
-  }, [address, isConnected, projectId]);
+  }, [address, isConnected]);
 
   if (isLoading) {
     return (
