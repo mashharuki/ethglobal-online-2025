@@ -1,17 +1,11 @@
-import Link from "next/link";
-import { Button } from "@/components/atoms/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
-import { Wallet, TrendingUp, Users, ExternalLink } from "lucide-react";
-import { AdminConversionCard } from "@/components/organisms/AdminConversionCard";
-import { RealtimeBalanceDisplay } from "@/components/organisms/RealtimeBalanceDisplay";
-import { getProjectById, mockBalances, mockTransactions } from "@/mockdatas";
-import { AdminPermissionGuard } from "@/components/organisms/AdminPermissionGuard";
+import Link from 'next/link';
+import { Button } from '@/components/atoms/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { Wallet, TrendingUp, Users, ExternalLink } from 'lucide-react';
+import { AdminConversionCard } from '@/components/organisms/AdminConversionCard';
+import { RealtimeBalanceDisplay } from '@/components/organisms/RealtimeBalanceDisplay';
+import { getProjectById, mockBalances, mockTransactions } from '@/mockdatas';
+import { AdminPermissionGuard } from '@/components/organisms/AdminPermissionGuard';
 
 export default async function AdminDashboardPage({
   params,
@@ -45,26 +39,20 @@ export default async function AdminDashboardPage({
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">
-                  総資産価値
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">総資産価値</CardTitle>
                 <Wallet className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-accent">
                   ${totalUsdValue.toLocaleString()}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  全チェーン合計
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">全チェーン合計</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">
-                  総寄付回数
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">総寄付回数</CardTitle>
                 <TrendingUp className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -75,9 +63,7 @@ export default async function AdminDashboardPage({
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">
-                  ユニーク寄付者
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">ユニーク寄付者</CardTitle>
                 <Users className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -110,18 +96,18 @@ export default async function AdminDashboardPage({
                           <div className="flex items-center gap-2">
                             <span
                               className={`text-xs px-2 py-0.5 rounded-full ${
-                                tx.type === "donation"
-                                  ? "bg-accent/10 text-accent"
-                                  : tx.type === "conversion"
-                                    ? "bg-primary/10 text-primary"
-                                    : "bg-chart-3/10 text-chart-3"
+                                tx.type === 'donation'
+                                  ? 'bg-accent/10 text-accent'
+                                  : tx.type === 'conversion'
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'bg-chart-3/10 text-chart-3'
                               }`}
                             >
-                              {tx.type === "donation"
-                                ? "寄付"
-                                : tx.type === "conversion"
-                                  ? "変換"
-                                  : "引き出し"}
+                              {tx.type === 'donation'
+                                ? '寄付'
+                                : tx.type === 'conversion'
+                                  ? '変換'
+                                  : '引き出し'}
                             </span>
                             <code className="text-xs font-mono">{tx.from}</code>
                           </div>
@@ -133,17 +119,16 @@ export default async function AdminDashboardPage({
                         <div className="text-right">
                           <span
                             className={`text-xs px-2 py-1 rounded-full ${
-                              tx.status === "confirmed" ||
-                              tx.status === "completed"
-                                ? "bg-accent/10 text-accent"
-                                : "bg-muted text-muted-foreground"
+                              tx.status === 'confirmed' || tx.status === 'completed'
+                                ? 'bg-accent/10 text-accent'
+                                : 'bg-muted text-muted-foreground'
                             }`}
                           >
-                            {tx.status === "confirmed"
-                              ? "確認済み"
-                              : tx.status === "completed"
-                                ? "完了"
-                                : "処理中"}
+                            {tx.status === 'confirmed'
+                              ? '確認済み'
+                              : tx.status === 'completed'
+                                ? '完了'
+                                : '処理中'}
                           </span>
                           <button
                             type="button"
@@ -175,23 +160,17 @@ export default async function AdminDashboardPage({
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      統一アドレス
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-1">統一アドレス</p>
                     <code className="text-xs font-mono break-all bg-secondary p-2 rounded block">
                       {project.unifiedAddress}
                     </code>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      集約先トークン
-                    </span>
+                    <span className="text-muted-foreground">集約先トークン</span>
                     <span className="font-semibold">{project.targetToken}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      集約先チェーン
-                    </span>
+                    <span className="text-muted-foreground">集約先チェーン</span>
                     <span className="font-semibold">{project.targetChain}</span>
                   </div>
                 </CardContent>

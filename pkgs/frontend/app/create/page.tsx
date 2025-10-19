@@ -1,33 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useId, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/atoms/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/Card";
-import { Input } from "@/components/atoms/Input";
-import { Label } from "@/components/atoms/Label";
-import { Textarea } from "@/components/atoms/Textarea";
-import {
-  Coins,
-  Loader2,
-  Sparkles,
-  Globe,
-  Zap,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
-import {
-  calculateMultiChainAddress,
-  verifyMultiChainConsistency,
-} from "@/utils/create2Address";
-import { saveProject, createProjectData } from "@/utils/projectStorage";
+import { useState, useId, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/atoms/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { Input } from '@/components/atoms/Input';
+import { Label } from '@/components/atoms/Label';
+import { Textarea } from '@/components/atoms/Textarea';
+import { Coins, Loader2, Sparkles, Globe, Zap, CheckCircle, AlertCircle } from 'lucide-react';
+import { calculateMultiChainAddress, verifyMultiChainConsistency } from '@/utils/create2Address';
+import { saveProject, createProjectData } from '@/utils/projectStorage';
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -37,17 +20,13 @@ export default function CreateProjectPage() {
   const targetChainId = useId();
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    targetToken: "USDC",
-    targetChain: "Arbitrum Sepolia",
+    name: '',
+    description: '',
+    targetToken: 'USDC',
+    targetChain: 'Arbitrum Sepolia',
   });
-  const [calculatedAddresses, setCalculatedAddresses] = useState<
-    Record<string, string>
-  >({});
-  const [isAddressConsistent, setIsAddressConsistent] = useState<
-    boolean | null
-  >(null);
+  const [calculatedAddresses, setCalculatedAddresses] = useState<Record<string, string>>({});
+  const [isAddressConsistent, setIsAddressConsistent] = useState<boolean | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // フォームバリデーション
@@ -55,17 +34,17 @@ export default function CreateProjectPage() {
     const errors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      errors.name = "プロジェクト名は必須です";
+      errors.name = 'プロジェクト名は必須です';
     } else if (formData.name.length < 3) {
-      errors.name = "プロジェクト名は3文字以上で入力してください";
+      errors.name = 'プロジェクト名は3文字以上で入力してください';
     }
 
     if (!formData.targetToken) {
-      errors.targetToken = "目標トークンを選択してください";
+      errors.targetToken = '目標トークンを選択してください';
     }
 
     if (!formData.targetChain) {
-      errors.targetChain = "目標チェーンを選択してください";
+      errors.targetChain = '目標チェーンを選択してください';
     }
 
     setFormErrors(errors);
@@ -79,12 +58,12 @@ export default function CreateProjectPage() {
         const addresses = calculateMultiChainAddress(
           formData.name,
           formData.targetToken,
-          formData.targetChain,
+          formData.targetChain
         );
         setCalculatedAddresses(addresses);
         setIsAddressConsistent(verifyMultiChainConsistency(addresses));
       } catch (error) {
-        console.error("Failed to calculate addresses:", error);
+        console.error('Failed to calculate addresses:', error);
         setIsAddressConsistent(false);
       }
     }
@@ -101,14 +80,14 @@ export default function CreateProjectPage() {
 
     try {
       // プロジェクトデータを作成
-      const unifiedAddress = Object.values(calculatedAddresses)[0] || "";
+      const unifiedAddress = Object.values(calculatedAddresses)[0] || '';
       const projectData = createProjectData(
         formData.name,
         formData.description,
         formData.targetToken,
         formData.targetChain,
         unifiedAddress,
-        calculatedAddresses,
+        calculatedAddresses
       );
 
       // ローカルストレージに保存
@@ -119,7 +98,7 @@ export default function CreateProjectPage() {
 
       router.push(`/admin/${projectData.id}`);
     } catch (error) {
-      console.error("Failed to create project:", error);
+      console.error('Failed to create project:', error);
       setIsCreating(false);
     }
   };
@@ -131,9 +110,7 @@ export default function CreateProjectPage() {
         <div className="container mx-auto px-4 py-16 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">
-              CREATE2で統一アドレスを生成
-            </span>
+            <span className="text-sm font-semibold text-primary">CREATE2で統一アドレスを生成</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-4 text-balance">
             新しいプロジェクトを作成
@@ -169,7 +146,7 @@ export default function CreateProjectPage() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       required
-                      className={`text-base h-12 ${formErrors.name ? "border-red-500" : ""}`}
+                      className={`text-base h-12 ${formErrors.name ? 'border-red-500' : ''}`}
                     />
                     {formErrors.name && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
@@ -180,10 +157,7 @@ export default function CreateProjectPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label
-                      htmlFor={descriptionId}
-                      className="text-base font-semibold"
-                    >
+                    <Label htmlFor={descriptionId} className="text-base font-semibold">
                       説明
                     </Label>
                     <Textarea
@@ -203,10 +177,7 @@ export default function CreateProjectPage() {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <Label
-                        htmlFor={targetTokenId}
-                        className="text-base font-semibold"
-                      >
+                      <Label htmlFor={targetTokenId} className="text-base font-semibold">
                         集約先トークン *
                       </Label>
                       <select
@@ -230,10 +201,7 @@ export default function CreateProjectPage() {
                     </div>
 
                     <div className="space-y-3">
-                      <Label
-                        htmlFor={targetChainId}
-                        className="text-base font-semibold"
-                      >
+                      <Label htmlFor={targetChainId} className="text-base font-semibold">
                         集約先チェーン *
                       </Label>
                       <select
@@ -247,14 +215,10 @@ export default function CreateProjectPage() {
                           })
                         }
                       >
-                        <option value="Arbitrum Sepolia">
-                          Arbitrum Sepolia
-                        </option>
+                        <option value="Arbitrum Sepolia">Arbitrum Sepolia</option>
                         <option value="Sepolia">Sepolia</option>
                       </select>
-                      <p className="text-sm text-muted-foreground">
-                        寄付が集約されるチェーン
-                      </p>
+                      <p className="text-sm text-muted-foreground">寄付が集約されるチェーン</p>
                     </div>
                   </div>
 
@@ -262,9 +226,7 @@ export default function CreateProjectPage() {
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Globe className="w-5 h-5 text-primary" />
-                        <h3 className="font-bold text-base">
-                          サポートされるチェーン
-                        </h3>
+                        <h3 className="font-bold text-base">サポートされるチェーン</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span className="text-sm font-semibold px-4 py-2 bg-accent/10 text-accent rounded-full border border-accent/20">
@@ -278,9 +240,7 @@ export default function CreateProjectPage() {
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Coins className="w-5 h-5 text-primary" />
-                        <h3 className="font-bold text-base">
-                          サポートされるトークン
-                        </h3>
+                        <h3 className="font-bold text-base">サポートされるトークン</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span className="text-sm font-semibold px-4 py-2 bg-primary/10 text-primary rounded-full border border-primary/20">
@@ -301,9 +261,7 @@ export default function CreateProjectPage() {
                     <div className="rounded-xl border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5 p-6 space-y-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Zap className="w-5 h-5 text-accent" />
-                        <h3 className="font-bold text-base">
-                          計算された統一アドレス
-                        </h3>
+                        <h3 className="font-bold text-base">計算された統一アドレス</h3>
                         {isAddressConsistent === true && (
                           <CheckCircle className="w-5 h-5 text-green-500" />
                         )}
@@ -313,21 +271,19 @@ export default function CreateProjectPage() {
                       </div>
 
                       <div className="space-y-2">
-                        {Object.entries(calculatedAddresses).map(
-                          ([chain, address]) => (
-                            <div
-                              key={chain}
-                              className="flex items-center justify-between p-3 bg-background rounded-lg"
-                            >
-                              <span className="text-sm font-semibold text-muted-foreground">
-                                {chain}
-                              </span>
-                              <code className="text-xs font-mono text-accent break-all">
-                                {address}
-                              </code>
-                            </div>
-                          ),
-                        )}
+                        {Object.entries(calculatedAddresses).map(([chain, address]) => (
+                          <div
+                            key={chain}
+                            className="flex items-center justify-between p-3 bg-background rounded-lg"
+                          >
+                            <span className="text-sm font-semibold text-muted-foreground">
+                              {chain}
+                            </span>
+                            <code className="text-xs font-mono text-accent break-all">
+                              {address}
+                            </code>
+                          </div>
+                        ))}
                       </div>
 
                       {isAddressConsistent === true && (
@@ -385,9 +341,7 @@ export default function CreateProjectPage() {
                 <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center mb-3 shadow-lg">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <CardTitle className="text-xl">
-                  CREATE2による統一アドレス
-                </CardTitle>
+                <CardTitle className="text-xl">CREATE2による統一アドレス</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -406,25 +360,19 @@ export default function CreateProjectPage() {
                   <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
                     1
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    統一アドレスが自動生成されます
-                  </p>
+                  <p className="text-sm text-muted-foreground">統一アドレスが自動生成されます</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
                     2
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    寄付ページで共有できます
-                  </p>
+                  <p className="text-sm text-muted-foreground">寄付ページで共有できます</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
                     3
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    管理ダッシュボードで管理
-                  </p>
+                  <p className="text-sm text-muted-foreground">管理ダッシュボードで管理</p>
                 </div>
               </CardContent>
             </Card>

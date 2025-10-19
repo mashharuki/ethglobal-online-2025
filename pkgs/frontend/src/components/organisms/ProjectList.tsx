@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/atoms/Card";
 import { Button } from "@/components/atoms/Button";
-import { ExternalLink, Calendar, Coins, Trash2, Edit } from "lucide-react";
+import { ExternalLink, Coins, Trash2 } from "lucide-react";
 import {
   getStoredProjects,
   deleteProject,

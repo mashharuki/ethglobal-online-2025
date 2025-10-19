@@ -14,19 +14,19 @@ export interface ProjectData {
   updatedAt: string;
 }
 
-const STORAGE_KEY = "crossdonate_projects";
+const STORAGE_KEY = 'crossdonate_projects';
 
 /**
  * ローカルストレージからプロジェクト一覧を取得
  */
 export function getStoredProjects(): ProjectData[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    console.error("Failed to load projects from localStorage:", error);
+    console.error('Failed to load projects from localStorage:', error);
     return [];
   }
 }
@@ -35,7 +35,7 @@ export function getStoredProjects(): ProjectData[] {
  * プロジェクトをローカルストレージに保存
  */
 export function saveProject(project: ProjectData): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
 
   try {
     const projects = getStoredProjects();
@@ -54,7 +54,7 @@ export function saveProject(project: ProjectData): void {
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
   } catch (error) {
-    console.error("Failed to save project to localStorage:", error);
+    console.error('Failed to save project to localStorage:', error);
   }
 }
 
@@ -62,14 +62,14 @@ export function saveProject(project: ProjectData): void {
  * プロジェクトをローカルストレージから削除
  */
 export function deleteProject(projectId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
 
   try {
     const projects = getStoredProjects();
     const filteredProjects = projects.filter((p) => p.id !== projectId);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredProjects));
   } catch (error) {
-    console.error("Failed to delete project from localStorage:", error);
+    console.error('Failed to delete project from localStorage:', error);
   }
 }
 
@@ -97,7 +97,7 @@ export function createProjectData(
   targetToken: string,
   targetChain: string,
   unifiedAddress: string,
-  multiChainAddresses: Record<string, string>,
+  multiChainAddresses: Record<string, string>
 ): ProjectData {
   return {
     id: generateProjectId(),

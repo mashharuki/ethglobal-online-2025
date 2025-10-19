@@ -1,4 +1,4 @@
-import { keccak256, toHex } from "viem";
+import { keccak256, toHex } from 'viem';
 
 /**
  * CREATE2アドレス計算ユーティリティ
@@ -18,15 +18,11 @@ export interface Create2Params {
  * @param bytecode デプロイするコントラクトのバイトコード
  * @returns 計算されたアドレス
  */
-export function calculateCreate2Address({
-  factory,
-  salt,
-  bytecode,
-}: Create2Params): string {
+export function calculateCreate2Address({ factory, salt, bytecode }: Create2Params): string {
   // CREATE2の計算式: keccak256(0xff + factory + salt + keccak256(bytecode))
   const bytecodeHash = keccak256(toHex(bytecode));
-  const saltHex = salt.startsWith("0x") ? salt : `0x${salt}`;
-  const factoryHex = factory.startsWith("0x") ? factory : `0x${factory}`;
+  const saltHex = salt.startsWith('0x') ? salt : `0x${salt}`;
+  const factoryHex = factory.startsWith('0x') ? factory : `0x${factory}`;
 
   // 0xff + factory + salt + bytecodeHash を結合
   const input = `0xff${factoryHex.slice(2)}${saltHex.slice(2)}${bytecodeHash.slice(2)}`;
@@ -48,7 +44,7 @@ export function calculateCreate2Address({
 export function generateProjectSalt(
   projectName: string,
   targetToken: string,
-  targetChain: string,
+  targetChain: string
 ): string {
   const saltData = `${projectName}-${targetToken}-${targetChain}-${Date.now()}`;
   return keccak256(toHex(saltData));
@@ -64,22 +60,21 @@ export function generateProjectSalt(
 export function calculateMultiChainAddress(
   projectName: string,
   targetToken: string,
-  targetChain: string,
+  targetChain: string
 ): Record<string, string> {
   const salt = generateProjectSalt(projectName, targetToken, targetChain);
 
   // 各チェーンのファクトリーアドレス（テストネット用）
   const factories = {
-    Sepolia: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    "Arbitrum Sepolia": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    "Base Sepolia": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    "Optimism Sepolia": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    "Polygon Amoy": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    Sepolia: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    'Arbitrum Sepolia': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    'Base Sepolia': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    'Optimism Sepolia': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+    'Polygon Amoy': '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
   };
 
   // デプロイするコントラクトのバイトコード（実際のコントラクトのバイトコード）
-  const bytecode =
-    "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063..."; // 実際のバイトコード
+  const bytecode = '0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063...'; // 実際のバイトコード
 
   const addresses: Record<string, string> = {};
 
@@ -99,9 +94,7 @@ export function calculateMultiChainAddress(
  * @param addresses 各チェーンのアドレス
  * @returns 全てのアドレスが同一かどうか
  */
-export function verifyMultiChainConsistency(
-  addresses: Record<string, string>,
-): boolean {
+export function verifyMultiChainConsistency(addresses: Record<string, string>): boolean {
   const addressValues = Object.values(addresses);
   if (addressValues.length === 0) return false;
 
