@@ -16,6 +16,35 @@ contract DonationPool is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
     using Address for address payable;
 
+    // ============ カスタムエラー ============
+
+    /// @dev 無効なアドレスエラー
+    error InvalidAddress(string message);
+
+    /// @dev 無効な金額エラー
+    error InvalidAmount(string message);
+
+    /// @dev 寄付が無効化されているエラー
+    error DonationsDisabled();
+
+    /// @dev サポートされていないトークンエラー
+    error TokenNotSupported(address token);
+
+    /// @dev 残高不足エラー
+    error InsufficientBalance(uint256 required, uint256 available);
+
+    /// @dev 権限不足エラー
+    error UnauthorizedAccess(address caller, string requiredRole);
+
+    /// @dev 設定値が無効なエラー
+    error InvalidConfiguration(string parameter, uint256 value);
+
+    /// @dev 緊急停止エラー
+    error EmergencyPaused();
+
+    /// @dev トークン転送失敗エラー
+    error TokenTransferFailed(address token, address to, uint256 amount);
+
     // ============ 状態変数 ============
 
     /// @dev 目標トークン（集約先のトークン）
@@ -40,6 +69,18 @@ contract DonationPool is ReentrancyGuard, Ownable {
 
     /// @dev 寄付の有効性フラグ
     bool public donationsEnabled;
+
+    /// @dev 緊急停止フラグ
+    bool public emergencyPaused;
+
+    /// @dev 最大寄付者数制限
+    uint256 public maxDonors;
+
+    /// @dev 現在の寄付者数
+    uint256 public currentDonorCount;
+
+    /// @dev 寄付者のマッピング（重複チェック用）
+    mapping(address => bool) public isDonor;
 
     // ============ イベント ============
 
@@ -77,6 +118,26 @@ contract DonationPool is ReentrancyGuard, Ownable {
         address indexed newToken
     );
 
+    /// @dev 緊急停止が発動された時に発行
+    event EmergencyPaused(
+        address indexed by,
+        uint256 timestamp,
+        string reason
+    );
+
+    /// @dev 緊急停止が解除された時に発行
+    event EmergencyUnpaused(
+        address indexed by,
+        uint256 timestamp
+    );
+
+    /// @dev セキュリティ設定が変更された時に発行
+    event SecuritySettingsUpdated(
+        uint256 maxDonors,
+        bool emergencyPaused,
+        bool donationsEnabled
+    );
+
     // ============ コンストラクタ ============
 
     /**
@@ -92,8 +153,12 @@ contract DonationPool is ReentrancyGuard, Ownable {
         address _targetToken,
         address _owner
     ) Ownable(_owner) {
-        require(_targetToken != address(0), "DonationPool: Invalid target token");
-        require(_owner != address(0), "DonationPool: Invalid owner");
+        if (_targetToken == address(0)) {
+            revert InvalidAddress("Target token cannot be zero address");
+        }
+        if (_owner == address(0)) {
+            revert InvalidAddress("Owner cannot be zero address");
+        }
 
         projectName = _projectName;
         projectDescription = _projectDescription;
@@ -103,12 +168,16 @@ contract DonationPool is ReentrancyGuard, Ownable {
         minDonationAmount = 0;
         maxDonationAmount = type(uint256).max;
         donationsEnabled = true;
+        emergencyPaused = false;
+        maxDonors = 1000; // デフォルト最大寄付者数
+        currentDonorCount = 0;
 
         // ETHをサポートトークンとして追加
         supportedTokens[address(0)] = true;
 
         emit TargetTokenUpdated(address(0), _targetToken);
         emit DonationSettingsUpdated(minDonationAmount, maxDonationAmount, donationsEnabled);
+        emit SecuritySettingsUpdated(maxDonors, emergencyPaused, donationsEnabled);
     }
 
     // ============ 寄付機能 ============
@@ -118,14 +187,37 @@ contract DonationPool is ReentrancyGuard, Ownable {
      * @notice msg.valueで送金されたETHを受け取る
      */
     function donateETH() external payable nonReentrant {
-        require(donationsEnabled, "DonationPool: Donations are disabled");
-        require(msg.value > 0, "DonationPool: Donation amount must be greater than 0");
-        require(msg.value >= minDonationAmount, "DonationPool: Donation below minimum");
-        require(msg.value <= maxDonationAmount, "DonationPool: Donation exceeds maximum");
+        // セキュリティチェック
+        if (emergencyPaused) {
+            revert EmergencyPaused();
+        }
+        if (!donationsEnabled) {
+            revert DonationsDisabled();
+        }
+        if (msg.value == 0) {
+            revert InvalidAmount("Donation amount must be greater than 0");
+        }
+        if (msg.value < minDonationAmount) {
+            revert InvalidAmount("Donation below minimum amount");
+        }
+        if (msg.value > maxDonationAmount) {
+            revert InvalidAmount("Donation exceeds maximum amount");
+        }
+
+        // 寄付者数制限チェック
+        if (!isDonor[msg.sender] && currentDonorCount >= maxDonors) {
+            revert InvalidConfiguration("Maximum number of donors reached", maxDonors);
+        }
 
         // 寄付額を記録
         totalDonations[address(0)] += msg.value;
         donorContributions[msg.sender] += msg.value;
+
+        // 新しい寄付者の場合、カウントを増加
+        if (!isDonor[msg.sender]) {
+            isDonor[msg.sender] = true;
+            currentDonorCount++;
+        }
 
         emit ETHDonationReceived(msg.sender, msg.value, block.timestamp);
     }
@@ -136,21 +228,50 @@ contract DonationPool is ReentrancyGuard, Ownable {
      * @param amount 寄付するトークン量
      */
     function donate(address token, uint256 amount) external nonReentrant {
-        require(donationsEnabled, "DonationPool: Donations are disabled");
-        require(token != address(0), "DonationPool: Invalid token address");
-        require(supportedTokens[token], "DonationPool: Token not supported");
-        require(amount > 0, "DonationPool: Donation amount must be greater than 0");
-        require(amount >= minDonationAmount, "DonationPool: Donation below minimum");
-        require(amount <= maxDonationAmount, "DonationPool: Donation exceeds maximum");
+        // セキュリティチェック
+        if (emergencyPaused) {
+            revert EmergencyPaused();
+        }
+        if (!donationsEnabled) {
+            revert DonationsDisabled();
+        }
+        if (token == address(0)) {
+            revert InvalidAddress("Token address cannot be zero");
+        }
+        if (!supportedTokens[token]) {
+            revert TokenNotSupported(token);
+        }
+        if (amount == 0) {
+            revert InvalidAmount("Donation amount must be greater than 0");
+        }
+        if (amount < minDonationAmount) {
+            revert InvalidAmount("Donation below minimum amount");
+        }
+        if (amount > maxDonationAmount) {
+            revert InvalidAmount("Donation exceeds maximum amount");
+        }
 
-        // トークンを転送
-        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        // 寄付者数制限チェック
+        if (!isDonor[msg.sender] && currentDonorCount >= maxDonors) {
+            revert InvalidConfiguration("Maximum number of donors reached", maxDonors);
+        }
 
-        // 寄付額を記録
-        totalDonations[token] += amount;
-        donorContributions[msg.sender] += amount;
+        // トークンを安全に転送
+        try IERC20(token).safeTransferFrom(msg.sender, address(this), amount) {
+            // 寄付額を記録
+            totalDonations[token] += amount;
+            donorContributions[msg.sender] += amount;
 
-        emit TokenDonationReceived(msg.sender, token, amount, block.timestamp);
+            // 新しい寄付者の場合、カウントを増加
+            if (!isDonor[msg.sender]) {
+                isDonor[msg.sender] = true;
+                currentDonorCount++;
+            }
+
+            emit TokenDonationReceived(msg.sender, token, amount, block.timestamp);
+        } catch {
+            revert TokenTransferFailed(token, address(this), amount);
+        }
     }
 
     // ============ 管理者機能 ============
@@ -161,7 +282,9 @@ contract DonationPool is ReentrancyGuard, Ownable {
      * @param supported サポートするかどうか
      */
     function setSupportedToken(address token, bool supported) external onlyOwner {
-        require(token != address(0), "DonationPool: Invalid token address");
+        if (token == address(0)) {
+            revert InvalidAddress("Token address cannot be zero");
+        }
 
         supportedTokens[token] = supported;
         emit TokenSupported(token, supported);
@@ -178,7 +301,9 @@ contract DonationPool is ReentrancyGuard, Ownable {
         uint256 _maxAmount,
         bool _enabled
     ) external onlyOwner {
-        require(_minAmount <= _maxAmount, "DonationPool: Invalid amount range");
+        if (_minAmount > _maxAmount) {
+            revert InvalidConfiguration("Minimum amount cannot exceed maximum amount", _minAmount);
+        }
 
         minDonationAmount = _minAmount;
         maxDonationAmount = _maxAmount;
@@ -188,11 +313,51 @@ contract DonationPool is ReentrancyGuard, Ownable {
     }
 
     /**
+     * @dev 緊急停止を発動
+     * @param reason 停止理由
+     */
+    function emergencyPause(string calldata reason) external onlyOwner {
+        if (emergencyPaused) {
+            revert InvalidConfiguration("Contract is already paused", 1);
+        }
+
+        emergencyPaused = true;
+        emit EmergencyPaused(msg.sender, block.timestamp, reason);
+    }
+
+    /**
+     * @dev 緊急停止を解除
+     */
+    function emergencyUnpause() external onlyOwner {
+        if (!emergencyPaused) {
+            revert InvalidConfiguration("Contract is not paused", 0);
+        }
+
+        emergencyPaused = false;
+        emit EmergencyUnpaused(msg.sender, block.timestamp);
+    }
+
+    /**
+     * @dev セキュリティ設定を更新
+     * @param _maxDonors 最大寄付者数
+     */
+    function updateSecuritySettings(uint256 _maxDonors) external onlyOwner {
+        if (_maxDonors == 0) {
+            revert InvalidConfiguration("Maximum donors cannot be zero", _maxDonors);
+        }
+
+        maxDonors = _maxDonors;
+        emit SecuritySettingsUpdated(_maxDonors, emergencyPaused, donationsEnabled);
+    }
+
+    /**
      * @dev 目標トークンを変更
      * @param _targetToken 新しい目標トークンアドレス
      */
     function setTargetToken(address _targetToken) external onlyOwner {
-        require(_targetToken != address(0), "DonationPool: Invalid target token");
+        if (_targetToken == address(0)) {
+            revert InvalidAddress("Target token cannot be zero address");
+        }
 
         address oldToken = targetToken;
         targetToken = _targetToken;
@@ -209,6 +374,10 @@ contract DonationPool is ReentrancyGuard, Ownable {
         string memory _name,
         string memory _description
     ) external onlyOwner {
+        if (bytes(_name).length == 0) {
+            revert InvalidConfiguration("Project name cannot be empty", 0);
+        }
+
         projectName = _name;
         projectDescription = _description;
     }
@@ -389,10 +558,20 @@ contract DonationPool is ReentrancyGuard, Ownable {
      * @param amount 引き出し量
      */
     function emergencyWithdrawETH(address payable to, uint256 amount) external onlyOwner {
-        require(to != address(0), "DonationPool: Invalid recipient");
-        require(amount <= address(this).balance, "DonationPool: Insufficient balance");
+        if (to == address(0)) {
+            revert InvalidAddress("Recipient cannot be zero address");
+        }
+        if (amount == 0) {
+            revert InvalidAmount("Withdrawal amount must be greater than 0");
+        }
+        if (amount > address(this).balance) {
+            revert InsufficientBalance(amount, address(this).balance);
+        }
 
-        to.sendValue(amount);
+        (bool success, ) = to.call{value: amount}("");
+        if (!success) {
+            revert TokenTransferFailed(address(0), to, amount);
+        }
     }
 
     /**
@@ -406,11 +585,26 @@ contract DonationPool is ReentrancyGuard, Ownable {
         address to,
         uint256 amount
     ) external onlyOwner {
-        require(token != address(0), "DonationPool: Invalid token");
-        require(to != address(0), "DonationPool: Invalid recipient");
-        require(amount <= IERC20(token).balanceOf(address(this)), "DonationPool: Insufficient balance");
+        if (token == address(0)) {
+            revert InvalidAddress("Token address cannot be zero");
+        }
+        if (to == address(0)) {
+            revert InvalidAddress("Recipient cannot be zero address");
+        }
+        if (amount == 0) {
+            revert InvalidAmount("Withdrawal amount must be greater than 0");
+        }
 
-        IERC20(token).safeTransfer(to, amount);
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        if (amount > balance) {
+            revert InsufficientBalance(amount, balance);
+        }
+
+        try IERC20(token).safeTransfer(to, amount) {
+            // 転送成功
+        } catch {
+            revert TokenTransferFailed(token, to, amount);
+        }
     }
 
     // ============ フォールバック関数 ============
@@ -419,10 +613,38 @@ contract DonationPool is ReentrancyGuard, Ownable {
      * @dev ETHの直接送金を受け取る
      */
     receive() external payable {
-        if (donationsEnabled && msg.value > 0) {
-            totalDonations[address(0)] += msg.value;
-            donorContributions[msg.sender] += msg.value;
-            emit ETHDonationReceived(msg.sender, msg.value, block.timestamp);
+        // セキュリティチェック
+        if (emergencyPaused) {
+            revert EmergencyPaused();
         }
+        if (!donationsEnabled) {
+            revert DonationsDisabled();
+        }
+        if (msg.value == 0) {
+            revert InvalidAmount("Donation amount must be greater than 0");
+        }
+        if (msg.value < minDonationAmount) {
+            revert InvalidAmount("Donation below minimum amount");
+        }
+        if (msg.value > maxDonationAmount) {
+            revert InvalidAmount("Donation exceeds maximum amount");
+        }
+
+        // 寄付者数制限チェック
+        if (!isDonor[msg.sender] && currentDonorCount >= maxDonors) {
+            revert InvalidConfiguration("Maximum number of donors reached", maxDonors);
+        }
+
+        // 寄付額を記録
+        totalDonations[address(0)] += msg.value;
+        donorContributions[msg.sender] += msg.value;
+
+        // 新しい寄付者の場合、カウントを増加
+        if (!isDonor[msg.sender]) {
+            isDonor[msg.sender] = true;
+            currentDonorCount++;
+        }
+
+        emit ETHDonationReceived(msg.sender, msg.value, block.timestamp);
     }
 }

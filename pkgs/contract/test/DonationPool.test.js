@@ -6,11 +6,12 @@ describe("DonationPool", function () {
   let owner;
   let donor1;
   let donor2;
+  let attacker;
   let mockToken;
   let targetToken;
 
   beforeEach(async function () {
-    [owner, donor1, donor2] = await ethers.getSigners();
+    [owner, donor1, donor2, attacker] = await ethers.getSigners();
 
     // モックERC20トークンをデプロイ
     const MockERC20 = await ethers.getContractFactory("MockERC20");
@@ -237,6 +238,55 @@ describe("DonationPool", function () {
     });
   });
 
+  describe("セキュリティ機能", function () {
+    it("カスタムエラーが正しく動作する", async function () {
+      // 無効なアドレス
+      await expect(
+        donationPool.setSupportedToken(ethers.ZeroAddress, true)
+      ).to.be.revertedWithCustomError(donationPool, "InvalidAddress");
+
+      // 無効な金額
+      await expect(
+        donationPool.connect(donor1).donateETH({ value: 0 })
+      ).to.be.revertedWithCustomError(donationPool, "InvalidAmount");
+    });
+
+    it("緊急停止機能が正しく動作する", async function () {
+      // 緊急停止を発動
+      await expect(donationPool.emergencyPause("Security test"))
+        .to.emit(donationPool, "EmergencyPaused");
+
+      // 停止中は寄付できない
+      await expect(
+        donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") })
+      ).to.be.revertedWithCustomError(donationPool, "EmergencyPaused");
+
+      // 停止を解除
+      await donationPool.emergencyUnpause();
+
+      // 寄付が再び可能
+      await expect(
+        donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") })
+      ).to.emit(donationPool, "ETHDonationReceived");
+    });
+
+    it("寄付者数制限が正しく動作する", async function () {
+      // 最大寄付者数を2に設定
+      await donationPool.updateSecuritySettings(2);
+
+      // 最初の寄付者
+      await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
+
+      // 2番目の寄付者
+      await donationPool.connect(donor2).donateETH({ value: ethers.parseEther("1") });
+
+      // 3番目の寄付者（制限に達している）
+      await expect(
+        donationPool.connect(attacker).donateETH({ value: ethers.parseEther("1") })
+      ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
+    });
+  });
+
   describe("緊急機能", function () {
     beforeEach(async function () {
       // コントラクトにETHとトークンを送金
@@ -264,6 +314,12 @@ describe("DonationPool", function () {
       await donationPool.emergencyWithdrawToken(mockToken.address, owner.address, withdrawAmount);
 
       expect(await mockToken.balanceOf(owner.address)).to.equal(withdrawAmount);
+    });
+
+    it("残高不足で緊急引き出しが失敗する", async function () {
+      await expect(
+        donationPool.emergencyWithdrawETH(owner.address, ethers.parseEther("10"))
+      ).to.be.revertedWithCustomError(donationPool, "InsufficientBalance");
     });
   });
 
