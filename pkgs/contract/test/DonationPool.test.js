@@ -152,6 +152,91 @@ describe("DonationPool", function () {
     });
   });
 
+  describe("残高管理機能", function () {
+    beforeEach(async function () {
+      // コントラクトにETHとトークンを送金
+      await donor1.sendTransaction({
+        to: donationPool.address,
+        value: ethers.parseEther("5")
+      });
+
+      await mockToken.mint(donationPool.address, ethers.parseEther("100"));
+    });
+
+    it("特定トークンの残高を取得できる", async function () {
+      // ETH残高の取得
+      const ethBalance = await donationPool.getBalance(ethers.ZeroAddress);
+      expect(ethBalance).to.equal(ethers.parseEther("5"));
+
+      // ERC20トークン残高の取得
+      const tokenBalance = await donationPool.getBalance(mockToken.address);
+      expect(tokenBalance).to.equal(ethers.parseEther("100"));
+    });
+
+    it("存在しないトークンの残高は0を返す", async function () {
+      const nonExistentToken = ethers.Wallet.createRandom().address;
+      const balance = await donationPool.getBalance(nonExistentToken);
+      expect(balance).to.equal(0);
+    });
+
+    it("全サポートトークンの残高を一括取得できる", async function () {
+      const [tokens, balances] = await donationPool.getAllBalances();
+
+      expect(tokens.length).to.equal(1);
+      expect(tokens[0]).to.equal(ethers.ZeroAddress);
+      expect(balances[0]).to.equal(ethers.parseEther("5"));
+    });
+
+    it("指定されたトークンリストの残高を取得できる", async function () {
+      const tokenList = [ethers.ZeroAddress, mockToken.address];
+      const balances = await donationPool.getBalances(tokenList);
+
+      expect(balances.length).to.equal(2);
+      expect(balances[0]).to.equal(ethers.parseEther("5")); // ETH
+      expect(balances[1]).to.equal(ethers.parseEther("100")); // MockToken
+    });
+
+    it("詳細な残高情報を取得できる", async function () {
+      const [tokenAddresses, tokenBalances, tokenNames, tokenSymbols] =
+        await donationPool.getDetailedBalances();
+
+      expect(tokenAddresses.length).to.equal(1);
+      expect(tokenAddresses[0]).to.equal(ethers.ZeroAddress);
+      expect(tokenBalances[0]).to.equal(ethers.parseEther("5"));
+      expect(tokenNames[0]).to.equal("Ethereum");
+      expect(tokenSymbols[0]).to.equal("ETH");
+    });
+
+    it("残高の合計値を取得できる", async function () {
+      const totalBalance = await donationPool.getTotalBalance();
+      expect(totalBalance).to.equal(ethers.parseEther("5"));
+    });
+
+    it("特定トークンの寄付統計を取得できる", async function () {
+      // ETHの統計
+      const ethStats = await donationPool.getTokenStats(ethers.ZeroAddress);
+      expect(ethStats.totalDonated).to.equal(0); // まだ寄付されていない
+      expect(ethStats.currentBalance).to.equal(ethers.parseEther("5"));
+      expect(ethStats.isSupported).to.be.true;
+
+      // MockTokenの統計
+      const tokenStats = await donationPool.getTokenStats(mockToken.address);
+      expect(tokenStats.totalDonated).to.equal(0);
+      expect(tokenStats.currentBalance).to.equal(ethers.parseEther("100"));
+      expect(tokenStats.isSupported).to.be.false; // まだサポートされていない
+    });
+
+    it("寄付後の統計が正しく更新される", async function () {
+      // 寄付を実行
+      await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
+
+      // 統計を確認
+      const ethStats = await donationPool.getTokenStats(ethers.ZeroAddress);
+      expect(ethStats.totalDonated).to.equal(ethers.parseEther("1"));
+      expect(ethStats.currentBalance).to.equal(ethers.parseEther("6")); // 5 + 1
+    });
+  });
+
   describe("緊急機能", function () {
     beforeEach(async function () {
       // コントラクトにETHとトークンを送金

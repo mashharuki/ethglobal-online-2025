@@ -213,7 +213,128 @@ contract DonationPool is ReentrancyGuard, Ownable {
         projectDescription = _description;
     }
 
-    // ============ ビュー関数 ============
+    // ============ 残高管理機能 ============
+
+    /**
+     * @dev 特定トークンの残高を取得
+     * @param token トークンアドレス（address(0)はETH）
+     * @return balance 残高
+     */
+    function getBalance(address token) external view returns (uint256 balance) {
+        if (token == address(0)) {
+            return address(this).balance;
+        }
+
+        try IERC20(token).balanceOf(address(this)) returns (uint256 tokenBalance) {
+            return tokenBalance;
+        } catch {
+            return 0;
+        }
+    }
+
+    /**
+     * @dev 全サポートトークンの残高を一括取得
+     * @return tokens トークンアドレス配列
+     * @return balances 対応する残高配列
+     */
+    function getAllBalances() external view returns (address[] memory tokens, uint256[] memory balances) {
+        // サポートされているトークンのリストを作成
+        address[] memory supportedTokensList = new address[](1);
+        supportedTokensList[0] = address(0); // ETH
+
+        // 各トークンの残高を取得
+        uint256[] memory balanceList = new uint256[](1);
+        balanceList[0] = address(this).balance;
+
+        return (supportedTokensList, balanceList);
+    }
+
+    /**
+     * @dev 指定されたトークンリストの残高を取得
+     * @param tokenList 取得したいトークンアドレスの配列
+     * @return balances 対応する残高配列
+     */
+    function getBalances(address[] calldata tokenList) external view returns (uint256[] memory balances) {
+        uint256 length = tokenList.length;
+        balances = new uint256[](length);
+
+        for (uint256 i = 0; i < length; i++) {
+            if (tokenList[i] == address(0)) {
+                balances[i] = address(this).balance;
+            } else {
+                try IERC20(tokenList[i]).balanceOf(address(this)) returns (uint256 balance) {
+                    balances[i] = balance;
+                } catch {
+                    balances[i] = 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * @dev サポートされているトークンの詳細情報を取得
+     * @return tokenAddresses トークンアドレス配列
+     * @return tokenBalances 残高配列
+     * @return tokenNames トークン名配列（可能な場合）
+     * @return tokenSymbols トークンシンボル配列（可能な場合）
+     */
+    function getDetailedBalances() external view returns (
+        address[] memory tokenAddresses,
+        uint256[] memory tokenBalances,
+        string[] memory tokenNames,
+        string[] memory tokenSymbols
+    ) {
+        // ETHを含むサポートトークンのリスト
+        address[] memory tokens = new address[](1);
+        tokens[0] = address(0);
+
+        uint256[] memory balances = new uint256[](1);
+        balances[0] = address(this).balance;
+
+        string[] memory names = new string[](1);
+        names[0] = "Ethereum";
+
+        string[] memory symbols = new string[](1);
+        symbols[0] = "ETH";
+
+        return (tokens, balances, names, symbols);
+    }
+
+    /**
+     * @dev 残高の合計値を取得（ETHベース）
+     * @return totalBalance 全残高の合計（wei単位）
+     */
+    function getTotalBalance() external view returns (uint256 totalBalance) {
+        return address(this).balance;
+    }
+
+    /**
+     * @dev 特定トークンの寄付統計を取得
+     * @param token トークンアドレス
+     * @return totalDonated 総寄付額
+     * @return currentBalance 現在の残高
+     * @return isSupported サポートされているかどうか
+     */
+    function getTokenStats(address token) external view returns (
+        uint256 totalDonated,
+        uint256 currentBalance,
+        bool isSupported
+    ) {
+        totalDonated = totalDonations[token];
+        isSupported = supportedTokens[token];
+
+        if (token == address(0)) {
+            currentBalance = address(this).balance;
+        } else {
+            try IERC20(token).balanceOf(address(this)) returns (uint256 balance) {
+                currentBalance = balance;
+            } catch {
+                currentBalance = 0;
+            }
+        }
+    }
+
+    // ============ 従来のビュー関数 ============
 
     /**
      * @dev コントラクトのETH残高を取得
