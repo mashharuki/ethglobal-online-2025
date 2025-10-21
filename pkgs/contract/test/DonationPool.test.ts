@@ -192,12 +192,14 @@ describe("DonationPool", async function () {
    });
 
 
-   assert.equal(events.length, 1, "Should emit exactly one DonatedETH event");
-   assert.equal((events[0].args as any).donor, donor1.account.address);
-   assert.equal((events[0].args as any).amount, ethAmount);
- });
+  assert.equal(events.length, 1, "Should emit exactly one DonatedETH event");
+  assert.equal(
+    (events[0].args as any).donor.toLowerCase(),
+    donor1.account.address.toLowerCase()
+  );
+  assert.equal((events[0].args as any).amount, ethAmount);
 });
-
+});
 
 
 
