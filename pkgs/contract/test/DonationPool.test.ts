@@ -158,10 +158,12 @@ describe("DonationPool", async function () {
    const token = await viem.deployContract("ExampleToken");
 
 
+   // include ETH (address(0)) in supported tokens so receive() emits DonatedETH
+   const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as `0x${string}`;
    const donationPool = await viem.deployContract("DonationPool", [
      owner.account.address,
      token.address,
-     [token.address],
+     [token.address, ZERO_ADDRESS],
    ]);
 
 
@@ -195,7 +197,6 @@ describe("DonationPool", async function () {
    assert.equal((events[0].args as any).amount, ethAmount);
  });
 });
-
 
 
 
