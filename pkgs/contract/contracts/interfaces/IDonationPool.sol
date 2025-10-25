@@ -24,4 +24,15 @@ interface IDonationPool {
   /// @notice プール内残高の参照
   /// @param token トークンアドレス（ETH の場合は address(0)）
   function balanceOf(address token) external view returns (uint256);
+
+  /// @notice 指定トークンの残高を取得（エイリアス）
+  /// @dev view 関数でガス消費なし
+  function getBalance(address token) external view returns (uint256);
+
+  /// @notice 追跡中の全トークン残高を一括取得
+  /// @dev view 関数でガス消費なし。返却配列は同一インデックスが対応（tokens[i] -> balances[i]）
+  function getAllBalances()
+    external
+    view
+    returns (address[] memory tokens, uint256[] memory balances);
 }
