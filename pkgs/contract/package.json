@@ -13,7 +13,12 @@
     "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
     "get-balance": "pnpm hardhat run scripts/get-balance.ts",
     "increment-counter": "pnpm hardhat run scripts/inc.ts",
-    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts"
+    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
+    "demo:deploy": "pnpm hardhat run scripts/demo/deploy-demo.ts",
+    "demo:donate-pyusd": "pnpm hardhat run scripts/demo/donate-pyusd.ts",
+    "demo:initiate": "pnpm hardhat run scripts/demo/initiate-conversion-pyusd.ts",
+    "demo:withdraw-usdc": "pnpm hardhat run scripts/demo/withdraw-usdc.ts",
+    "demo:nexus-listener": "pnpm hardhat run scripts/nexus-listener.ts"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0"
