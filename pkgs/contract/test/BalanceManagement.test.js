@@ -278,3 +278,4 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 });
+
