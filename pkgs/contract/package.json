@@ -1,20 +1,36 @@
 {
-  "name": "crossdonate-contracts",
+  "name": "contract",
   "version": "1.0.0",
-  "description": "CrossDonate Smart Contracts - ETH Global Online 2025",
   "private": true,
-  "main": "index.js",
+  "type": "module",
+  "description": "Hardhat v3 contracts package for ETHGlobal Online 2025",
   "scripts": {
-    "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.ts",
-    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
-    "deploy:arbitrum": "hardhat run scripts/deploy.ts --network arbitrumSepolia",
-    "clean": "hardhat clean",
-    "coverage": "hardhat coverage"
+    "build": "pnpm hardhat build",
+    "clean": "pnpm hardhat clean",
+    "test": "pnpm hardhat test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
+    "get-balance": "pnpm hardhat run scripts/get-balance.ts",
+    "increment-counter": "pnpm hardhat run scripts/inc.ts",
+    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
+    "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
+    "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"
   },
-  "keywords": ["ethereum", "donation", "cross-chain", "avail", "nexus"],
-  "author": "CrossDonate Team",
-  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^3.0.3",
+    "@nomicfoundation/hardhat-viem": "^3.0.0",
+    "@types/node": "^22.8.5",
+    "hardhat": "^3.0.7",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.2.0",
+    "typescript": "~5.8.0",
+    "viem": "^2.30.0"
+  },
   "packageManager": "pnpm@10.13.1"
 }
