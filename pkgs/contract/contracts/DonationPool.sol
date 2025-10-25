@@ -43,6 +43,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     error ETHSendFailed();
     error InvalidMsgValue();
     error InsufficientEthBalance();
+    error NotSupported();
 
     /// @param initialOwner オーナー
     /// @param targetToken_ 変換先トークンアドレス
@@ -60,54 +61,6 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
             supportedTokens[token] = true;
             _trackToken(token);
         }
-    }
-
-    // -------- Owner ops --------
-
-/// @title DonationPool (v1)
-/// @notice ETH / ERC20 寄付の受け取りと残高管理、基本状態の保持
-contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
-  using SafeERC20 for IERC20;
-
-  /// @notice 変換先トークン（将来のコンバージョン機能向け）
-  address public targetToken;
-
-  /// @notice サポートするトークンの許可リスト（ETH は address(0)）
-  mapping(address => bool) public supportedTokens;
-
-  /// @dev token => total balance in pool
-  mapping(address => uint256) private _balances;
-
-  /// @dev 追跡中のトークン（getAllBalances 用）
-  address[] private _trackedTokens;
-  mapping(address => bool) private _isTracked;
-
-  /// @dev 変換関連
-  address public conversionSink; // Avail Nexus SDK を実行するエージェント/ブリッジ先
-  uint256 private _conversionNonce;
-
-  /// @dev errors
-  error ZeroAddress();
-  error ZeroAmount();
-  error UnsupportedToken();
-  error InsufficientBalance();
-  error ZeroRecipient();
-  error SinkNotSet();
-  error ETHSendFailed();
-  error InvalidMsgValue();
-  error InsufficientEthBalance();
-  error NotSupported();
-
-  /// @param initialOwner オーナー
-  /// @param targetToken_ 変換先トークンアドレス
-  /// @param initialSupported 初期サポートトークン配列（ETH を許可する場合は address(0) を含める）
-  constructor(address initialOwner, address targetToken_, address[] memory initialSupported) Ownable(initialOwner) {
-    targetToken = targetToken_;
-    // 初期サポートトークン設定
-    for (uint256 i = 0; i < initialSupported.length; i++) {
-      address token = initialSupported[i];
-      supportedTokens[token] = true;
-      _trackToken(token);
     }
 
     /// @notice targetToken の更新
@@ -205,6 +158,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
       _trackToken(address(0));
       emit DonatedETH(msg.sender, msg.value);
     }
+  }
 
     // -------- Withdraw (owner) --------
 
@@ -261,7 +215,6 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
             _trackedTokens.push(token);
         }
     }
-  }
 
   /**
    * @Todo: ブリッジされてきたUSDCをPYUSDに変換する機能
