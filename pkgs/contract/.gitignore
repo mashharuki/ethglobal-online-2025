@@ -1,0 +1,18 @@
+# Hardhat artifacts and caches
+artifacts/
+cache/
+coverage/
+typechain-types/
+
+# Ignition deployments
+ignition/deployments/
+
+# Node
+node_modules/
+dist/
+
+# Env/config
+.env
+.env.local
+.env.*.local
+
