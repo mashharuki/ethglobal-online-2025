@@ -22,10 +22,21 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
   /// @dev token => total balance in pool
   mapping(address => uint256) private _balances;
 
+  /// @dev 追跡中のトークン（getAllBalances 用）
+  address[] private _trackedTokens;
+  mapping(address => bool) private _isTracked;
+
+  /// @dev 変換関連
+  address public conversionSink; // Avail Nexus SDK を実行するエージェント/ブリッジ先
+  uint256 private _conversionNonce;
+
   /// @dev errors
   error ZeroAddress();
   error ZeroAmount();
   error UnsupportedToken();
+  error InsufficientBalance();
+  error ZeroRecipient();
+  error SinkNotSet();
 
   /// @param initialOwner オーナー
   /// @param targetToken_ 変換先トークンアドレス
@@ -34,13 +45,18 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     targetToken = targetToken_;
     // 初期サポートトークン設定
     for (uint256 i = 0; i < initialSupported.length; i++) {
-      supportedTokens[initialSupported[i]] = true;
+      address token = initialSupported[i];
+      supportedTokens[token] = true;
+      _trackToken(token);
     }
   }
 
   /// @notice サポートトークンの設定
   function setSupportedToken(address token, bool supported) external onlyOwner {
     supportedTokens[token] = supported;
+    if (supported) {
+      _trackToken(token);
+    }
   }
 
   /// @notice targetToken の更新
@@ -49,35 +65,122 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
   }
 
   /// @inheritdoc IDonationPool
-  function donate(address token, uint256 amount) external nonReentrant {
+  function donate(address token, uint256 amount) external override nonReentrant {
     if (token == address(0)) revert ZeroAddress();
     if (amount == 0) revert ZeroAmount();
     if (!supportedTokens[token]) revert UnsupportedToken();
 
     IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
     _balances[token] += amount;
+    _trackToken(token);
     emit Donated(msg.sender, token, amount);
   }
 
   /// @inheritdoc IDonationPool
-  function donateETH() external payable nonReentrant {
+  function donateETH() external override payable nonReentrant {
     if (msg.value == 0) revert ZeroAmount();
     if (!supportedTokens[address(0)]) revert UnsupportedToken();
 
     _balances[address(0)] += msg.value;
+    _trackToken(address(0));
     emit DonatedETH(msg.sender, msg.value);
   }
 
   /// @inheritdoc IDonationPool
-  function balanceOf(address token) external view returns (uint256) {
+  function balanceOf(address token) external view override returns (uint256) {
     return _balances[token];
+  }
+
+  /// @inheritdoc IDonationPool
+  function getBalance(address token) external view override returns (uint256) {
+    return _balances[token];
+  }
+
+  /// @inheritdoc IDonationPool
+  function getAllBalances()
+    external
+    view
+    returns (address[] memory tokens, uint256[] memory balances)
+  {
+    uint256 len = _trackedTokens.length;
+    tokens = new address[](len);
+    balances = new uint256[](len);
+    for (uint256 i = 0; i < len; i++) {
+      address t = _trackedTokens[i];
+      tokens[i] = t;
+      balances[i] = _balances[t];
+    }
+  }
+
+  /// @notice 変換の出力先シンクを設定
+  function setConversionSink(address sink) external override onlyOwner {
+    if (sink == address(0)) revert ZeroAddress();
+    conversionSink = sink;
+  }
+
+  /// @inheritdoc IDonationPool
+  function initiateConversion(
+    address token,
+    uint256 amount,
+    string calldata targetChain,
+    bytes calldata targetRecipient,
+    bytes calldata metadata
+  ) external override onlyOwner nonReentrant returns (bytes32 conversionId) {
+    if (token == address(0)) revert ZeroAddress();
+    if (amount == 0) revert ZeroAmount();
+    if (!supportedTokens[token]) revert UnsupportedToken();
+    if (_balances[token] < amount) revert InsufficientBalance();
+    if (conversionSink == address(0)) revert SinkNotSet();
+
+    // 減算してから外部転送（Checks-Effects-Interactions + nonReentrant）
+    _balances[token] -= amount;
+
+    // ブリッジエージェント/シンクへ転送（Nexus SDK がこの転送を基にクロスチェーン処理を実行）
+    IERC20(token).safeTransfer(conversionSink, amount);
+
+    // 一意な変換IDを生成（オフチェーンで参照）
+    unchecked {
+      _conversionNonce++;
+    }
+    conversionId = keccak256(
+      abi.encode(block.chainid, address(this), token, amount, targetChain, targetRecipient, _conversionNonce)
+    );
+
+    emit ConversionInitiated(conversionId, token, amount, targetChain, targetRecipient, conversionSink, metadata);
+  }
+
+  /// @inheritdoc IDonationPool
+  function withdrawFunds(address token, uint256 amount, address payable to) external override onlyOwner nonReentrant {
+    if (to == address(0)) revert ZeroRecipient();
+    if (amount == 0) revert ZeroAmount();
+    if (_balances[token] < amount) revert InsufficientBalance();
+
+    _balances[token] -= amount;
+
+    if (token == address(0)) {
+      (bool ok, ) = to.call{ value: amount }("");
+      require(ok, "ETH_SEND_FAILED");
+    } else {
+      IERC20(token).safeTransfer(to, amount);
+    }
+
+    emit FundsWithdrawn(token, amount, to);
   }
 
   /// @dev 受動的に ETH を受領した場合も寄付扱いにする
   receive() external payable {
     if (msg.value > 0 && supportedTokens[address(0)]) {
       _balances[address(0)] += msg.value;
+      _trackToken(address(0));
       emit DonatedETH(msg.sender, msg.value);
+    }
+  }
+
+  /// @dev トークンを追跡対象に追加（重複排除）
+  function _trackToken(address token) internal {
+    if (!_isTracked[token]) {
+      _isTracked[token] = true;
+      _trackedTokens.push(token);
     }
   }
 }
