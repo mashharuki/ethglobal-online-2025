@@ -40,6 +40,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
   error ETHSendFailed();
   error InvalidMsgValue();
   error InsufficientEthBalance();
+  error NotSupported();
 
   /// @param initialOwner オーナー
   /// @param targetToken_ 変換先トークンアドレス
@@ -178,6 +179,30 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     }
 
     emit FundsWithdrawn(token, amount, to);
+  }
+
+  /// @inheritdoc IDonationPool
+  function swapUsdcToPyusd(address usdc, address pyusd, uint256 amount, address to)
+    external
+    override
+    onlyOwner
+    nonReentrant
+  {
+    if (to == address(0)) revert ZeroRecipient();
+    if (amount == 0) revert ZeroAmount();
+    if (!supportedTokens[usdc] || !supportedTokens[pyusd]) revert NotSupported();
+
+    // プール内の内部残高を確認（1:1スワップ）
+    if (_balances[usdc] < amount) revert InsufficientBalance();
+    if (_balances[pyusd] < amount) revert InsufficientBalance();
+
+    // CEI: 内部残高を先に更新し、その後送金
+    _balances[usdc] -= amount; // 受領USDCを消費
+    _balances[pyusd] -= amount; // プールのPYUSD流動性を消費
+
+    IERC20(pyusd).safeTransfer(to, amount);
+
+    emit Swapped(usdc, pyusd, to, amount);
   }
 
   /// @dev 受動的に ETH を受領した場合も寄付扱いにする
