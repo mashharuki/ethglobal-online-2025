@@ -1,15 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/atoms/Button";
-import { Copy, Check, QrCode } from "lucide-react";
-import QRCode from "qrcode";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/atoms/Button';
+import { Copy, Check, QrCode } from 'lucide-react';
+import QRCode from 'qrcode';
+import Image from 'next/image';
 
-export function DonatePageClient({
-  unifiedAddress,
-}: { unifiedAddress: string }) {
+export function DonatePageClient({ unifiedAddress }: { unifiedAddress: string }) {
   const [copied, setCopied] = useState(false);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   const handleCopy = () => {
     navigator.clipboard.writeText(unifiedAddress);
@@ -24,13 +23,13 @@ export function DonatePageClient({
           width: 200,
           margin: 2,
           color: {
-            dark: "#000000",
-            light: "#FFFFFF",
+            dark: '#000000',
+            light: '#FFFFFF',
           },
         });
         setQrCodeDataUrl(qrCodeUrl);
       } catch (error) {
-        console.error("QRコード生成エラー:", error);
+        console.error('QRコード生成エラー:', error);
       }
     };
 
@@ -63,10 +62,12 @@ export function DonatePageClient({
         <div className="text-center space-y-4">
           <div className="w-56 h-56 mx-auto bg-white rounded-2xl flex items-center justify-center border-4 border-primary/20 shadow-xl relative overflow-hidden">
             {qrCodeDataUrl ? (
-              <img
+              <Image
                 src={qrCodeDataUrl}
                 alt="寄付アドレスQRコード"
-                className="w-48 h-48 object-contain"
+                width={192}
+                height={192}
+                className="object-contain"
               />
             ) : (
               <>
@@ -76,12 +77,8 @@ export function DonatePageClient({
             )}
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">
-              QRコードで簡単送金
-            </p>
-            <p className="text-xs text-muted-foreground">
-              モバイルウォレットでスキャンして送金
-            </p>
+            <p className="text-sm font-semibold text-foreground">QRコードで簡単送金</p>
+            <p className="text-xs text-muted-foreground">モバイルウォレットでスキャンして送金</p>
           </div>
         </div>
       </div>

@@ -1,18 +1,28 @@
 {
-  "name": "contract",
+  "name": "crossdonate-contracts",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Hardhat v3 contracts package for ETHGlobal Online 2025",
+  "description": "CrossDonate Smart Contracts (Hardhat v3) - ETHGlobal Online 2025",
+  "keywords": ["ethereum", "donation", "cross-chain", "avail", "nexus"],
+  "author": "CrossDonate Team",
+  "license": "MIT",
   "scripts": {
-    "build": "pnpm hardhat build",
+    "build": "pnpm hardhat compile",
+    "compile": "pnpm hardhat compile",
     "clean": "pnpm hardhat clean",
     "test": "pnpm hardhat test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+
+    "deploy": "pnpm hardhat run scripts/deploy.js",
+    "deploy:sepolia": "pnpm hardhat run scripts/deploy.js --network sepolia",
+    "deploy:arbitrum": "pnpm hardhat run scripts/deploy.js --network arbitrumSepolia",
+
     "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
     "get-balance": "pnpm hardhat run scripts/get-balance.ts",
     "increment-counter": "pnpm hardhat run scripts/inc.ts",
+
     "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
     "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
     "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"
