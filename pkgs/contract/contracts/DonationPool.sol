@@ -196,4 +196,10 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
       _trackedTokens.push(token);
     }
   }
+
+  /**
+   * @Todo: ブリッジされてきたUSDCをPYUSDに変換する機能
+   * ブリッジは Nexus SDK を利用して行う想定
+   * Nexus SDK側で Bridge AND Exchangeをメソッドを呼び出して ブリッジとswapを同時に行う
+   */
 }
