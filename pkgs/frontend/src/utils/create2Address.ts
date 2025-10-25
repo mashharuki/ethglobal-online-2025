@@ -101,4 +101,3 @@ export function verifyMultiChainConsistency(addresses: Record<string, string>): 
   const firstAddress = addressValues[0];
   return addressValues.every((address) => address === firstAddress);
 }
-
