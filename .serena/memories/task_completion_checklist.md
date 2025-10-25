@@ -1,133 +1,181 @@
-# タスク完了時の実行項目
+# タスク完了時の実行項目 (2025年10月最新版)
 
-## コード品質チェックリスト
-### 1. リンティング・フォーマット
+## 必須実行チェックリスト
+
+### 1. コード品質管理
 ```bash
-# モノレポルートで実行
-pnpm biome:check               # 全体のリント + フォーマット
-pnpm biome:format              # 全体のフォーマット
+# モノレポ全体の品質チェック
+pnpm biome:check               # Biome統合リント+フォーマット
+pnpm biome:format              # 必要に応じてフォーマット修正
 
-# または個別パッケージで実行
-pnpm frontend check            # フロントエンドのみ
-pnpm contract format           # コントラクトのみ (Prettier)
+# パッケージ別品質チェック
+pnpm frontend check            # フロントエンド (Biome)
+pnpm frontend typecheck        # TypeScript型チェック
+pnpm contract format           # コントラクト (Prettier + Solidity)
 ```
 
-### 2. TypeScriptタイプチェック
+### 2. ビルド・コンパイルテスト
 ```bash
-# フロントエンド
+# プロダクションビルド確認
+pnpm frontend build            # Next.js 15ビルド
+pnpm contract build            # Solidityコンパイル
+
+# 型安全性確認
 cd pkgs/frontend && pnpm typecheck
-
-# コントラクト (ビルド時に自動実行)
-cd pkgs/contract && pnpm build
+cd pkgs/contract && tsc --noEmit
 ```
 
-## テスト実行
-### 3. 単体テスト
+### 3. テスト実行
 ```bash
-# コントラクトテスト
+# コントラクトテスト (Hardhat V3 + Node.js test runner)
 cd pkgs/contract && pnpm test
 
-# フロントエンド (将来的にテスト追加時)
-cd pkgs/frontend && pnpm test
+# フロントエンドテスト (将来的)
+# cd pkgs/frontend && pnpm test
+
+# E2Eテスト (将来的)
+# pnpm test:e2e
 ```
 
-### 4. ビルドテスト
-```bash
-# フロントエンドビルド
-cd pkgs/frontend && pnpm build
+## セキュリティ・品質チェック
 
-# コントラクトコンパイル
-cd pkgs/contract && pnpm build
-```
-
-## セキュリティチェック
-### 5. 依存関係監査
+### 4. 依存関係セキュリティ監査
 ```bash
 # セキュリティ脆弱性チェック
-pnpm audit
+pnpm audit                     # 全パッケージ監査
+pnpm audit --fix               # 修正可能な脆弱性自動修正
 
-# 修正可能な脆弱性の自動修正
-pnpm audit --fix
+# 依存関係更新確認
+pnpm outdated                  # 古い依存関係確認
 ```
 
-### 6. コントラクトセキュリティ
-- **ReentrancyGuard**: リエントランシー攻撃対策確認
-- **Access Control**: Ownable権限管理確認
-- **Input Validation**: 入力値検証確認
-- **Custom Errors**: エラーハンドリング確認
+### 5. コントラクトセキュリティ確認
+- **ReentrancyGuard**: 全payable関数に適用確認
+- **Access Control**: Ownable/役割ベース権限管理確認
+- **Input Validation**: ゼロアドレス・ゼロ値チェック確認
+- **Custom Errors**: revert stringではなくcustom error使用確認
+- **OpenZeppelin**: 最新版(5.0.0)使用確認
 
-## デプロイ前チェック
-### 7. 環境変数確認
+### 6. フロントエンドセキュリティ
+- **環境変数**: 機密情報のハードコード禁止確認
+- **XSS対策**: ユーザー入力の適切なサニタイズ
+- **CSRF対策**: Next.js built-in対策活用
+- **ウォレット接続**: RainbowKit標準セキュリティ適用
+
+## 環境・設定確認
+
+### 7. 環境変数・設定
 ```bash
-# 必須環境変数の設定確認
-echo $SEPOLIA_RPC_URL
-echo $ARBITRUM_SEPOLIA_RPC_URL
-echo $PRIVATE_KEY
+# 必須環境変数の存在確認
+echo $SEPOLIA_RPC_URL          # Sepoliaテストネット
+echo $ARBITRUM_SEPOLIA_RPC_URL # Arbitrumテストネット
+echo $PRIVATE_KEY              # デプロイ用秘密鍵 (testnet only)
+
+# 設定ファイル確認
+cat hardhat.config.ts | grep -E "sepolia|arbitrum"
+cat next.config.js | grep -E "env|public"
 ```
 
 ### 8. ネットワーク接続テスト
 ```bash
 # テストネット接続確認
-cd pkgs/contract && pnpm get-balance
+cd pkgs/contract && pnpm get-balance --network sepolia
+cd pkgs/contract && pnpm get-balance --network arbitrumSepolia
+
+# RPCエンドポイント確認
+curl -X POST $SEPOLIA_RPC_URL -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
 ```
 
-## Git運用
-### 9. コミット前チェック
+## Git・バージョン管理
+
+### 9. コミット前確認
 ```bash
 # 変更ファイル確認
-git status
+git status                     # 追跡対象・未追跡ファイル確認
+git diff                       # 変更差分確認
+git diff --staged              # ステージング済み差分
 
-# 差分確認
-git diff
-
-# コンベンショナルコミット形式でコミット
-git commit -m "feat: add new donation feature"
-git commit -m "fix: resolve wallet connection issue"
-git commit -m "docs: update README with setup instructions"
-git commit -m "test: add DonationPool contract tests"
-git commit -m "refactor: improve error handling"
-git commit -m "chore: update dependencies"
+# コンベンショナルコミット (ETHGlobal審査員向け英語)
+git commit -m "feat: integrate Avail Nexus SDK for cross-chain donations"
+git commit -m "feat: add PYUSD support with PayPal integration"
+git commit -m "feat: implement Hardhat V3 deployment with Ignition"
+git commit -m "fix: resolve wallet connection timeout in RainbowKit"
+git commit -m "test: add comprehensive DonationPool security tests"
+git commit -m "docs: update README with Nexus SDK setup guide"
+git commit -m "refactor: improve error handling across donation flow"
+git commit -m "chore: upgrade to Next.js 15 and React 19"
 ```
 
 ### 10. プッシュ前最終確認
 ```bash
-# ブランチ確認
-git branch
+# ブランチ・リモート確認
+git branch -v                  # ローカルブランチ一覧
+git remote -v                  # リモートリポジトリ確認
+git log --oneline -5           # 最新5コミット確認
 
-# リモート同期確認
-git remote -v
-
-# プッシュ
+# プッシュ実行
 git push origin <feature-branch>
 ```
 
-## ドキュメント更新
-### 11. 必要に応じて更新
-- **README.md**: 新機能の使用方法
-- **コントラクト**: NatSpecコメント
-- **型定義**: JSDocコメント
-- **変更ログ**: 重要な変更の記録
+## ドキュメント・メタデータ
 
-## ETHGlobal提出準備
-### 12. ハッカソン要件確認
-- **Avail**: Nexus SDK使用確認
-- **PayPal**: PYUSD統合確認
-- **Hardhat**: Hardhat V3使用確認
-- **デモ動画**: 機能動作確認
-- **プレゼン資料**: 技術説明準備
+### 11. ドキュメント更新
+- **README.md**: セットアップ手順、Nexus SDK使用方法
+- **コントラクトNatSpec**: すべてのpublic/external関数
+- **型定義JSDoc**: 複雑な型・インターフェース
+- **CHANGELOG.md**: 重要な変更・リリース情報 (将来的)
 
-## パフォーマンスチェック
-### 13. 最適化確認 (本番環境向け)
+### 12. パッケージメタデータ確認
 ```bash
-# フロントエンドバンドルサイズ確認
-cd pkgs/frontend && pnpm build && ls -la .next/
+# package.json メタデータ確認
+jq '.name, .version, .description' package.json
+jq '.dependencies | keys[]' pkgs/frontend/package.json
+jq '.devDependencies | keys[]' pkgs/contract/package.json
 
-# コントラクトガス効率確認
-cd pkgs/contract && pnpm test --gas-reporter
+# ライセンス・作者情報確認
+jq '.author, .license' package.json
 ```
 
-## 自動化されたチェック
-### 14. CI/CDパイプライン (将来的)
-- **GitHub Actions**: 自動テスト・ビルド
-- **Dependabot**: 依存関係自動更新
-- **CodeQL**: セキュリティ解析
+## ETHGlobal固有要件
+
+### 13. ハッカソン要件確認
+- **Avail Prize**: Nexus SDK (`@avail-project/nexus-core`, `nexus-widgets`) 使用確認
+- **PayPal Prize**: PYUSD統合機能動作確認
+- **Hardhat Prize**: Hardhat V3 (3.0.7) + Viem統合確認
+- **デモ準備**: フルフローの動作確認
+- **プレゼン**: 技術アーキテクチャ説明準備
+
+### 14. 提出用最終チェック
+```bash
+# 総合品質確認
+pnpm biome:check && pnpm frontend build && pnpm contract test
+
+# プロジェクトサイズ・構成確認
+du -sh .                       # プロジェクト総サイズ
+find . -name "*.ts" -o -name "*.tsx" -o -name "*.sol" | wc -l  # ソースファイル数
+git log --oneline --since="2025-10-10" | wc -l  # ハッカソン期間中のコミット数
+
+# リポジトリ状態確認
+git remote get-url origin      # GitHub URL確認
+git branch --show-current      # 現在ブランチ
+git status --porcelain         # 未コミット変更確認
+```
+
+## パフォーマンス最適化 (オプション)
+
+### 15. 本番向け最適化確認
+```bash
+# フロントエンドバンドル分析
+cd pkgs/frontend && pnpm build
+ls -la .next/static/           # 静的アセットサイズ確認
+
+# コントラクトガス効率
+cd pkgs/contract && pnpm test --gas-reporter  # ガス使用量レポート
+```
+
+### 16. 自動化・CI/CD (将来的準備)
+- **GitHub Actions**: 自動テスト・ビルドワークフロー
+- **Dependabot**: 依存関係自動更新設定
+- **CodeQL**: セキュリティ脆弱性自動検出
+- **Vercel**: フロントエンド自動デプロイ設定
