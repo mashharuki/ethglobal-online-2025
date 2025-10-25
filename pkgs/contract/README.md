@@ -1,53 +1,53 @@
-# Contracts (Hardhat v3)
+# CrossDonate Smart Contracts
 
-Hardhat v3 setup for ETHGlobal Online 2025.
+CrossDonate プロジェクトのスマートコントラクト実装です。  
+CREATE2 と Avail Nexus SDK を用いて **マルチチェーンで統一アドレス**を実現し、複数チェーン・複数トークンからの寄付を安全に受け付け、統一的に管理します。
 
-## Requirements
+- Solidity: `^0.8.28`（最適化有効のプロファイル）
+- 対応ネットワーク（例）: `sepolia`, `arbitrumSepolia`
 
-- Node 22+
+---
+
+## 概要
+
+CrossDonate は、寄付の受付から残高・統計の確認、緊急時の資金退避までをカバーします。  
+CREATE2 により **チェーンを跨いでも同一のデプロイアドレス**を維持できます。
+
+---
+
+## 機能
+
+### DonationPool
+- **ETH 寄付**: 直接 ETH の寄付を受け取る
+- **ERC20 寄付**: サポート済み ERC20 トークンの寄付を受け取る
+- **寄付管理**: 寄付額の制限 / 有効・無効切り替え
+- **残高管理**: 包括的な残高確認と統計機能
+- **セキュリティ**: OpenZeppelin ライブラリによる堅牢実装
+- **緊急機能**: 緊急時の資金引き出し機能（ETH / ERC20）
+
+### CREATE2Factory
+- **統一アドレス**: CREATE2 を用いたマルチチェーン同一アドレス
+- **事前計算**: デプロイ前にアドレスを算出
+- **プール管理**: デプロイ済みプールの管理・追跡
+- **マルチチェーン対応**: 複数チェーンで一貫したアドレス生成
+
+---
+
+## 要件 / Requirements
+
+- Node.js 22+
 - PNPM 10+
-- Set environment variables:
+- 環境変数（`.env` か CI 上のシークレットに設定）
   - `SEPOLIA_RPC_URL`
   - `ARBITRUM_SEPOLIA_RPC_URL`
-  - `PRIVATE_KEY` (deploy/test account)
+  - `PRIVATE_KEY`（デプロイ/テストに用いるアカウント）
 
-## Install
+> 参考: ルートにある `.env.example` を元に `pkgs/contract/.env` を作成してください。
 
-Run from the monorepo root:
+---
 
+## インストール
+
+**モノレポのルート**で実行:
 ```sh
 pnpm install
-```
-
-Or only this package:
-
-```sh
-pnpm --filter contract install
-```
-
-## Common commands
-
-From this folder (`pkgs/contract`):
-
-```sh
-pnpm build             # compile contracts
-pnpm test              # run tests (node:test + viem)
-pnpm deploy:Counter    # deploy Counter via Ignition (local or with --network)
-pnpm get-balance       # example script fetching chain info and balance
-pnpm increment-counter # call inc() on deployed Counter
-```
-
-Examples:
-
-```sh
-pnpm hardhat node                       # start local node (optional)
-pnpm hardhat ignition deploy ignition/modules/Counter.ts
-pnpm hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
-
-## Notes
-
-- Solidity `0.8.28` with a production profile enabling optimizer.
-- Test networks configured: `sepolia`, `arbitrumSepolia`.
-- Includes an OpenZeppelin-based `ExampleToken.sol` to validate OZ integration.
-
