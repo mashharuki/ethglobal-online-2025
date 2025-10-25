@@ -142,8 +142,9 @@ contract CREATE2Factory {
             )
         );
 
+        bytes32 salt = params.salt;
         assembly {
-            poolAddress := create2(0, add(bytecode, 0x20), mload(bytecode), params.salt)
+            poolAddress := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
         }
 
         // デプロイが成功したかチェック
