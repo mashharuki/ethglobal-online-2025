@@ -13,7 +13,9 @@
     "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
     "get-balance": "pnpm hardhat run scripts/get-balance.ts",
     "increment-counter": "pnpm hardhat run scripts/inc.ts",
-    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts"
+    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
+    "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
+    "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0"
