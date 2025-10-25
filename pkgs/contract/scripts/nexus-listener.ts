@@ -1,14 +1,48 @@
 import { network } from "hardhat";
 
-// Minimal Nexus SDK stub interface for illustration
-type NexusConversionParams = {
-  conversionId: `0x${string}` | string;
+// ConversionInitiated event args (from DonationPool)
+type ConversionInitiatedArgs = {
+  conversionId: `0x${string}`;
   token: `0x${string}`;
   amount: bigint;
   targetChain: string;
-  targetRecipient: `0x${string}` | string | Uint8Array;
-  metadata: `0x${string}` | string | Uint8Array;
+  targetRecipient: `0x${string}` | Uint8Array;
+  sink: `0x${string}`;
+  metadata: `0x${string}` | Uint8Array;
 };
+
+// Minimal Nexus SDK stub interface for illustration
+type NexusConversionParams = ConversionInitiatedArgs;
+
+function isHexString(v: unknown, expectedLength?: number): v is `0x${string}` {
+  return (
+    typeof v === "string" &&
+    v.startsWith("0x") &&
+    (expectedLength === undefined || v.length === expectedLength)
+  );
+}
+
+function isBytesLike(v: unknown): v is `0x${string}` | Uint8Array {
+  return isHexString(v) || v instanceof Uint8Array;
+}
+
+function isAddress(v: unknown): v is `0x${string}` {
+  return isHexString(v, 42);
+}
+
+function isConversionInitiatedArgs(x: unknown): x is ConversionInitiatedArgs {
+  if (typeof x !== "object" || x === null) return false;
+  const a: any = x;
+  return (
+    isHexString(a.conversionId, 66) &&
+    isAddress(a.token) &&
+    typeof a.amount === "bigint" &&
+    typeof a.targetChain === "string" &&
+    isBytesLike(a.targetRecipient) &&
+    isAddress(a.sink) &&
+    isBytesLike(a.metadata)
+  );
+}
 
 async function submitViaNexus(params: NexusConversionParams) {
   // TODO: Integrate Avail Nexus SDK here
@@ -18,6 +52,7 @@ async function submitViaNexus(params: NexusConversionParams) {
     token: params.token,
     amount: params.amount.toString(),
     targetChain: params.targetChain,
+    sink: params.sink,
   });
 }
 
@@ -43,7 +78,12 @@ const unwatch = publicClient.watchContractEvent({
   onError: (err) => console.error("[NEXUS] watch error", err),
   onLogs: async (logs) => {
     for (const log of logs) {
-      const args = log.args as any;
+      const argsUnknown: unknown = (log as { args: unknown }).args;
+      if (!isConversionInitiatedArgs(argsUnknown)) {
+        console.warn("[NEXUS] unexpected event args shape", argsUnknown);
+        continue;
+      }
+      const args = argsUnknown;
       console.log("[NEXUS] ConversionInitiated log", args);
       try {
         await submitViaNexus({
@@ -52,6 +92,7 @@ const unwatch = publicClient.watchContractEvent({
           amount: args.amount,
           targetChain: args.targetChain,
           targetRecipient: args.targetRecipient,
+          sink: args.sink,
           metadata: args.metadata,
         });
       } catch (e) {
@@ -69,4 +110,3 @@ process.on("SIGINT", () => {
 });
 
 setInterval(() => void 0, 10_000);
-

@@ -39,6 +39,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
   error SinkNotSet();
   error ETHSendFailed();
   error InvalidMsgValue();
+  error InsufficientEthBalance();
 
   /// @param initialOwner オーナー
   /// @param targetToken_ 変換先トークンアドレス
@@ -138,8 +139,10 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
 
     // ブリッジエージェント/シンクへ転送（Nexus SDK がこの転送を基にクロスチェーン処理を実行）
     if (token == address(0)) {
-      // ETH 変換: 送金額が一致することを要求
-      if (msg.value != amount) revert InvalidMsgValue();
+      // ETH 変換: オーナーからの余分なETH送付を防止（常に0を要求）
+      if (msg.value != 0) revert InvalidMsgValue();
+      // コントラクト保有ETHで送金できることを検証
+      if (address(this).balance < amount) revert InsufficientEthBalance();
       (bool ok, ) = payable(conversionSink).call{ value: amount }("");
       if (!ok) revert ETHSendFailed();
     } else {
