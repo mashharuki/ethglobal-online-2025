@@ -71,7 +71,7 @@ interface IDonationPool {
     string calldata targetChain,
     bytes calldata targetRecipient,
     bytes calldata metadata
-  ) external returns (bytes32 conversionId);
+  ) external payable returns (bytes32 conversionId);
 
   /// @notice プールから資金を引き出す（変換後の受取など）
   /// @param token トークン（ETH は address(0)）

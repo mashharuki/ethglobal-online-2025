@@ -37,6 +37,8 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
   error InsufficientBalance();
   error ZeroRecipient();
   error SinkNotSet();
+  error ETHSendFailed();
+  error InvalidMsgValue();
 
   /// @param initialOwner オーナー
   /// @param targetToken_ 変換先トークンアドレス
@@ -125,8 +127,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     string calldata targetChain,
     bytes calldata targetRecipient,
     bytes calldata metadata
-  ) external override onlyOwner nonReentrant returns (bytes32 conversionId) {
-    if (token == address(0)) revert ZeroAddress();
+  ) external override payable onlyOwner nonReentrant returns (bytes32 conversionId) {
     if (amount == 0) revert ZeroAmount();
     if (!supportedTokens[token]) revert UnsupportedToken();
     if (_balances[token] < amount) revert InsufficientBalance();
@@ -136,7 +137,16 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     _balances[token] -= amount;
 
     // ブリッジエージェント/シンクへ転送（Nexus SDK がこの転送を基にクロスチェーン処理を実行）
-    IERC20(token).safeTransfer(conversionSink, amount);
+    if (token == address(0)) {
+      // ETH 変換: 送金額が一致することを要求
+      if (msg.value != amount) revert InvalidMsgValue();
+      (bool ok, ) = payable(conversionSink).call{ value: amount }("");
+      if (!ok) revert ETHSendFailed();
+    } else {
+      // ERC20 変換: 付随ETHは禁止
+      if (msg.value != 0) revert InvalidMsgValue();
+      IERC20(token).safeTransfer(conversionSink, amount);
+    }
 
     // 一意な変換IDを生成（オフチェーンで参照）
     unchecked {
@@ -159,7 +169,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
 
     if (token == address(0)) {
       (bool ok, ) = to.call{ value: amount }("");
-      require(ok, "ETH_SEND_FAILED");
+      if (!ok) revert ETHSendFailed();
     } else {
       IERC20(token).safeTransfer(to, amount);
     }
