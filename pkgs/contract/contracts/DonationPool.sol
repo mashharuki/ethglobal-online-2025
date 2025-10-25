@@ -64,11 +64,50 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
 
     // -------- Owner ops --------
 
-    /// @notice サポートトークンの設定
-    function setSupportedToken(address token, bool supported) external onlyOwner {
-        if (token == address(0)) revert ZeroAddress();
-        supportedTokens[token] = supported;
-        if (supported) _trackToken(token);
+/// @title DonationPool (v1)
+/// @notice ETH / ERC20 寄付の受け取りと残高管理、基本状態の保持
+contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
+  using SafeERC20 for IERC20;
+
+  /// @notice 変換先トークン（将来のコンバージョン機能向け）
+  address public targetToken;
+
+  /// @notice サポートするトークンの許可リスト（ETH は address(0)）
+  mapping(address => bool) public supportedTokens;
+
+  /// @dev token => total balance in pool
+  mapping(address => uint256) private _balances;
+
+  /// @dev 追跡中のトークン（getAllBalances 用）
+  address[] private _trackedTokens;
+  mapping(address => bool) private _isTracked;
+
+  /// @dev 変換関連
+  address public conversionSink; // Avail Nexus SDK を実行するエージェント/ブリッジ先
+  uint256 private _conversionNonce;
+
+  /// @dev errors
+  error ZeroAddress();
+  error ZeroAmount();
+  error UnsupportedToken();
+  error InsufficientBalance();
+  error ZeroRecipient();
+  error SinkNotSet();
+  error ETHSendFailed();
+  error InvalidMsgValue();
+  error InsufficientEthBalance();
+  error NotSupported();
+
+  /// @param initialOwner オーナー
+  /// @param targetToken_ 変換先トークンアドレス
+  /// @param initialSupported 初期サポートトークン配列（ETH を許可する場合は address(0) を含める）
+  constructor(address initialOwner, address targetToken_, address[] memory initialSupported) Ownable(initialOwner) {
+    targetToken = targetToken_;
+    // 初期サポートトークン設定
+    for (uint256 i = 0; i < initialSupported.length; i++) {
+      address token = initialSupported[i];
+      supportedTokens[token] = true;
+      _trackToken(token);
     }
 
     /// @notice targetToken の更新
@@ -135,66 +174,36 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
         }
     }
 
-    // -------- Conversion (owner) --------
+  /// @inheritdoc IDonationPool
+  function swapUsdcToPyusd(address usdc, address pyusd, uint256 amount, address to)
+    external
+    override
+    onlyOwner
+    nonReentrant
+  {
+    if (to == address(0)) revert ZeroRecipient();
+    if (amount == 0) revert ZeroAmount();
+    if (!supportedTokens[usdc] || !supportedTokens[pyusd]) revert NotSupported();
 
-    /// @inheritdoc IDonationPool
-    function initiateConversion(
-        address token,
-        uint256 amount,
-        string calldata targetChain,
-        bytes calldata targetRecipient,
-        bytes calldata metadata
-    )
-        external
-        payable
-        override
-        onlyOwner
-        nonReentrant
-        returns (bytes32 conversionId)
-    {
-        if (amount == 0) revert ZeroAmount();
-        if (!supportedTokens[token]) revert UnsupportedToken();
-        if (_balances[token] < amount) revert InsufficientBalance();
-        if (conversionSink == address(0)) revert SinkNotSet();
+    // プール内の内部残高を確認（1:1スワップ）
+    if (_balances[usdc] < amount) revert InsufficientBalance();
+    if (_balances[pyusd] < amount) revert InsufficientBalance();
 
-        // 減算してから外部転送（Checks-Effects-Interactions + nonReentrant）
-        _balances[token] -= amount;
+    // CEI: 内部残高を先に更新し、その後送金
+    _balances[usdc] -= amount; // 受領USDCを消費
+    _balances[pyusd] -= amount; // プールのPYUSD流動性を消費
 
-        if (token == address(0)) {
-            // 付随ETHは禁止（コントラクト保有ETHのみを使用）
-            if (msg.value != 0) revert InvalidMsgValue();
-            if (address(this).balance < amount) revert InsufficientEthBalance();
-            (bool ok, ) = payable(conversionSink).call{value: amount}("");
-            if (!ok) revert ETHSendFailed();
-        } else {
-            if (msg.value != 0) revert InvalidMsgValue();
-            IERC20(token).safeTransfer(conversionSink, amount);
-        }
+    IERC20(pyusd).safeTransfer(to, amount);
 
-        unchecked {
-            _conversionNonce++;
-        }
-        conversionId = keccak256(
-            abi.encode(
-                block.chainid,
-                address(this),
-                token,
-                amount,
-                targetChain,
-                targetRecipient,
-                _conversionNonce
-            )
-        );
+    emit Swapped(usdc, pyusd, to, amount);
+  }
 
-        emit ConversionInitiated(
-            conversionId,
-            token,
-            amount,
-            targetChain,
-            targetRecipient,
-            conversionSink,
-            metadata
-        );
+  /// @dev 受動的に ETH を受領した場合も寄付扱いにする
+  receive() external payable {
+    if (msg.value > 0 && supportedTokens[address(0)]) {
+      _balances[address(0)] += msg.value;
+      _trackToken(address(0));
+      emit DonatedETH(msg.sender, msg.value);
     }
 
     // -------- Withdraw (owner) --------
@@ -252,4 +261,11 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
             _trackedTokens.push(token);
         }
     }
+  }
+
+  /**
+   * @Todo: ブリッジされてきたUSDCをPYUSDに変換する機能
+   * ブリッジは Nexus SDK を利用して行う想定
+   * Nexus SDK側で Bridge AND Exchangeをメソッドを呼び出して ブリッジとswapを同時に行う
+   */
 }

@@ -37,6 +37,13 @@ interface IDonationPool {
   /// @param to 送付先
   event FundsWithdrawn(address indexed token, uint256 amount, address indexed to);
 
+  /// @notice トークンスワップ（USDC→PYUSD）イベント
+  /// @param fromToken 送信元トークン（USDC）
+  /// @param toToken 送信先トークン（PYUSD）
+  /// @param to 受取先
+  /// @param amount スワップ額（1:1）
+  event Swapped(address indexed fromToken, address indexed toToken, address indexed to, uint256 amount);
+
   /// @notice ERC20 の寄付
   /// @param token トークンアドレス
   /// @param amount 寄付金額
@@ -82,4 +89,11 @@ interface IDonationPool {
   /// @notice 変換シンク（ブリッジエージェント等）の設定
   /// @param sink 送付先アドレス
   function setConversionSink(address sink) external;
+
+  /// @notice 受領済みUSDCを1:1でPYUSDに変換して送付（Nexus側のBridge+Swap完了に対応）
+  /// @param usdc USDCトークンアドレス
+  /// @param pyusd PYUSDトークンアドレス
+  /// @param amount 変換額（1:1）
+  /// @param to 受取先アドレス（EOAまたはコントラクト）
+  function swapUsdcToPyusd(address usdc, address pyusd, uint256 amount, address to) external;
 }
