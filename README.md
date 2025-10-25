@@ -13,7 +13,33 @@ Universal Non-Custodial Donation Receiver
 
 ## Project Overview
 
-CrossDonate revolutionizes Web3 donations by eliminating chain and token fragmentation. Our platform enables donors to contribute to any project using any token on any supported EVM chain, all while providing project operators with a unified, secure receiving address.
+### The Problem
+
+The Web3 donation ecosystem is fragmented. Project owners struggle to manage donations across multiple chains and tokens, while donors face the complexity of bridging and swapping assets just to contribute. This friction hinders the flow of capital to public goods and impactful projects.
+
+### Our Solution
+
+CrossDonate is a universal donation platform that eliminates this fragmentation. We provide a single, unified donation address that works across multiple EVM chains, solving the headache of managing countless wallet addresses. Donors can send any supported token they hold from any supported chain, and our platform automatically swaps and aggregates the funds into a single target asset for the project owner.
+
+### How It Works & Key Features
+
+#### For Donors: "Just Send" Simplicity
+No more complex bridging or swapping. Donors simply send their preferred token (e.g., ETH, PYUSD) to the project's universal CrossDonate address. It's the most intuitive and frictionless giving experience in Web3.
+
+#### For Project Owners: "One-Click" Treasury Management
+From a simple admin dashboard, project owners can view all donations in real-time, regardless of their origin chain or token. With a single click, they can initiate a process to convert all donated assets into their preferred token (e.g., USDC on Arbitrum) and consolidate them into their treasury.
+
+#### Core Technology
+
+**Unified Address System:** We leverage CREATE2 to deterministically deploy identical DonationPool contract addresses across different chains (initially Sepolia and Arbitrum Sepolia). This provides a single, consistent point of contact for donors.
+
+**Automated Cross-Chain Conversion:** Powered by the Avail Nexus SDK, our backend handles the complex task of bridging various tokens and swapping them into the project's target asset, completely abstracting the complexity away from both the donor and the project owner.
+
+**Simple & Secure:** The system uses a straightforward EOA-based ownership model (onlyOwner), ensuring that only the project owner has control over the funds and administrative functions, providing robust security without unnecessary complexity for the MVP.
+
+### Hackathon MVP Scope
+
+For the ETHGlobal Online 2025 hackathon, our MVP is built with Hardhat V3 and Next.js 15. It demonstrates the core functionality on the Sepolia and Arbitrum Sepolia testnets. The platform accepts donations in tokens like ETH and PYUSD and automatically aggregates them into USDC on Arbitrum Sepolia, showcasing a real-world use case for seamless cross-chain value transfer.
 
 ### Core Value Proposition
 
@@ -122,6 +148,43 @@ The platform prioritizes PYUSD as the primary receiving token:
 - **Smart Contracts**: Hardhat V3 with Viem integration for type safety
 - **UI/UX**: Tailwind CSS 4.0 with Radix UI components
 - **Testing**: Comprehensive test suites with Node.js built-in runner
+
+## How It's Made
+
+We built CrossDonate using a pnpm monorepo to manage two main packages: a contract package for our Solidity smart contracts and a frontend package for our Next.js application. This architecture allowed for parallel development, which was crucial for a time-constrained hackathon. Our code quality and formatting are consistently maintained by Biome.
+
+### Smart Contracts (The Foundation)
+
+Our smart contract architecture, developed with Hardhat V3, is designed for simplicity and cross-chain compatibility.
+
+**`CREATE2Factory.sol`**: This is the cornerstone for our unified address feature. We use a factory contract with CREATE2 to deterministically deploy our DonationPool contract on multiple chains (Sepolia and Arbitrum Sepolia), ensuring they share the exact same address. This is the key to our "one address" user experience.
+
+**`DonationPool.sol`**: Deployed on each chain, this contract is responsible for receiving donations (both native currency and ERC20 tokens like PYUSD), tracking balances, and exposing owner-only functions. We intentionally used a simple but robust EOA-based onlyOwner access control model to ensure security while keeping the scope manageable for an MVP.
+
+### Frontend (The User Experience)
+
+The frontend is a modern web application built with Next.js 15 and TypeScript, leveraging its latest features for a fast and interactive user experience.
+
+We used the App Router with React 19 features like the use hook and Suspense for efficient data fetching and streamlined loading states. Server Actions are used for critical administrative tasks, like triggering the fund aggregation process from the admin dashboard. This provides a secure way to interact with our backend logic without building a separate API.
+
+For Web3 connectivity, we integrated Wagmi and RainbowKit, which provided a seamless wallet connection experience and simplified our interactions with the smart contracts—from sending transactions to listening for on-chain events in real-time.
+
+### The Magic Sauce: How We Used Avail Nexus
+
+The true innovation of CrossDonate is its automated cross-chain aggregation, which is powered by the Avail NexusSDK. This partner technology was a game-changer for us.
+
+When a project owner clicks "Convert & Withdraw," our backend logic utilizes the Avail Nexus SDK to:
+
+1. Read the balances of all donated tokens from our DonationPool contracts on each chain.
+2. Execute the necessary cross-chain bridging and token swaps to convert all these disparate assets into a single target token (USDC on Arbitrum Sepolia).
+
+Avail Nexus allowed us to abstract away the most complex part of our system—cross-chain interoperability—saving us from building a fragile, custom solution and enabling us to focus on the core user experience.
+
+### Notable Hacks & Workflow
+
+Given the time constraints, our most notable "hack" was to deliberately simplify our security model to an EOA onlyOwner pattern, bypassing the complexity of a multi-sig system. This was a strategic trade-off that allowed us to deliver a fully functional end-to-end product.
+
+Additionally, instead of setting up a complex indexing service, we implemented real-time updates on the frontend by directly listening to contract events using Wagmi's useContractEvent hook, which was incredibly fast and effective for our MVP.
 
 ## Technology Stack
 
@@ -296,7 +359,7 @@ cp pkgs/frontend/.env.example pkgs/frontend/.env.local
 # Start local blockchain (run in separate terminal)
 cd pkgs/contract && npx hardhat node
 
-# Deploy test token (run in separate terminal)  
+# Deploy test token (run in separate terminal)
 pnpm contract deploy:ExampleToken --network localhost
 
 # Deploy DonationPool contracts
