@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useId, useEffect } from 'react';
+import { useState, useId } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/atoms/Button';
@@ -8,9 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/atoms/Input';
 import { Label } from '@/components/atoms/Label';
 import { Textarea } from '@/components/atoms/Textarea';
-import { Coins, Loader2, Sparkles, Globe, Zap, CheckCircle, AlertCircle } from 'lucide-react';
-import { calculateMultiChainAddress, verifyMultiChainConsistency } from '@/utils/create2Address';
-import { saveProject, createProjectData } from '@/utils/projectStorage';
+import { Coins, Loader2, Sparkles, Globe, Zap } from 'lucide-react';
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -25,82 +23,17 @@ export default function CreateProjectPage() {
     targetToken: 'USDC',
     targetChain: 'Arbitrum Sepolia',
   });
-  const [calculatedAddresses, setCalculatedAddresses] = useState<Record<string, string>>({});
-  const [isAddressConsistent, setIsAddressConsistent] = useState<boolean | null>(null);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  // フォームバリデーション
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      errors.name = 'プロジェクト名は必須です';
-    } else if (formData.name.length < 3) {
-      errors.name = 'プロジェクト名は3文字以上で入力してください';
-    }
-
-    if (!formData.targetToken) {
-      errors.targetToken = '目標トークンを選択してください';
-    }
-
-    if (!formData.targetChain) {
-      errors.targetChain = '目標チェーンを選択してください';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // CREATE2アドレス計算
-  useEffect(() => {
-    if (formData.name && formData.targetToken && formData.targetChain) {
-      try {
-        const addresses = calculateMultiChainAddress(
-          formData.name,
-          formData.targetToken,
-          formData.targetChain
-        );
-        setCalculatedAddresses(addresses);
-        setIsAddressConsistent(verifyMultiChainConsistency(addresses));
-      } catch (error) {
-        console.error('Failed to calculate addresses:', error);
-        setIsAddressConsistent(false);
-      }
-    }
-  }, [formData.name, formData.targetToken, formData.targetChain]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
     setIsCreating(true);
 
-    try {
-      // プロジェクトデータを作成
-      const unifiedAddress = Object.values(calculatedAddresses)[0] || '';
-      const projectData = createProjectData(
-        formData.name,
-        formData.description,
-        formData.targetToken,
-        formData.targetChain,
-        unifiedAddress,
-        calculatedAddresses
-      );
+    // モック: 実際にはスマートコントラクトをデプロイ
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // ローカルストレージに保存
-      saveProject(projectData);
-
-      // モック: 実際にはスマートコントラクトをデプロイ
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      router.push(`/admin/${projectData.id}`);
-    } catch (error) {
-      console.error('Failed to create project:', error);
-      setIsCreating(false);
-    }
+    // モックプロジェクトIDを生成
+    const projectId = `project-${Date.now()}`;
+    router.push(`/admin/${projectId}`);
   };
 
   return (
@@ -146,14 +79,8 @@ export default function CreateProjectPage() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       required
-                      className={`text-base h-12 ${formErrors.name ? 'border-red-500' : ''}`}
+                      className="text-base h-12"
                     />
-                    {formErrors.name && (
-                      <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {formErrors.name}
-                      </p>
-                    )}
                   </div>
 
                   <div className="space-y-3">
@@ -166,10 +93,7 @@ export default function CreateProjectPage() {
                       rows={5}
                       value={formData.description}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        })
+                        setFormData({ ...formData, description: e.target.value })
                       }
                       className="text-base"
                     />
@@ -185,10 +109,7 @@ export default function CreateProjectPage() {
                         className="w-full px-4 py-3 border-2 border-input rounded-xl bg-background text-base font-medium hover:border-primary/50 transition-colors"
                         value={formData.targetToken}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                          setFormData({
-                            ...formData,
-                            targetToken: e.target.value,
-                          })
+                          setFormData({ ...formData, targetToken: e.target.value })
                         }
                       >
                         <option value="USDC">USDC</option>
@@ -209,10 +130,7 @@ export default function CreateProjectPage() {
                         className="w-full px-4 py-3 border-2 border-input rounded-xl bg-background text-base font-medium hover:border-primary/50 transition-colors"
                         value={formData.targetChain}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                          setFormData({
-                            ...formData,
-                            targetChain: e.target.value,
-                          })
+                          setFormData({ ...formData, targetChain: e.target.value })
                         }
                       >
                         <option value="Arbitrum Sepolia">Arbitrum Sepolia</option>
@@ -255,51 +173,6 @@ export default function CreateProjectPage() {
                       </div>
                     </div>
                   </div>
-
-                  {/* 計算されたアドレス表示 */}
-                  {Object.keys(calculatedAddresses).length > 0 && (
-                    <div className="rounded-xl border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5 p-6 space-y-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Zap className="w-5 h-5 text-accent" />
-                        <h3 className="font-bold text-base">計算された統一アドレス</h3>
-                        {isAddressConsistent === true && (
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                        )}
-                        {isAddressConsistent === false && (
-                          <AlertCircle className="w-5 h-5 text-red-500" />
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        {Object.entries(calculatedAddresses).map(([chain, address]) => (
-                          <div
-                            key={chain}
-                            className="flex items-center justify-between p-3 bg-background rounded-lg"
-                          >
-                            <span className="text-sm font-semibold text-muted-foreground">
-                              {chain}
-                            </span>
-                            <code className="text-xs font-mono text-accent break-all">
-                              {address}
-                            </code>
-                          </div>
-                        ))}
-                      </div>
-
-                      {isAddressConsistent === true && (
-                        <p className="text-sm text-green-600 flex items-center gap-1">
-                          <CheckCircle className="w-4 h-4" />
-                          全てのチェーンで同一アドレスが生成されます
-                        </p>
-                      )}
-                      {isAddressConsistent === false && (
-                        <p className="text-sm text-red-600 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          アドレス計算に問題があります
-                        </p>
-                      )}
-                    </div>
-                  )}
 
                   <div className="flex gap-4 pt-4">
                     <Button
