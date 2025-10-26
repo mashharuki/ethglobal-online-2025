@@ -205,6 +205,12 @@ Additionally, instead of setting up a complex indexing service, we implemented r
 | **Solidity Compiler** | Solidity | 0.8.28 | Smart contract language |
 | **Security Library** | OpenZeppelin | 5.0.0 | Battle-tested contract components |
 
+## Deployed Contract
+
+| Contract | Network | Address |
+|:----------|:---------|:---------|
+|**DonationPool**|Arbitrum Sepolia|[0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11](https://sepolia.arbiscan.io/address/0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11)|
+
 ## Sponsor Prize Descriptions
 
 ### 🌐 Avail Prize - How We Use Nexus SDK
