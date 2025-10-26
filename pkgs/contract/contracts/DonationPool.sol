@@ -166,11 +166,11 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
 
     // プール内の内部残高を確認（1:1スワップ）
     if (_balances[usdc] < amount) revert InsufficientBalance();
-    if (_balances[pyusd] < amount) revert InsufficientBalance();
+    // if (_balances[pyusd] < amount) revert InsufficientBalance();
 
     // CEI: 内部残高を先に更新し、その後送金
     _balances[usdc] -= amount; // 受領USDCを消費
-    _balances[pyusd] -= amount; // プールのPYUSD流動性を消費
+    // _balances[pyusd] -= amount; // プールのPYUSD流動性を消費
 
     IERC20(pyusd).safeTransfer(to, amount);
 
