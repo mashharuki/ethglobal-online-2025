@@ -29,7 +29,7 @@ const Nexus = () => {
               {isInitialized ? "Initialized" : "Not Initialized"}
             </p>
             {isInitializing && (
-              <p className="text-sm text-orange-600 font-medium">SDK初期化中...</p>
+              <p className="text-sm text-orange-600 font-medium">SDK Initializing...</p>
             )}
           </div>
           <div className="w-full flex justify-center">
@@ -55,14 +55,9 @@ const Nexus = () => {
             <DialogHeader className="space-y-4">
               <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {selectedToken
-                  ? `${selectedToken} Bridge & Donate テスト`
-                  : "Bridge & Donate テスト"}
+                  ? `${selectedToken} Bridge & Donate`
+                  : "Bridge & Donate"}
               </DialogTitle>
-              <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
-                <p className="text-green-700 font-medium text-center">
-                  ✅ USDC用のNexus SDK初期化完了！ テストを開始できます
-                </p>
-              </div>
             </DialogHeader>
             <BridgeAndExecuteTest selectedToken={selectedToken} />
           </DialogContent>

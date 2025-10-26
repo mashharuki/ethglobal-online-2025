@@ -90,7 +90,7 @@ export default function BridgeAndExecuteTest({
   // コンポーネント表示時にSDK初期化を自動実行
   useEffect(() => {
     if (isConnected && !isInitialized && !isInitializing) {
-      console.log("Bridge & Execute: SDK初期化を開始します...");
+      console.log("Bridge & Execute: Starting SDK initialization...");
       setIsInitializing(true);
       initializeSDK().finally(() => {
         setIsInitializing(false);
@@ -106,7 +106,7 @@ export default function BridgeAndExecuteTest({
   // シミュレーション実行
   const handleSimulate = async () => {
     if (!isInitialized || !nexusSDK) {
-      setError("Nexus SDKが初期化されていません");
+      setError("Nexus SDK is not initialized");
       return;
     }
 
@@ -194,7 +194,7 @@ export default function BridgeAndExecuteTest({
   // 実際の実行
   const handleExecute = async () => {
     if (!isInitialized || !nexusSDK) {
-      setError("Nexus SDKが初期化されていません");
+      setError("Nexus SDK is not initialized");
       return;
     }
 
@@ -293,9 +293,9 @@ export default function BridgeAndExecuteTest({
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800">
               {selectedToken
-                ? `${selectedToken}用のNexus SDKを初期化中...`
-                : "Nexus SDKを初期化中..."}{" "}
-              しばらくお待ちください
+                ? `Initializing Nexus SDK for ${selectedToken}...`
+                : "Initializing Nexus SDK..."}{" "}
+              Please wait
             </p>
             <div className="mt-2">
               <div className="w-full bg-blue-200 rounded-full h-2">
@@ -313,49 +313,49 @@ export default function BridgeAndExecuteTest({
             <p className="text-green-800">
               ✅{" "}
               {selectedToken
-                ? `${selectedToken}用のNexus SDK初期化完了！`
-                : "Nexus SDK初期化完了！"}{" "}
-              テストを開始できます
+                ? `Nexus SDK initialization completed for ${selectedToken}!`
+                : "Nexus SDK initialization completed!"}{" "}
+              You can start testing
             </p>
           </div>
         )}
 
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border border-blue-200 mb-6">
           <h3 className="text-xl font-bold text-blue-800 mb-4 flex items-center gap-2">
-            🔄 Base Sepolia → Arbitrum Sepolia ブリッジ & 実行テスト
+            🔄 Base Sepolia → Arbitrum Sepolia Bridge & Execute Test
           </h3>
           <div className="text-sm text-blue-700 space-y-3">
             <p>
-              <strong>テスト内容:</strong> Base SepoliaのUSDCをArbitrum
-              Sepoliaにブリッジ後、DonationPoolコントラクトでdonateまたはswapUsdcToPyusdを実行
+              <strong>Test Content:</strong> Bridge USDC from Base Sepolia to Arbitrum
+              Sepolia, then execute donate or swapUsdcToPyusd on DonationPool contract
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="font-semibold mb-2">利用可能な関数:</p>
+                <p className="font-semibold mb-2">Available Functions:</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>
-                    <strong>donate:</strong> トークンを寄付（USDCをDonationPoolに寄付）
+                    <strong>donate:</strong> Donate tokens (donate USDC to DonationPool)
                   </li>
                   <li>
-                    <strong>swapUsdcToPyusd:</strong> USDCをPYUSDにスワップ
+                    <strong>swapUsdcToPyusd:</strong> Swap USDC to PYUSD
                   </li>
                 </ul>
               </div>
               <div>
-                <p className="font-semibold mb-2">必要な設定:</p>
+                <p className="font-semibold mb-2">Required Settings:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>DonationPoolコントラクトアドレス（Arbitrum Sepolia）</li>
-                  <li>USDCコントラクトアドレス（Arbitrum Sepolia）: デフォルト設定済み</li>
-                  <li>PYUSDコントラクトアドレス（Arbitrum Sepolia）: デフォルト設定済み</li>
-                  <li>送信元チェーン: Base Sepolia (84532)</li>
-                  <li>宛先チェーン: Arbitrum Sepolia (421614)</li>
+                  <li>DonationPool contract address (Arbitrum Sepolia)</li>
+                  <li>USDC contract address (Arbitrum Sepolia): Preconfigured</li>
+                  <li>PYUSD contract address (Arbitrum Sepolia): Preconfigured</li>
+                  <li>Source chain: Base Sepolia (84532)</li>
+                  <li>Destination chain: Arbitrum Sepolia (421614)</li>
                 </ul>
               </div>
             </div>
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
               <p className="text-yellow-800 text-sm font-medium">
-                <strong>注意:</strong> テスト前にBase SepoliaでUSDCを取得し、Arbitrum
-                SepoliaでETHを取得してください。
+                <strong>Note:</strong> Please acquire USDC on Base Sepolia and ETH on Arbitrum
+                Sepolia before testing.
               </p>
             </div>
           </div>
@@ -364,11 +364,11 @@ export default function BridgeAndExecuteTest({
         <div className="space-y-8">
           {/* 基本設定セクション */}
           <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">基本設定</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Basic Settings</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <Label htmlFor={`${id}-token`} className="text-sm font-medium text-gray-700">
-                  ブリッジトークン
+                  Bridge Token
                 </Label>
                 <select
                   id={`${id}-token`}
@@ -384,13 +384,13 @@ export default function BridgeAndExecuteTest({
                   <option value="ETH">ETH (Ethereum)</option>
                 </select>
                 <p className="text-xs text-gray-500">
-                  Base SepoliaからArbitrum Sepoliaにブリッジするトークンを選択
+                  Select token to bridge from Base Sepolia to Arbitrum Sepolia
                 </p>
               </div>
 
               <div className="space-y-3">
                 <Label htmlFor={`${id}-amount`} className="text-sm font-medium text-gray-700">
-                  数量
+                  Amount
                 </Label>
                 <Input
                   id={`${id}-amount`}
@@ -402,12 +402,12 @@ export default function BridgeAndExecuteTest({
                   step="0.000001"
                   min="0"
                 />
-                <p className="text-xs text-gray-500">ブリッジする{formData.token}の数量</p>
+                <p className="text-xs text-gray-500">Amount of {formData.token} to bridge</p>
               </div>
 
               <div className="space-y-3">
                 <Label htmlFor={`${id}-functionName`} className="text-sm font-medium text-gray-700">
-                  関数名
+                  Function Name
                 </Label>
                 <select
                   id={`${id}-functionName`}
@@ -417,15 +417,15 @@ export default function BridgeAndExecuteTest({
                   }
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  <option value="donate">donate - トークンを寄付</option>
-                  <option value="swapUsdcToPyusd">swapUsdcToPyusd - USDCをPYUSDにスワップ</option>
+                  <option value="donate">donate - Donate tokens</option>
+                  <option value="swapUsdcToPyusd">swapUsdcToPyusd - Swap USDC to PYUSD</option>
                 </select>
-                <p className="text-xs text-gray-500">DonationPoolコントラクトで実行したい関数名</p>
+                <p className="text-xs text-gray-500">Function name to execute on DonationPool contract</p>
               </div>
 
               <div className="space-y-3">
                 <Label htmlFor={`${id}-recipient`} className="text-sm font-medium text-gray-700">
-                  受信者アドレス（空の場合は現在のアドレス）
+                  Recipient Address (leave empty for current address)
                 </Label>
                 <Input
                   id={`${id}-recipient`}
@@ -440,11 +440,11 @@ export default function BridgeAndExecuteTest({
 
           {/* チェーン設定セクション */}
           <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">チェーン設定</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Chain Settings</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <Label htmlFor={`${id}-sourceChains`} className="text-sm font-medium text-gray-700">
-                  送信元チェーンID
+                  Source Chain ID
                 </Label>
                 <Input
                   id={`${id}-sourceChains`}
@@ -458,7 +458,7 @@ export default function BridgeAndExecuteTest({
 
               <div className="space-y-3">
                 <Label htmlFor={`${id}-toChainId`} className="text-sm font-medium text-gray-700">
-                  宛先チェーンID
+                  Destination Chain ID
                 </Label>
                 <Input
                   id={`${id}-toChainId`}
@@ -474,14 +474,14 @@ export default function BridgeAndExecuteTest({
 
           {/* コントラクトアドレス設定セクション */}
           <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">コントラクトアドレス設定</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Contract Address Settings</h4>
             <div className="space-y-6">
               <div className="space-y-3">
                 <Label
                   htmlFor={`${id}-contractAddress`}
                   className="text-sm font-medium text-gray-700"
                 >
-                  DonationPoolコントラクトアドレス（Arbitrum Sepolia）
+                  DonationPool Contract Address (Arbitrum Sepolia)
                 </Label>
                 <Input
                   id={`${id}-contractAddress`}
@@ -491,7 +491,7 @@ export default function BridgeAndExecuteTest({
                   className="p-3 font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500">
-                  Arbitrum SepoliaにデプロイされたDonationPoolコントラクトのアドレス
+                  Address of DonationPool contract deployed on Arbitrum Sepolia
                 </p>
               </div>
 
@@ -501,7 +501,7 @@ export default function BridgeAndExecuteTest({
                     htmlFor={`${id}-usdcAddress`}
                     className="text-sm font-medium text-gray-700"
                   >
-                    USDCコントラクトアドレス（Arbitrum Sepolia）
+                    USDC Contract Address (Arbitrum Sepolia)
                   </Label>
                   <Input
                     id={`${id}-usdcAddress`}
@@ -511,7 +511,7 @@ export default function BridgeAndExecuteTest({
                     className="p-3 font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500">
-                    Arbitrum SepoliaのUSDCコントラクトアドレス
+                    USDC contract address on Arbitrum Sepolia
                   </p>
                 </div>
 
@@ -520,7 +520,7 @@ export default function BridgeAndExecuteTest({
                     htmlFor={`${id}-pyusdAddress`}
                     className="text-sm font-medium text-gray-700"
                   >
-                    PYUSDコントラクトアドレス（Arbitrum Sepolia）
+                    PYUSD Contract Address (Arbitrum Sepolia)
                   </Label>
                   <Input
                     id={`${id}-pyusdAddress`}
@@ -530,7 +530,7 @@ export default function BridgeAndExecuteTest({
                     className="p-3 font-mono text-sm"
                   />
                   <p className="text-xs text-gray-500">
-                    Arbitrum SepoliaのPYUSDコントラクトアドレス
+                    PYUSD contract address on Arbitrum Sepolia
                   </p>
                 </div>
               </div>
@@ -540,7 +540,7 @@ export default function BridgeAndExecuteTest({
 
         {/* アクションボタン */}
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4">アクション</h4>
+          <h4 className="text-lg font-semibold text-gray-800 mb-4">Actions</h4>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
               onClick={handleSimulate}
@@ -550,10 +550,10 @@ export default function BridgeAndExecuteTest({
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  シミュレーション中...
+                  Simulating...
                 </div>
               ) : (
-                "シミュレーション実行"
+                "Run Simulation"
               )}
             </Button>
             <Button
@@ -564,10 +564,10 @@ export default function BridgeAndExecuteTest({
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  実行中...
+                  Executing...
                 </div>
               ) : (
-                "実際に実行"
+                "Execute Transaction"
               )}
             </Button>
           </div>
@@ -578,7 +578,7 @@ export default function BridgeAndExecuteTest({
           <div className="p-6 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg shadow-sm">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <h3 className="font-semibold text-red-800">エラーが発生しました</h3>
+              <h3 className="font-semibold text-red-800">An error occurred</h3>
             </div>
             <p className="text-red-700">{error}</p>
           </div>
@@ -589,23 +589,23 @@ export default function BridgeAndExecuteTest({
           <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <h3 className="text-lg font-semibold text-blue-800">シミュレーション結果</h3>
+              <h3 className="text-lg font-semibold text-blue-800">Simulation Results</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-blue-700">成功:</span>
+                  <span className="font-medium text-blue-700">Success:</span>
                   <span
                     className={`px-2 py-1 rounded text-sm font-medium ${
                       simulation.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {simulation.success ? "はい" : "いいえ"}
+                    {simulation.success ? "Yes" : "No"}
                   </span>
                 </div>
                 {simulation.totalEstimatedCost && (
                   <div>
-                    <span className="font-medium text-blue-700">推定コスト:</span>
+                    <span className="font-medium text-blue-700">Estimated Cost:</span>
                     <pre className="mt-1 p-2 bg-white rounded border text-xs overflow-x-auto">
                       {JSON.stringify(simulation.totalEstimatedCost, null, 2)}
                     </pre>
@@ -613,9 +613,9 @@ export default function BridgeAndExecuteTest({
                 )}
                 {simulation.metadata?.approvalRequired && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-blue-700">承認が必要:</span>
+                    <span className="font-medium text-blue-700">Approval Required:</span>
                     <span className="px-2 py-1 rounded text-sm font-medium bg-yellow-100 text-yellow-800">
-                      はい
+                      Yes
                     </span>
                   </div>
                 )}
@@ -623,7 +623,7 @@ export default function BridgeAndExecuteTest({
               <div className="space-y-3">
                 {simulation.metadata?.bridgeReceiveAmount && (
                   <div>
-                    <span className="font-medium text-blue-700">ブリッジ受信数量:</span>
+                    <span className="font-medium text-blue-700">Bridge Receive Amount:</span>
                     <p className="mt-1 p-2 bg-white rounded border font-mono text-sm">
                       {simulation.metadata.bridgeReceiveAmount}
                     </p>
@@ -631,14 +631,14 @@ export default function BridgeAndExecuteTest({
                 )}
                 {simulation.steps && simulation.steps.length > 0 && (
                   <div>
-                    <span className="font-medium text-blue-700">ステップ:</span>
+                    <span className="font-medium text-blue-700">Steps:</span>
                     <div className="mt-1 space-y-1">
                       {simulation.steps.map((step, index) => (
                         <div
                           key={`step-${index}-${JSON.stringify(step)}`}
                           className="p-2 bg-white rounded border text-xs"
                         >
-                          <span className="text-blue-600 font-medium">ステップ {index + 1}:</span>
+                          <span className="text-blue-600 font-medium">Step {index + 1}:</span>
                           <pre className="mt-1 overflow-x-auto">
                             {JSON.stringify(step, null, 2)}
                           </pre>
@@ -657,25 +657,25 @@ export default function BridgeAndExecuteTest({
           <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <h3 className="text-lg font-semibold text-green-800">実行結果</h3>
+              <h3 className="text-lg font-semibold text-green-800">Execution Results</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-green-700">成功:</span>
+                  <span className="font-medium text-green-700">Success:</span>
                   <span
                     className={`px-2 py-1 rounded text-sm font-medium ${
                       result.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {result.success ? "はい" : "いいえ"}
+                    {result.success ? "Yes" : "No"}
                   </span>
                 </div>
                 {result.bridgeSkipped && (
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-green-700">ブリッジスキップ:</span>
+                    <span className="font-medium text-green-700">Bridge Skipped:</span>
                     <span className="px-2 py-1 rounded text-sm font-medium bg-blue-100 text-blue-800">
-                      はい（十分な資金があるため）
+                      Yes (sufficient funds available)
                     </span>
                   </div>
                 )}
@@ -684,7 +684,7 @@ export default function BridgeAndExecuteTest({
                 {result.bridgeTransactionHash && (
                   <div>
                     <span className="font-medium text-green-700">
-                      ブリッジトランザクションハッシュ:
+                      Bridge Transaction Hash:
                     </span>
                     <p className="mt-1 p-2 bg-white rounded border font-mono text-xs break-all">
                       {result.bridgeTransactionHash}
@@ -694,7 +694,7 @@ export default function BridgeAndExecuteTest({
                 {result.executeTransactionHash && (
                   <div>
                     <span className="font-medium text-green-700">
-                      実行トランザクションハッシュ:
+                      Execute Transaction Hash:
                     </span>
                     <p className="mt-1 p-2 bg-white rounded border font-mono text-xs break-all">
                       {result.executeTransactionHash}
@@ -704,7 +704,7 @@ export default function BridgeAndExecuteTest({
                 {result.approvalTransactionHash && (
                   <div>
                     <span className="font-medium text-green-700">
-                      承認トランザクションハッシュ:
+                      Approval Transaction Hash:
                     </span>
                     <p className="mt-1 p-2 bg-white rounded border font-mono text-xs break-all">
                       {result.approvalTransactionHash}
@@ -713,7 +713,7 @@ export default function BridgeAndExecuteTest({
                 )}
                 {result.error && (
                   <div className="p-3 bg-red-100 border border-red-200 rounded">
-                    <span className="font-medium text-red-700">エラー:</span>
+                    <span className="font-medium text-red-700">Error:</span>
                     <p className="mt-1 text-red-600">{result.error}</p>
                   </div>
                 )}

@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/atoms/Button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/atoms/Dialog";
 import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/atoms/Label";
@@ -87,10 +87,10 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
 
     try {
       await initializeSDK();
-      setSuccess("Nexus SDKが正常に初期化されました。");
+      setSuccess("Nexus SDK initialized successfully.");
     } catch (err) {
       console.error("SDK initialization error:", err);
-      setError(`SDK初期化に失敗しました: ${err instanceof Error ? err.message : "不明なエラー"}`);
+      setError(`SDK initialization failed: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setIsInitializing(false);
     }
@@ -121,17 +121,17 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
     try {
       // SDKが初期化されていない場合は自動初期化を実行
       if (!isInitialized) {
-        setSuccess("Nexus SDKを初期化中...");
+        setSuccess("Initializing Nexus SDK...");
         try {
           await initializeSDK();
-          setSuccess("Nexus SDKの初期化が完了しました。ブリッジを開始します...");
+          setSuccess("Nexus SDK initialization completed. Starting bridge...");
 
           // 初期化完了後、少し待機してからブリッジ処理を続行
           await new Promise((resolve) => setTimeout(resolve, 200));
         } catch (initError) {
-          console.error("SDK初期化エラー:", initError);
+          console.error("SDK initialization error:", initError);
           setError(
-            `SDK初期化に失敗しました: ${initError instanceof Error ? initError.message : "不明なエラー"}`
+            `SDK initialization failed: ${initError instanceof Error ? initError.message : "Unknown error"}`
           );
           return;
         }
@@ -146,17 +146,17 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
 
       if (result.success) {
         setSuccess(
-          `ブリッジが成功しました！${result.explorerUrl ? `トランザクション: ${result.explorerUrl}` : ""}`
+          `Bridge successful!${result.explorerUrl ? ` Transaction: ${result.explorerUrl}` : ""}`
         );
         // 成功後、フォームをリセット
         setAmount("");
       } else {
-        setError(`ブリッジが失敗しました: ${result.error || "不明なエラー"}`);
+        setError(`Bridge failed: ${result.error || "Unknown error"}`);
       }
     } catch (err) {
       console.error("Bridge error:", err);
       setError(
-        `ブリッジ中にエラーが発生しました: ${err instanceof Error ? err.message : "不明なエラー"}`
+        `Error occurred during bridge: ${err instanceof Error ? err.message : "Unknown error"}`
       );
     } finally {
       setIsLoading(false);
