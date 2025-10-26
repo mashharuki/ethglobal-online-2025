@@ -51,13 +51,18 @@ const Nexus = () => {
 
         {/* Bridge & Execute Test Modal (Donate) */}
         <Dialog open={isBridgeAndExecuteOpen} onOpenChange={setIsBridgeAndExecuteOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
+          <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto p-6 md:p-8">
+            <DialogHeader className="space-y-4">
+              <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {selectedToken
                   ? `${selectedToken} Bridge & Donate テスト`
                   : 'Bridge & Donate テスト'}
               </DialogTitle>
+              <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                <p className="text-green-700 font-medium text-center">
+                  ✅ USDC用のNexus SDK初期化完了！ テストを開始できます
+                </p>
+              </div>
             </DialogHeader>
             <BridgeAndExecuteTest selectedToken={selectedToken} />
           </DialogContent>
@@ -65,7 +70,7 @@ const Nexus = () => {
 
         {/* Bridge & Swap Test Modal */}
         <Dialog open={isBridgeAndSwapOpen} onOpenChange={setIsBridgeAndSwapOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto p-6 md:p-8">
             <DialogHeader>
               <DialogTitle>
                 {selectedToken ? `${selectedToken} Bridge & Swap テスト` : 'Bridge & Swap テスト'}

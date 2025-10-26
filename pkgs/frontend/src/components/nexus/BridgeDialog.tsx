@@ -186,28 +186,246 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">トークンブリッジ</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] max-w-4xl max-h-[95vh] overflow-y-auto p-6 md:p-8">
+        <DialogHeader className="space-y-4">
+          <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            トークンブリッジ
+          </DialogTitle>
+          <DialogDescription className="text-center text-lg text-gray-600">
             Nexus SDKを使用してトークンを異なるチェーン間でブリッジします。
           </DialogDescription>
-          {/* 成功メッセージを説明文の真下に表示 */}
+          
+          {/* 成功メッセージ - より目立つデザイン */}
           {success && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-md mt-1">
-              <p className="text-green-700 text-sm">{success}</p>
+            <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <p className="text-green-700 font-medium">{success}</p>
+              </div>
             </div>
           )}
         </DialogHeader>
 
-        <div className="space-y-6 mt-2">
-          {/* ネットワークモード選択 */}
-          <div className="space-y-2">
-            <Label htmlFor={networkModeId}>ネットワーク</Label>
-            <div className="flex gap-2">
+        <div className="space-y-8 mt-6">
+          {/* ネットワークモード選択 - 改善されたデザイン */}
+          <div className="space-y-3">
+            <Label htmlFor={networkModeId} className="text-lg font-semibold text-gray-700">
+              ネットワーク
+            </Label>
+            <div className="flex gap-3">
               <Button
                 variant={networkMode === 'mainnet' ? 'default' : 'outline'}
                 onClick={() => handleNetworkModeChange('mainnet')}
+                className={`flex-1 py-3 transition-all duration-200 ${
+                  networkMode === 'mainnet' 
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg' 
+                    : 'hover:border-purple-300 hover:bg-purple-50'
+                }`}
+              >
+                Mainnet
+              </Button>
+              <Button
+                variant={networkMode === 'testnet' ? 'default' : 'outline'}
+                onClick={() => handleNetworkModeChange('testnet')}
+                className={`flex-1 py-3 transition-all duration-200 ${
+                  networkMode === 'testnet' 
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg' 
+                    : 'hover:border-purple-300 hover:bg-purple-50'
+                }`}
+              >
+                Testnet
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* 左カラム - トークンと数量 */}
+            <div className="space-y-6">
+              {/* トークン選択 */}
+              <div className="space-y-3">
+                <Label htmlFor={tokenId} className="text-lg font-semibold text-gray-700">
+                  ブリッジトークン
+                </Label>
+                <Select
+                  value={token}
+                  onValueChange={(value: 'ETH' | 'USDC' | 'USDT') => setToken(value)}
+                >
+                  <SelectTrigger className="w-full h-12 text-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentTokens.map((tokenOption) => (
+                      <SelectItem key={tokenOption} value={tokenOption} className="text-lg">
+                        {tokenOption}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">
+                  Base SepoliaからArbitrum Sepoliaにブリッジするトークンを選択
+                </p>
+              </div>
+
+              {/* 数量入力 */}
+              <div className="space-y-3">
+                <Label htmlFor={amountId} className="text-lg font-semibold text-gray-700">
+                  数量
+                </Label>
+                <Input
+                  id={amountId}
+                  type="number"
+                  placeholder="0.0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="h-12 text-lg"
+                  step="0.000001"
+                  min="0"
+                />
+                <p className="text-sm text-gray-500">
+                  ブリッジする{token}の数量を入力してください
+                </p>
+              </div>
+            </div>
+
+            {/* 右カラム - チェーン選択 */}
+            <div className="space-y-6">
+              {/* 送信元チェーン */}
+              <div className="space-y-3">
+                <Label className="text-lg font-semibold text-gray-700">
+                  送信元チェーン
+                </Label>
+                <div className="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                  <p className="text-center text-gray-600 font-medium">
+                    Base Sepolia (84532)
+                  </p>
+                  <p className="text-center text-sm text-gray-500 mt-1">
+                    注意: テスト前にBase SepoliaでUSDCを取得し、Arbitrum SepoliaでETHを取得してください
+                  </p>
+                </div>
+              </div>
+
+              {/* 送信先チェーン */}
+              <div className="space-y-3">
+                <Label htmlFor={targetChainId} className="text-lg font-semibold text-gray-700">
+                  送信先チェーン
+                </Label>
+                <Select
+                  value={targetChain.toString()}
+                  onValueChange={(value) => setTargetChain(parseInt(value) as SUPPORTED_CHAINS_IDS)}
+                >
+                  <SelectTrigger className="w-full h-12 text-lg">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currentChains.map((chain) => (
+                      <SelectItem key={chain.id} value={chain.id.toString()} className="text-lg">
+                        {chain.name} ({chain.id})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* 利用可能な関数の説明 */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-semibold text-blue-800 mb-3">
+              🌉 Base Sepolia → Arbitrium Sepolia ブリッジ & 実行テスト
+            </h3>
+            <div className="space-y-2 text-sm text-blue-700">
+              <p><strong>テスト内容:</strong> Base SepoliaのUSDCをArbitrium Sepoliaにブリッジ後、DonationPoolコントラクトでdonateまたはswapUsdcToPyusdを実行</p>
+              <div className="mt-3">
+                <p className="font-medium">利用可能な関数:</p>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li><strong>donate:</strong> トークンを寄付（USDCをDonationPoolに寄付）</li>
+                  <li><strong>swapUsdcToPyusd:</strong> USDCをPYUSDにスワップ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* 必要な設定情報 */}
+          <div className="bg-gray-50 p-6 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">必要な設定:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium text-gray-700">DonationPoolコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-mono text-xs bg-white p-2 rounded border break-all">
+                  0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700">USDCコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-mono text-xs bg-white p-2 rounded border break-all">
+                  0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700">PYUSDコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-mono text-xs bg-white p-2 rounded border break-all">
+                  0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700">関数名</p>
+                <p className="bg-white p-2 rounded border">
+                  donate - トークンを寄付
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* エラーメッセージ */}
+          {error && (
+            <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {/* アクションボタン */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            {!isInitialized && isConnected && (
+              <Button
+                onClick={handleInitializeSDK}
+                disabled={isInitializing}
+                className="flex-1 h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-lg transition-all duration-200"
+              >
+                {isInitializing ? 'ブリッジ中...' : '✅ USDC用のNexus SDK初期化完了！ テストを開始できます'}
+              </Button>
+            )}
+            
+            <Button
+              onClick={handleBridge}
+              disabled={isLoading || !isConnected || !amount || parseFloat(amount) <= 0}
+              className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-lg transition-all duration-200 shadow-lg"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ブリッジ中...
+                </div>
+              ) : (
+                'ブリッジ実行'
+              )}
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className="h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold text-lg transition-all duration-200"
+            >
+              閉じる
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
                 className="flex-1"
               >
                 メインネット
