@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Copy, Check, QrCode } from "lucide-react";
 import QRCode from "qrcode";
+import Image from "next/image";
 
 export function DonatePageClient({
   unifiedAddress,
@@ -63,10 +64,12 @@ export function DonatePageClient({
         <div className="text-center space-y-4">
           <div className="w-56 h-56 mx-auto bg-white rounded-2xl flex items-center justify-center border-4 border-primary/20 shadow-xl relative overflow-hidden">
             {qrCodeDataUrl ? (
-              <img
+              <Image
                 src={qrCodeDataUrl}
                 alt="寄付アドレスQRコード"
-                className="w-48 h-48 object-contain"
+                width={192}
+                height={192}
+                className="object-contain"
               />
             ) : (
               <>

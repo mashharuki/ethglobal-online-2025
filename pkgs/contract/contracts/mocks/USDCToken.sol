@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-/// @title Mock USD Coin (USDC) for demo
+/// @title Mock USD Coin (USDC) for demo and tests
 contract USDCToken is ERC20 {
   constructor() ERC20("USD Coin", "USDC") {
     _mint(msg.sender, 10_000_000 * 10 ** decimals());

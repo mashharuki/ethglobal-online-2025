@@ -3,6 +3,7 @@ import { Button } from '@/components/atoms/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/atoms/Card';
 import { ArrowRight, Globe, Shield, Zap, Users, TrendingUp, Sparkles, Coins } from 'lucide-react';
 import { mockProjects } from '@/mockdatas';
+import { ProjectList } from '@/components/organisms/ProjectList';
 
 /**
  * CrossDonate Homepage - Exact V0 Design Replica
@@ -94,7 +95,7 @@ export default function HomePage() {
                 統一されたアドレスで複数のブロックチェーンから寄付を受け付けます。
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card className="border-0 shadow-xl gradient-card glass-effect">
                 <CardContent className="p-8">
@@ -102,7 +103,7 @@ export default function HomePage() {
                   <ViewUnifiedBalance />
                 </CardContent>
               </Card>
-              
+
               <Card className="border-0 shadow-xl gradient-card glass-effect">
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-bold text-foreground mb-6">クロスチェーン操作</h3>
@@ -266,6 +267,13 @@ export default function HomePage() {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 作成済みプロジェクト一覧 */}
+      <section className="py-24 px-4 bg-secondary/30">
+        <div className="container mx-auto max-w-6xl">
+          <ProjectList />
         </div>
       </section>
     </div>

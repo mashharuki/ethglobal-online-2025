@@ -1,107 +1,265 @@
-# 推奨コマンド一覧
+# 推奨コマンド・操作ガイド (2025年10月26日最新版)
 
-## モノレポルートコマンド
+## プロジェクト初期セットアップ
+
+### 依存関係インストール
 ```bash
-# 基本操作
-pnpm install                    # 全パッケージの依存関係インストール
-pnpm biome:format              # 全体フォーマット
-pnpm biome:check               # 全体リント + フォーマット
+# ルートで全パッケージをインストール
+pnpm install
 
-# パッケージ別操作
-pnpm frontend <command>        # フロントエンドパッケージでコマンド実行
-pnpm contract <command>        # コントラクトパッケージでコマンド実行
+# フロントエンドのみ
+pnpm frontend install
+
+# コントラクトのみ
+pnpm contract install
 ```
 
-## フロントエンド開発コマンド (pkgs/frontend)
+### 環境設定
 ```bash
-# 開発・ビルド
-pnpm dev                       # 開発サーバー起動 (Next.js)
-pnpm build                     # プロダクションビルド
-pnpm start                     # プロダクションサーバー起動
+# フロントエンド環境変数設定
+cp pkgs/frontend/.env.example pkgs/frontend/.env.local
 
-# コード品質
-pnpm lint                      # Biomeリント (自動修正)
-pnpm format                    # Biomeフォーマット
-pnpm check                     # Biomeリント + フォーマット
-pnpm typecheck                 # TypeScriptタイプチェック
-
-# Git
-pnpm prepare                   # Git hooksセットアップ
+# 必要な環境変数を設定
+# - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+# - NEXT_PUBLIC_AVAIL_NEXUS_API_KEY (if required)
 ```
 
-## コントラクト開発コマンド (pkgs/contract)
+## 開発サーバー起動
+
+### フロントエンド開発
 ```bash
-# ビルド・テスト
-pnpm build                     # コントラクトコンパイル
-pnpm clean                     # アーティファクト削除
-pnpm test                      # テスト実行 (Hardhat v3 + Viem)
+# フロントエンド開発サーバー起動 (http://localhost:3000)
+pnpm frontend dev
 
-# デプロイメント
-pnpm deploy:Counter            # Counterコントラクトデプロイ (Ignition)
-pnpm hardhat ignition deploy ignition/modules/Counter.ts --network sepolia
+# 型チェック
+pnpm frontend typecheck
 
-# スクリプト実行
-pnpm send-op-tx               # OPトランザクション送信
-pnpm get-balance              # 残高取得サンプル
-pnpm increment-counter        # Counterインクリメント
-
-# コード品質
-pnpm format                   # Prettier フォーマット
-pnpm format:check             # フォーマットチェック
+# Biome lint/format
+pnpm frontend check
 ```
 
-## Hardhat詳細コマンド
+### スマートコントラクト開発
 ```bash
-# ネットワーク管理
-pnpm hardhat node             # ローカルノード起動
-pnpm hardhat compile          # コントラクトコンパイル
-pnpm hardhat test             # テスト実行
+# Hardhatローカルノード起動
+pnpm contract hardhat node
 
-# デプロイメント (Ignition)
-pnpm hardhat ignition deploy <module> [--network <network>]
-pnpm hardhat ignition deploy ignition/modules/Counter.ts --network arbitrumSepolia
+# コントラクトコンパイル
+pnpm contract compile
 
-# ネットワーク設定
-# - hardhatMainnet (L1シミュレート)
-# - hardhatOp (Optimismシミュレート)  
-# - sepolia (テストネット)
-# - arbitrumSepolia (テストネット)
+# テスト実行
+pnpm contract test
+
+# カバレッジレポート
+pnpm contract coverage
 ```
 
-## 環境変数設定
+## コード品質管理
+
+### 統一コードフォーマット
 ```bash
-# 必須環境変数 (.env ファイル作成)
-SEPOLIA_RPC_URL=<Sepolia RPC URL>
-ARBITRUM_SEPOLIA_RPC_URL=<Arbitrum Sepolia RPC URL>
-PRIVATE_KEY=<デプロイ・テスト用秘密鍵>
+# ルートレベルでBiome実行（全体）
+pnpm biome:format
+pnpm biome:check
+
+# フロントエンドのみ
+pnpm frontend format
+pnpm frontend lint
+
+# コントラクトのみ (Prettier + Solidity)
+pnpm contract format
 ```
 
-## Git運用コマンド (macOS/zsh)
+### 型安全性チェック
 ```bash
-# 基本操作
-git status                     # 変更状況確認
-git add .                      # 全変更をステージング
-git commit -m "feat: 機能追加" # コンベンショナルコミット
-git push origin <branch>       # リモートにプッシュ
+# フロントエンド型チェック
+pnpm frontend typecheck
 
-# ブランチ管理
-git checkout -b feature/new-feature
-git merge main
-git branch -d feature/old-feature
+# コントラクト型チェック（コンパイル）
+pnpm contract compile
 ```
 
-## macOS固有のユーティリティ
-```bash
-# ファイル検索・操作
-find . -name "*.ts" -type f    # TypeScriptファイル検索
-grep -r "pattern" src/         # パターン検索
-ls -la                         # 詳細リスト表示
-cat package.json               # ファイル内容表示
-head -20 README.md             # ファイル先頭20行表示
-tail -f logs/app.log           # ファイル末尾追跡
+## デプロイメント・テスト
 
-# プロセス管理
-ps aux | grep node             # Node.jsプロセス確認
-kill -9 <PID>                  # プロセス強制終了
-lsof -i :3000                  # ポート3000使用状況確認
+### ローカルデプロイ
+```bash
+# ローカルHardhatノードにデプロイ
+pnpm contract deploy
+
+# Hardhat Ignition使用
+pnpm contract hardhat ignition deploy ignition/modules/Counter.ts --network localhost
+pnpm contract hardhat ignition deploy ignition/modules/DonationPool.ts --network localhost
+```
+
+### テストネットデプロイ
+```bash
+# Sepoliaにデプロイ
+pnpm contract deploy:sepolia
+
+# Arbitrum Sepoliaにデプロイ
+pnpm contract deploy:arbitrum
+
+# Ignition使用（推奨）
+pnpm contract hardhat ignition deploy ignition/modules/DonationPool.ts --network sepolia
+```
+
+### テスト実行
+```bash
+# 全テスト実行
+pnpm contract test
+
+# 特定テスト実行
+pnpm contract hardhat test test/DonationPool.test.ts
+pnpm contract hardhat test test/Counter.test.ts
+
+# ガスレポート付きテスト
+pnpm contract hardhat test --gas-reporter
+```
+
+## Nexus SDK関連操作
+
+### Nexus統合テスト
+```bash
+# Nexusリスナー起動
+pnpm contract hardhat run scripts/nexus-listener.ts
+
+# 残高取得テスト
+pnpm contract hardhat run scripts/get-balance.ts
+
+# クロスチェーントランザクション送信
+pnpm contract hardhat run scripts/send-op-tx.ts
+```
+
+## デバッグ・ログ確認
+
+### フロントエンド
+```bash
+# 開発モードでログ確認
+pnpm frontend dev
+
+# ビルドテスト
+pnpm frontend build
+pnpm frontend start
+```
+
+### コントラクト
+```bash
+# Hardhatコンソール起動
+pnpm contract hardhat console --network localhost
+
+# デバッグログ付きテスト
+DEBUG=true pnpm contract test
+
+# トランザクション詳細確認
+pnpm contract hardhat run scripts/get-balance.ts --network sepolia
+```
+
+## CREATE2アドレス関連
+
+### 統一アドレス計算・デプロイ
+```bash
+# CREATE2アドレス事前計算
+pnpm contract hardhat run scripts/calculate-create2-address.ts
+
+# CREATE2デプロイ
+pnpm contract hardhat run scripts/deploy-create2.ts --network sepolia
+pnpm contract hardhat run scripts/deploy-create2.ts --network arbitrumSepolia
+```
+
+## パフォーマンス・最適化
+
+### バンドルサイズ分析
+```bash
+# Next.js バンドル分析
+pnpm frontend build
+npx @next/bundle-analyzer
+
+# 依存関係分析
+pnpm frontend why <package-name>
+```
+
+### コントラクトガス最適化
+```bash
+# ガス使用量レポート
+pnpm contract hardhat test --gas-reporter
+
+# ストレージレイアウト確認
+pnpm contract hardhat storage-layout contracts/DonationPool.sol
+```
+
+## トラブルシューティング
+
+### よくある問題と解決法
+```bash
+# キャッシュクリア
+pnpm contract clean
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+
+# TypeScript型エラー解決
+pnpm frontend typecheck
+pnpm contract compile
+
+# Git hooks確認
+pnpm frontend prepare
+
+# Hardhat設定確認
+pnpm contract hardhat config
+```
+
+### ログ・デバッグ出力
+```bash
+# 詳細ログ出力
+DEBUG=* pnpm frontend dev
+DEBUG=* pnpm contract test
+
+# Nexus SDK デバッグ
+DEBUG=nexus:* pnpm frontend dev
+```
+
+## ETHGlobal提出準備
+
+### プロダクション準備
+```bash
+# フロントエンドプロダクションビルド
+pnpm frontend build
+
+# コントラクト最終テスト
+pnpm contract test
+pnpm contract coverage
+
+# 全体品質チェック
+pnpm biome:check
+```
+
+### デモ準備
+```bash
+# 全サービス同時起動
+pnpm contract hardhat node &
+pnpm frontend dev
+
+# テストデータ投入
+pnpm contract hardhat run scripts/deploy-test-data.ts --network localhost
+```
+
+## 高度なツール活用
+
+### Hardhat Ignition詳細操作
+```bash
+# デプロイメント履歴確認
+pnpm contract hardhat ignition list
+
+# デプロイメント詳細確認
+pnpm contract hardhat ignition status Counter#Counter
+
+# デプロイメントロールバック（開発時）
+pnpm contract hardhat ignition wipe Counter#Counter --network localhost
+```
+
+### Viem統合操作
+```bash
+# Viemクライアント使用例
+pnpm contract hardhat run scripts/viem-example.ts
+
+# 型安全なコントラクト操作
+pnpm contract hardhat run scripts/typed-contract-calls.ts
 ```

@@ -8,6 +8,7 @@
     "build": "pnpm hardhat build",
     "clean": "pnpm hardhat clean",
     "test": "pnpm hardhat test",
+    "verify": "npx hardhat verify",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
@@ -23,6 +24,11 @@
     "demo:withdraw-usdc": "pnpm hardhat run scripts/demo/withdraw-usdc.ts",
     "demo:withdraw-pyusd": "pnpm hardhat run scripts/demo/withdraw-pyusd.ts",
     "demo:nexus-listener": "pnpm hardhat run scripts/nexus-listener.ts"
+    "donate": "pnpm hardhat run scripts/donate.ts",
+    "swapUsdcToPyusd": "pnpm hardhat run scripts/swapUsdcToPyusd.ts",
+    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
+    "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
+    "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.0"
