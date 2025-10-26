@@ -26,7 +26,7 @@ pnpm deploy:DonationPool --network sepolia \
 
 # 4. Arbitrum SepoliaでPYUSDをターゲットとしてDonationPoolをデプロイ
 pnpm deploy:DonationPool --network arbitrumSepolia \
-  --parameters '{"DonationPoolModule":{"targetToken":"0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1","initialSupportedTokens":["0x0000000000000000000000000000000000000000","0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1"]}}'
+  --parameters '{"DonationPoolModule":{"targetToken":"0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1","initialSupportedTokens":["0x0000000000000000000000000000000000000000","0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1", "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"]}}'
 ```
 
 ### Mainnet環境でのPYUSDセットアップ

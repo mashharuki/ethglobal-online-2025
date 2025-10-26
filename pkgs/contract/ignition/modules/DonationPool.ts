@@ -18,6 +18,7 @@ export default buildModule("DonationPoolModule", (m) => {
 
   // 初期サポートトークン配列もパラメータ化
   // デフォルトはETHのみ。追加トークンはコマンド引数で指定
+  // 他に USDCとPYUSDを含めること
   const initialSupportedTokens = m.getParameter("initialSupportedTokens", [
     "0x0000000000000000000000000000000000000000", // ETH (常に含める)
   ]);

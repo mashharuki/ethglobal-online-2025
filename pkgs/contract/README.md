@@ -1,6 +1,6 @@
 # CrossDonate Smart Contracts
 
-CrossDonate プロジェクトのスマートコントラクト実装です。  
+CrossDonate プロジェクトのスマートコントラクト実装です。
 CREATE2 と Avail Nexus SDK を用いて **マルチチェーンで統一アドレス**を実現し、複数チェーン・複数トークンからの寄付を安全に受け付け、統一的に管理します。
 
 - Solidity: `^0.8.28`（最適化有効のプロファイル）
@@ -10,7 +10,7 @@ CREATE2 と Avail Nexus SDK を用いて **マルチチェーンで統一アド�
 
 ## 概要
 
-CrossDonate は、寄付の受付から残高・統計の確認、緊急時の資金退避までをカバーします。  
+CrossDonate は、寄付の受付から残高・統計の確認、緊急時の資金退避までをカバーします。
 CREATE2 により **チェーンを跨いでも同一のデプロイアドレス**を維持できます。
 
 ---
@@ -49,5 +49,31 @@ CREATE2 により **チェーンを跨いでも同一のデプロイアドレス
 ## インストール
 
 **モノレポのルート**で実行:
+
 ```sh
 pnpm install
+```
+
+## スクリプト系
+
+### donate
+
+Aribitrum sepolia 上の USDCを指定する場合
+
+```bash
+pnpm contract run donate --network arbitrumSepolia
+```
+
+以下のようになっていればOK
+
+```bash
+========================= [START] =========================
+Sender address: 0x51908f598a5e0d8f1a3babfa6df76f9704dad072
+ChainID: 421614
+Donating to contract DonationPoolModule#DonationPool at address: 0x677fA3F54bab17C4654A534683F1CEab94278632
+Approve tx receipt: 0x2c46a276a69045ab869ff0065077e68a8c922c60e6822eba73a38c0e046883f6
+Donate tx receipt: 0xd273a484ae10795b2833ca6097f3a0038f6ca8455254ad1688533270740dd4b4
+========================= [END] =========================
+```
+
+###
