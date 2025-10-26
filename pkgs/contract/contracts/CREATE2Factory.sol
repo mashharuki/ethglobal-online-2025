@@ -123,14 +123,6 @@ contract CREATE2Factory {
             revert InvalidSalt(params.salt);
         }
 
-        // アドレスを事前計算
-        poolAddress = _calculateAddress(params.salt, params.owner);
-
-        // 既にデプロイされているかチェック
-        if (deployedPools[poolAddress]) {
-            revert PoolAlreadyExists(poolAddress);
-        }
-
         // CREATE2を使用してデプロイ
         bytes memory bytecode = abi.encodePacked(
             type(DonationPool).creationCode,
@@ -142,13 +134,19 @@ contract CREATE2Factory {
             )
         );
 
+        bytes32 salt = params.salt;
         assembly {
-            poolAddress := create2(0, add(bytecode, 0x20), mload(bytecode), params.salt)
+            poolAddress := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
         }
 
         // デプロイが成功したかチェック
         if (poolAddress == address(0)) {
             revert DeploymentFailed(poolAddress);
+        }
+
+        // 既にデプロイされているかチェック（デプロイ後にチェック）
+        if (deployedPools[poolAddress]) {
+            revert PoolAlreadyExists(poolAddress);
         }
 
         // プール情報を記録
@@ -214,12 +212,15 @@ contract CREATE2Factory {
      * @return calculatedAddress 計算されたアドレス
      */
     function _calculateAddress(bytes32 salt, address owner) internal view returns (address calculatedAddress) {
+        // Note: For accurate calculation, we need to use the same parameters as actual deployment
+        // However, for a simplified version, we use a placeholder approach
+        // In production, you might want to pass the actual deployment parameters
         bytes memory bytecode = abi.encodePacked(
             type(DonationPool).creationCode,
             abi.encode(
                 "", // プロジェクト名（計算時は空でOK）
                 "", // プロジェクト説明（計算時は空でOK）
-                address(0), // 目標トークン（計算時はゼロアドレスでOK）
+                address(1), // 目標トークン（計算時は適切なダミーアドレス）
                 owner
             )
         );

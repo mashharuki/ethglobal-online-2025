@@ -128,6 +128,32 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     }
 
   /// @inheritdoc IDonationPool
+  function initiateConversion(
+    address token,
+    uint256 amount,
+    string calldata targetChain,
+    bytes calldata targetRecipient,
+    bytes calldata metadata
+  ) external payable override returns (bytes32 conversionId) {
+    // For now, this is a simple implementation that generates a conversion ID
+    // In a real implementation, this would integrate with cross-chain protocols
+    conversionId = keccak256(abi.encodePacked(
+      msg.sender,
+      token,
+      amount,
+      targetChain,
+      targetRecipient,
+      metadata,
+      block.timestamp,
+      block.number
+    ));
+
+    // Note: This is a placeholder implementation
+    // Real implementation would need to integrate with cross-chain infrastructure
+    return conversionId;
+  }
+
+  /// @inheritdoc IDonationPool
   function swapUsdcToPyusd(address usdc, address pyusd, uint256 amount, address to)
     external
     override
@@ -196,15 +222,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     }
 
     // -------- Receive --------
-
-    /// @dev 受動的に ETH を受領した場合も寄付扱いにする
-    receive() external payable {
-        if (msg.value > 0 && supportedTokens[address(0)]) {
-            _balances[address(0)] += msg.value;
-            _trackToken(address(0));
-            emit DonatedETH(msg.sender, msg.value);
-        }
-    }
+    // Note: receive() function is already defined above around line 155
 
     // -------- Internal --------
 
