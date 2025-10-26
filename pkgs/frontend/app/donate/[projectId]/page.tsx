@@ -1,9 +1,9 @@
-import { Coins, ExternalLink, Shield, TrendingUp, Zap } from 'lucide-react';
-import Link from 'next/link';
 import { Button } from '@/components/atoms/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
 import { DonatePageClient } from '@/components/organisms/DonatePageClient';
 import { getProjectById, mockRecentDonations, mockSupportedTokens } from '@/mockdatas';
+import { Coins, ExternalLink, Shield, TrendingUp, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function DonatePage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;

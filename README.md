@@ -10,7 +10,7 @@ Universal Non-Custodial Donation Receiver
 
 ![](./docs/assets/overview.png)
 
-## Futute
+## Future
 
 ![](./docs/assets/future.png)
 
