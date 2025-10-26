@@ -1,16 +1,14 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/atoms/Button";
-import { Copy, Check, QrCode } from "lucide-react";
-import QRCode from "qrcode";
-import Image from "next/image";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/atoms/Button';
+import { Copy, Check, QrCode } from 'lucide-react';
+import QRCode from 'qrcode';
+import Image from 'next/image';
 
-export function DonatePageClient({
-  unifiedAddress,
-}: { unifiedAddress: string }) {
+export function DonatePageClient({ unifiedAddress }: { unifiedAddress: string }) {
   const [copied, setCopied] = useState(false);
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   const handleCopy = () => {
     navigator.clipboard.writeText(unifiedAddress);
@@ -25,13 +23,13 @@ export function DonatePageClient({
           width: 200,
           margin: 2,
           color: {
-            dark: "#000000",
-            light: "#FFFFFF",
+            dark: '#000000',
+            light: '#FFFFFF',
           },
         });
         setQrCodeDataUrl(qrCodeUrl);
       } catch (error) {
-        console.error("QRコード生成エラー:", error);
+        console.error('QRコード生成エラー:', error);
       }
     };
 
@@ -79,12 +77,8 @@ export function DonatePageClient({
             )}
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">
-              QRコードで簡単送金
-            </p>
-            <p className="text-xs text-muted-foreground">
-              モバイルウォレットでスキャンして送金
-            </p>
+            <p className="text-sm font-semibold text-foreground">QRコードで簡単送金</p>
+            <p className="text-xs text-muted-foreground">モバイルウォレットでスキャンして送金</p>
           </div>
         </div>
       </div>
