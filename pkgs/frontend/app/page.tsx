@@ -20,7 +20,7 @@ export default function HomePage() {
               <Card className="border-0 shadow-xl gradient-card glass-effect w-full max-w-4xl">
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-bold text-foreground mb-6 text-center">
-                    Cross-chain operation
+                    Cross-chain Donate operation
                   </h3>
                   <Nexus />
                 </CardContent>

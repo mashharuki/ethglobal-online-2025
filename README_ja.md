@@ -65,7 +65,7 @@ ETHGlobal Online 2025ハッカソンのために、私たちのMVPはHardhat V3�
 - 複数のトークン変換による複雑な会計処理
 - 秘密鍵管理の単一障害点によるセキュリティリスク
 
-## プロジェクトのアーキテクチャ
+## プロジェクトアーキテクチャ
 
 ```mermaid
 graph TB
@@ -73,43 +73,55 @@ graph TB
         A[Next.js 15 + React 19] --> B[Nexus SDK統合]
         A --> C[RainbowKitウォレット接続]
         A --> D[Tailwind CSS 4.0 UI]
+        A --> E[SwapToPyusdCardコンポーネント]
     end
 
     subgraph "スマートコントラクト層"
-        E[DonationPool.sol] --> F[CREATE2Factory.sol]
-        E --> G[PYUSD統合]
-        E --> H[緊急引き出し機能]
+        F[DonationPool.sol] --> G[CREATE2Factory.sol]
+        F --> H[USDC ⟷ PYUSD変換]
+        F --> I[緊急引き出し]
+        F --> J[swapUsdcToPyusdメソッド]
     end
 
     subgraph "クロスチェーンインフラ"
-        I[Avail Nexus SDK] --> J[クロスチェーン集約]
-        I --> K[トークン変換]
-        I --> L[統一残高表示]
+        K[Avail Nexus SDK] --> L[クロスチェーン集約]
+        K --> M[トークン変換]
+        K --> N[統一残高表示]
     end
 
     subgraph "開発ツール"
-        M[Hardhat V3 + Viem] --> N[TypeScript統合]
-        M --> O[Ignitionデプロイ]
-        M --> P[ガス最適化]
+        O[Hardhat V3 + Viem] --> P[TypeScript統合]
+        O --> Q[Ignitionデプロイメント]
+        O --> R[ガス最適化]
     end
 
-    A --> E
-    B --> I
-    E --> I
+    subgraph "トークンエコシステム"
+        S[USDC Mockトークン]
+        T[PYUSD Mockトークン]
+        U[ETHネイティブトークン]
+    end
+
+    A --> F
+    B --> K
+    F --> K
+    E --> J
+    J --> H
+    H --> S
+    H --> T
 
     subgraph "対応ネットワーク"
-        Q[Ethereum メインネット]
-        R[Arbitrum]
-        S[Base]
-        T[Sepolia テストネット]
-        U[Arbitrum Sepolia]
+        V[Ethereum メインネット]
+        W[Arbitrum]
+        X[Base]
+        Y[Sepolia テストネット]
+        Z[Arbitrum Sepolia]
     end
 
-    I --> Q
-    I --> R
-    I --> S
-    E --> T
-    E --> U
+    K --> V
+    K --> W
+    K --> X
+    F --> Y
+    F --> Z
 ```
 
 ## プロジェクトで実装した機能一覧
@@ -120,6 +132,7 @@ graph TB
 | **クロスチェーン寄付** | 複数のEVMチェーンでの寄付受付 | ✅ 完了 | Avail Nexus SDK |
 | **PYUSD統合** | PayPal USDステーブルコインサポート | ✅ 完了 | PYUSDスマートコントラクト |
 | **トークン変換** | 自動USDC→PYUSD変換 | ✅ 完了 | DonationPool.sol |
+| **USDC→PYUSD変換UI** | 管理者向け手動トークン変換インターフェース | ✅ 完了 | SwapToPyusdCard.tsx |
 | **プロジェクト管理** | 寄付プロジェクトの作成・管理 | ✅ 完了 | Next.jsフロントエンド |
 | **ウォレット統合** | RainbowKitによるモダンなウォレット接続 | ✅ 完了 | Wagmi + RainbowKit |
 | **リアルタイム残高表示** | チェーン間のライブ残高追跡 | ✅ 完了 | useNexusBalanceフック |
@@ -208,11 +221,13 @@ Avail Nexusにより、システムの最も複雑な部分—クロスチェー
 | **Solidityコンパイラ** | Solidity | 0.8.28 | スマートコントラクト言語 |
 | **セキュリティライブラリ** | OpenZeppelin | 5.0.0 | 実戦で検証済みコントラクトコンポーネント |
 
-## Deployed Contract
+## デプロイ済みコントラクト
 
-| Contract | Network | Address |
+| コントラクト | ネットワーク | アドレス |
 |:----------|:---------|:---------|
-|**DonationPool**|Arbitrum Sepolia|[0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11](https://sepolia.arbiscan.io/address/0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11)|
+|**DonationPool**|Arbitrum Sepolia|[0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3](https://sepolia.arbiscan.io/address/0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3)|
+|**USDC Mock**|Arbitrum Sepolia|[0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d](https://sepolia.arbiscan.io/address/0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d)|
+|**PYUSD Mock**|Arbitrum Sepolia|[0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1](https://sepolia.arbiscan.io/address/0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1)|
 
 ## スポンサープライズ向けディスクリプション
 
@@ -251,7 +266,7 @@ Avail Nexusにより、システムの最も複雑な部分—クロスチェー
 - `nexus-listener.ts`によるクロスチェーントランザクションのイベントリスニング
 - 統一されたチェーン非依存データを表示するためのフロントエンドコンポーネント設計
 
-### 💳 PayPal - どのようにPYUSDを使っているのか
+### 💳 PayPal賞 - どのようにPYUSDを使っているのか
 
 私たちのプラットフォームは、安定性とPayPalエコシステムの互換性を確保するために、寄付の主要ステーブルコインとしてPYUSDを中心に構築されています：
 
@@ -259,60 +274,159 @@ Avail Nexusにより、システムの最も複雑な部分—クロスチェー
 
 1. **スマートコントラクト統合:**
    ```solidity
-   // DonationPool.sol
-   function swapUsdcToPyusd(uint256 usdcAmount) external onlyOwner {
-       // 自動USDC→PYUSD変換ロジック
+   // DonationPool.sol - コアPYUSD変換機能
+   function swapUsdcToPyusd(
+       address usdc,
+       address pyusd,
+       uint256 amount,
+       address to
+   ) external onlyOwner nonReentrant {
+       // CEIパターンによる安全な1:1 USDC→PYUSD変換
+       if (_balances[usdc] < amount) revert InsufficientBalance();
+       _balances[usdc] -= amount;
+       IERC20(pyusd).safeTransfer(to, amount);
+       emit Swapped(usdc, pyusd, to, amount);
    }
    ```
 
-2. **テスト用モック実装:**
-   - `PYUSDToken.sol` - 開発用完全PYUSDモック
-   - `USDCToken.sol` - 変換テスト用USDCモック
-   - `USDCtoPYUSD.test.ts`での包括的テストスイート
+2. **高度な管理インターフェース:**
+   - **SwapToPyusdCard.tsx** - USDC→PYUSD変換用プロフェッショナルUI
+   - Wagmi統合によるリアルタイムトランザクション状態
+   - 金額と受信者アドレスのフォームバリデーション
+   - Arbitrumエクスプローラーリンク付き詳細トランザクションフィードバック
 
-3. **フロントエンドPYUSD機能:**
-   - リアルタイム更新付きPYUSD残高表示
-   - USDCとPYUSD間の変換レート追跡
-   - PayPalブランディングとPYUSD専用UIコンポーネント
+3. **デプロイ済みコントラクト統合:**
+   - **PYUSD Mock**: `0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1` (Arbitrum Sepolia)
+   - **USDC Mock**: `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` (Arbitrum Sepolia)
+   - **DonationPool**: `0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3` (変換ロジック搭載)
 
-4. **変換メカニズム:**
-   - **自動変換**: 入金されたUSDC寄付の自動PYUSD変換
-   - **レート最適化**: 最適な変換レートを取得するスマートコントラクトロジック
-   - **残高管理**: すべての寄付ソースにわたる統一PYUSD残高追跡
+4. **フロントエンドPYUSD機能:**
+   - Nexus SDK経由でのリアルタイム更新付きPYUSD残高表示
+   - 専用PYUSD変換カード付き管理ダッシュボード
+   - モバイル・デスクトップ最適化レスポンシブデザイン
+   - 包括的エラーハンドリングと成功通知
 
-#### **ユーザーへの利益:**
-- **安定性**: PYUSDのUSDペッグにより寄付価値が安定
-- **PayPal統合**: PayPalの幅広いエコシステムとの将来的な統合可能性
+5. **セキュリティ・ユーザー体験:**
+   - **オーナー専用アクセス**: プロジェクト管理者のみに変換を制限
+   - **CEIパターン**: リエントランシー保護のためのChecks-Effects-Interactions
+   - **安全な転送**: 安全なトークン操作のためのOpenZeppelin SafeERC20
+   - **トランザクション追跡**: イベント発行による完全監査証跡
+
+#### **実世界実装:**
+私たちのPYUSD統合は基本的なトークンサポートを超えています - 完全なエコシステムを構築しました：
+- **USDCでの寄付フロー** (最も一般的なステーブルコイン)
+- **PYUSDへの自動変換** PayPalエコシステムの利益のため
+- **柔軟な財務管理のための管理制御**
+- **PYUSDをターゲットアセットとするクロスチェーン集約**
 - **低ボラティリティ**: 寄付者・受益者双方のリスク軽減
 
-### 🔨 Hardhat - どのようにhardhat V3を使っているのか
+### 🔨 Hardhat賞 - どのようにHardhat V3を使っているのか
 
-私たちのプロジェクトは、モダンなTypeScript統合でHardhat V3の高度な機能を紹介しています：
+私たちのプロジェクトは、モダンなTypeScript統合と最先端の開発プラクティスでHardhat V3の高度な機能を紹介しています：
 
 #### **Hardhat V3高度機能:**
 
 1. **Viem統合** (`@nomicfoundation/hardhat-viem: 3.0.0`)
    ```typescript
-   // テストでの完全TypeScript統合
+   // テストとデプロイでの完全TypeScript統合
    const donationPool = await viem.deployContract("DonationPool", [
      owner.address, targetToken, supportedTokens
+   ]);
+
+   // 型安全なコントラクトインタラクション
+   const swapTx = await donationPool.write.swapUsdcToPyusd([
+     USDC_ADDRESS, PYUSD_ADDRESS, parseUnits("100", 6), recipient
    ]);
    ```
 
 2. **Hardhat Ignition** (`@nomicfoundation/hardhat-ignition: 3.0.0`)
    ```typescript
-   // ignition/modules/DonationPool.ts
+   // ignition/modules/DonationPool.ts - 宣言的デプロイメント
    export default buildModule("DonationPool", (m) => {
      const owner = m.getAccount(0);
-     const targetToken = m.getParameter("targetToken");
-     return { donationPool: m.contract("DonationPool", [owner, targetToken, []]) };
+     const targetToken = m.getParameter("targetToken", PYUSD_ADDRESS);
+     const supportedTokens = [USDC_ADDRESS, PYUSD_ADDRESS, ZERO_ADDRESS];
+
+     return {
+       donationPool: m.contract("DonationPool", [owner, targetToken, supportedTokens])
+     };
    });
    ```
 
 3. **モダンテストフレームワーク:**
-   - MochaではなくNode.js組み込みテストランナー
-   - Viemによる型安全なコントラクトインタラクション
-   - ガスレポート付きの包括的テストカバレッジ
+   ```typescript
+   // Viemを使用したNode.js組み込みテストランナー
+   import { test } from 'node:test';
+   import assert from 'node:assert';
+
+   test('USDC to PYUSD swap functionality', async () => {
+     const client = await viem.getTestClient();
+     const [owner, recipient] = await client.getAddresses();
+
+     // 型安全で高速なテスト実行
+     const result = await donationPool.write.swapUsdcToPyusd([
+       USDC_ADDRESS, PYUSD_ADDRESS, parseUnits("50", 6), recipient
+     ]);
+
+     assert(result.status === 'success');
+   });
+   ```
+
+4. **高度なデプロイメント・検証:**
+   ```bash
+   # モダンデプロイワークフロー
+   npx hardhat ignition deploy ignition/modules/DonationPool.ts --network arbitrumSepolia
+   npx hardhat verify --network arbitrumSepolia 0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3
+   ```
+
+#### **開発体験の向上:**
+
+1. **完全な型安全性:**
+   ```typescript
+   // hardhat.config.ts - 完全型付き設定
+   const config: HardhatUserConfig = {
+     solidity: {
+       version: "0.8.28",
+       settings: {
+         optimizer: { enabled: true, runs: 200 },
+         evmVersion: "shanghai"
+       }
+     },
+     networks: {
+       arbitrumSepolia: {
+         url: process.env.ARBITRUM_SEPOLIA_URL,
+         accounts: [process.env.PRIVATE_KEY!]
+       }
+     }
+   };
+   ```
+
+2. **ガス最適化・モダンSolidity:**
+   - 最新機能を持つSolidity 0.8.28
+   - ガス効率のためのカスタムエラー
+   - OpenZeppelin 5.0.0コントラクト
+   - 包括的ReentrancyGuard保護
+
+3. **統合開発ワークフロー:**
+   ```json
+   // V3機能を紹介するpackage.jsonスクリプト
+   {
+     "build": "hardhat compile",
+     "test": "hardhat test",
+     "deploy": "hardhat ignition deploy ignition/modules/DonationPool.ts",
+     "verify": "hardhat verify --network arbitrumSepolia"
+   }
+   ```
+
+#### **実証された実世界の利益:**
+
+- **高速開発**: ViemのTypeScriptファーストアプローチでランタイムエラーを排除
+- **安全なデプロイメント**: Ignitionの宣言的アプローチでデプロイミスを防止
+- **より良いテスト**: 組み込みNode.jsテストランナーで高速テスト実行
+- **プロフェッショナルDevOps**: 自動検証・デプロイスクリプト
+- **モダン標準**: ガス最適化を伴う最新Solidityバージョン
+
+**私たちの実装は、開発者の生産性とコード品質を大幅に向上させる本格的なエンタープライズグレード開発環境としてのHardhat V3を紹介しています。**
 
 4. **高度デプロイメント:**
    ```bash

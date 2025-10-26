@@ -73,31 +73,56 @@ graph TB
         A[Next.js 15 + React 19] --> B[Nexus SDK Integration]
         A --> C[RainbowKit Wallet Connection]
         A --> D[Tailwind CSS 4.0 UI]
+        A --> E[SwapToPyusdCard Component]
     end
 
     subgraph "Smart Contract Layer"
-        E[DonationPool.sol] --> F[CREATE2Factory.sol]
-        E --> G[PYUSD Integration]
-        E --> H[Emergency Withdrawal]
+        F[DonationPool.sol] --> G[CREATE2Factory.sol]
+        F --> H[USDC ⟷ PYUSD Conversion]
+        F --> I[Emergency Withdrawal]
+        F --> J[swapUsdcToPyusd Method]
     end
 
     subgraph "Cross-Chain Infrastructure"
-        I[Avail Nexus SDK] --> J[Cross-Chain Aggregation]
-        I --> K[Token Conversion]
-        I --> L[Unified Balance Display]
+        K[Avail Nexus SDK] --> L[Cross-Chain Aggregation]
+        K --> M[Token Conversion]
+        K --> N[Unified Balance Display]
     end
 
     subgraph "Development Tools"
-        M[Hardhat V3 + Viem] --> N[TypeScript Integration]
-        M --> O[Ignition Deployment]
-        M --> P[Gas Optimization]
+        O[Hardhat V3 + Viem] --> P[TypeScript Integration]
+        O --> Q[Ignition Deployment]
+        O --> R[Gas Optimization]
     end
 
-    A --> E
-    B --> I
-    E --> I
+    subgraph "Token Ecosystem"
+        S[USDC Mock Token]
+        T[PYUSD Mock Token]
+        U[ETH Native Token]
+    end
+
+    A --> F
+    B --> K
+    F --> K
+    E --> J
+    J --> H
+    H --> S
+    H --> T
 
     subgraph "Supported Networks"
+        V[Ethereum Mainnet]
+        W[Arbitrum]
+        X[Base]
+        Y[Sepolia Testnet]
+        Z[Arbitrum Sepolia]
+    end
+
+    K --> V
+    K --> W
+    K --> X
+    F --> Y
+    F --> Z
+```
         Q[Ethereum Mainnet]
         R[Arbitrum]
         S[Base]
@@ -120,6 +145,7 @@ graph TB
 | **Cross-Chain Donations** | Accept donations on multiple EVM chains | ✅ Complete | Avail Nexus SDK |
 | **PYUSD Integration** | PayPal USD stablecoin support | ✅ Complete | PYUSD Smart Contract |
 | **Token Conversion** | Automatic USDC to PYUSD swapping | ✅ Complete | DonationPool.sol |
+| **USDC→PYUSD Swap UI** | Admin interface for manual token conversion | ✅ Complete | SwapToPyusdCard.tsx |
 | **Project Management** | Create and manage donation projects | ✅ Complete | Next.js Frontend |
 | **Wallet Integration** | Modern wallet connection with RainbowKit | ✅ Complete | Wagmi + RainbowKit |
 | **Real-time Balance Display** | Live balance tracking across chains | ✅ Complete | useNexusBalance Hook |
@@ -208,11 +234,13 @@ Additionally, instead of setting up a complex indexing service, we implemented r
 | **Solidity Compiler** | Solidity | 0.8.28 | Smart contract language |
 | **Security Library** | OpenZeppelin | 5.0.0 | Battle-tested contract components |
 
-## Deployed Contract
+## Deployed Contracts
 
 | Contract | Network | Address |
 |:----------|:---------|:---------|
-|**DonationPool**|Arbitrum Sepolia|[0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11](https://sepolia.arbiscan.io/address/0x8D649Ae3C6DEf2b21db9867dB92fDA10Fc231a11)|
+|**DonationPool**|Arbitrum Sepolia|[0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3](https://sepolia.arbiscan.io/address/0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3)|
+|**USDC Mock**|Arbitrum Sepolia|[0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d](https://sepolia.arbiscan.io/address/0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d)|
+|**PYUSD Mock**|Arbitrum Sepolia|[0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1](https://sepolia.arbiscan.io/address/0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1)|
 
 ## Sponsor Prize Descriptions
 
@@ -259,45 +287,158 @@ Our platform is built around PYUSD as the primary stablecoin for donations, ensu
 
 1. **Smart Contract Integration:**
    ```solidity
-   // DonationPool.sol
-   function swapUsdcToPyusd(uint256 usdcAmount) external onlyOwner {
-       // Automatic USDC to PYUSD conversion logic
+   // DonationPool.sol - Core PYUSD conversion functionality
+   function swapUsdcToPyusd(
+       address usdc,
+       address pyusd,
+       uint256 amount,
+       address to
+   ) external onlyOwner nonReentrant {
+       // Secure 1:1 USDC to PYUSD conversion with CEI pattern
+       if (_balances[usdc] < amount) revert InsufficientBalance();
+       _balances[usdc] -= amount;
+       IERC20(pyusd).safeTransfer(to, amount);
+       emit Swapped(usdc, pyusd, to, amount);
    }
    ```
 
-2. **Mock Implementation for Testing:**
-   - `PYUSDToken.sol` - Complete PYUSD mock for development
-   - `USDCToken.sol` - USDC mock for conversion testing
-   - Comprehensive test suite in `USDCtoPYUSD.test.ts`
+2. **Advanced Admin Interface:**
+   - **SwapToPyusdCard.tsx** - Professional UI for USDC→PYUSD conversion
+   - Real-time transaction status with Wagmi integration
+   - Form validation for amount and recipient address
+   - Detailed transaction feedback with Arbitrum explorer links
 
-3. **Frontend PYUSD Features:**
-   - PYUSD balance display with real-time updates
-   - Conversion rate tracking between USDC and PYUSD
-   - PayPal branding and PYUSD-specific UI components
+3. **Deployed Contract Integration:**
+   - **PYUSD Mock**: `0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1` on Arbitrum Sepolia
+   - **USDC Mock**: `0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d` on Arbitrum Sepolia
+   - **DonationPool**: `0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3` with conversion logic
 
-4. **Conversion Mechanisms:**
-   - **Automatic Conversion**: Incoming USDC donations automatically converted to PYUSD
-   - **Rate Optimization**: Smart contract logic to get best conversion rates
-   - **Balance Management**: Unified PYUSD balance tracking across all donation sources
+4. **Frontend PYUSD Features:**
+   - PYUSD balance display with real-time updates via Nexus SDK
+   - Admin dashboard with dedicated PYUSD conversion card
+   - Responsive design optimized for mobile and desktop
+   - Comprehensive error handling and success notifications
 
-#### **Benefits for Users:**
-- **Stability**: PYUSD's peg to USD ensures donation values remain stable
-- **PayPal Integration**: Potential future integration with PayPal's broader ecosystem
-- **Lower Volatility**: Reduced risk for both donors and recipients
+5. **Security & User Experience:**
+   - **Owner-only access**: Conversion restricted to project administrators
+   - **CEI Pattern**: Checks-Effects-Interactions for reentrancy protection
+   - **Safe transfers**: OpenZeppelin SafeERC20 for secure token operations
+   - **Transaction tracking**: Full audit trail with event emissions
+
+#### **Real-World Implementation:**
+Our PYUSD integration goes beyond basic token support - we've created a complete ecosystem where:
+- **Donations flow through USDC** (most common stablecoin)
+- **Automatic conversion to PYUSD** for PayPal ecosystem benefits
+- **Admin controls** for flexible treasury management
+- **Cross-chain aggregation** with PYUSD as the target asset
 
 ### 🔨 Hardhat Prize - How We Use Hardhat V3
 
-Our project showcases advanced Hardhat V3 features with modern TypeScript integration:
+Our project showcases advanced Hardhat V3 features with modern TypeScript integration and cutting-edge development practices:
 
 #### **Hardhat V3 Advanced Features:**
 
 1. **Viem Integration** (`@nomicfoundation/hardhat-viem: 3.0.0`)
    ```typescript
-   // Full TypeScript integration in tests
+   // Full TypeScript integration in tests and deployment
    const donationPool = await viem.deployContract("DonationPool", [
      owner.address, targetToken, supportedTokens
    ]);
+
+   // Type-safe contract interactions
+   const swapTx = await donationPool.write.swapUsdcToPyusd([
+     USDC_ADDRESS, PYUSD_ADDRESS, parseUnits("100", 6), recipient
+   ]);
    ```
+
+2. **Hardhat Ignition** (`@nomicfoundation/hardhat-ignition: 3.0.0`)
+   ```typescript
+   // ignition/modules/DonationPool.ts - Declarative deployment
+   export default buildModule("DonationPool", (m) => {
+     const owner = m.getAccount(0);
+     const targetToken = m.getParameter("targetToken", PYUSD_ADDRESS);
+     const supportedTokens = [USDC_ADDRESS, PYUSD_ADDRESS, ZERO_ADDRESS];
+
+     return {
+       donationPool: m.contract("DonationPool", [owner, targetToken, supportedTokens])
+     };
+   });
+   ```
+
+3. **Modern Testing Framework:**
+   ```typescript
+   // Using Node.js built-in test runner with Viem
+   import { test } from 'node:test';
+   import assert from 'node:assert';
+
+   test('USDC to PYUSD swap functionality', async () => {
+     const client = await viem.getTestClient();
+     const [owner, recipient] = await client.getAddresses();
+
+     // Type-safe, fast test execution
+     const result = await donationPool.write.swapUsdcToPyusd([
+       USDC_ADDRESS, PYUSD_ADDRESS, parseUnits("50", 6), recipient
+     ]);
+
+     assert(result.status === 'success');
+   });
+   ```
+
+4. **Advanced Deployment & Verification:**
+   ```bash
+   # Modern deployment workflow
+   npx hardhat ignition deploy ignition/modules/DonationPool.ts --network arbitrumSepolia
+   npx hardhat verify --network arbitrumSepolia 0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3
+   ```
+
+#### **Development Experience Improvements:**
+
+1. **Complete Type Safety:**
+   ```typescript
+   // hardhat.config.ts - Fully typed configuration
+   const config: HardhatUserConfig = {
+     solidity: {
+       version: "0.8.28",
+       settings: {
+         optimizer: { enabled: true, runs: 200 },
+         evmVersion: "shanghai"
+       }
+     },
+     networks: {
+       arbitrumSepolia: {
+         url: process.env.ARBITRUM_SEPOLIA_URL,
+         accounts: [process.env.PRIVATE_KEY!]
+       }
+     }
+   };
+   ```
+
+2. **Gas Optimization & Modern Solidity:**
+   - Solidity 0.8.28 with latest features
+   - Custom errors for gas efficiency
+   - OpenZeppelin 5.0.0 contracts
+   - Comprehensive ReentrancyGuard protection
+
+3. **Integrated Development Workflow:**
+   ```json
+   // package.json scripts showcasing V3 features
+   {
+     "build": "hardhat compile",
+     "test": "hardhat test",
+     "deploy": "hardhat ignition deploy ignition/modules/DonationPool.ts",
+     "verify": "hardhat verify --network arbitrumSepolia"
+   }
+   ```
+
+#### **Real-World Benefits Demonstrated:**
+
+- **Faster Development**: Viem's TypeScript-first approach eliminated runtime errors
+- **Safer Deployments**: Ignition's declarative approach prevented deployment mistakes
+- **Better Testing**: Built-in Node.js test runner provided faster test execution
+- **Professional DevOps**: Automated verification and deployment scripts
+- **Modern Standards**: Latest Solidity version with gas optimizations
+
+**Our implementation showcases Hardhat V3 as a production-ready, enterprise-grade development environment that significantly improves developer productivity and code quality.**
 
 2. **Hardhat Ignition** (`@nomicfoundation/hardhat-ignition: 3.0.0`)
    ```typescript
