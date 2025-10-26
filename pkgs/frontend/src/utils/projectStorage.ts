@@ -111,4 +111,3 @@ export function createProjectData(
     updatedAt: new Date().toISOString(),
   };
 }
-
