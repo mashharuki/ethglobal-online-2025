@@ -34,4 +34,3 @@ const afterCount = await contract.read.x();
 console.log("After count:", Number(afterCount));
 
 console.log("========================= [END] =========================");
-

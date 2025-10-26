@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import type { ApiError } from '@/types';
+import type { ApiError } from "@/types";
+import { useCallback, useState } from "react";
 
 interface ErrorState {
   error: string | null;
@@ -14,7 +14,7 @@ export function useErrorHandler() {
 
   const setError = useCallback((error: string | Error | ApiError) => {
     const errorMessage =
-      typeof error === 'string' ? error : error instanceof Error ? error.message : error.message;
+      typeof error === "string" ? error : error instanceof Error ? error.message : error.message;
 
     setErrorState({
       error: errorMessage,
@@ -30,10 +30,10 @@ export function useErrorHandler() {
   }, []);
 
   const handleError = useCallback(
-    (error: unknown, fallbackMessage = 'An error occurred') => {
+    (error: unknown, fallbackMessage = "An error occurred") => {
       if (error instanceof Error) {
         setError(error);
-      } else if (typeof error === 'string') {
+      } else if (typeof error === "string") {
         setError(error);
       } else {
         setError(fallbackMessage);

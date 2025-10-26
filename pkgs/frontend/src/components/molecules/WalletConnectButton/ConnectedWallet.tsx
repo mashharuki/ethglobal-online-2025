@@ -1,7 +1,7 @@
-import Image from 'next/image';
-import type { ResponsiveConfig, WalletInfo } from '@/types';
-import { formatAddress, formatChainName } from '@/utils/addressFormatter';
-import { getResponsiveButtonStyles, getResponsiveText } from '@/utils/responsive';
+import type { ResponsiveConfig, WalletInfo } from "@/types";
+import { formatAddress, formatChainName } from "@/utils/addressFormatter";
+import { getResponsiveButtonStyles, getResponsiveText } from "@/utils/responsive";
+import Image from "next/image";
 
 interface ConnectedWalletProps {
   walletInfo: WalletInfo;
@@ -23,7 +23,7 @@ export function ConnectedWallet({
   const formattedChainName = formatChainName(walletInfo.chain?.name);
 
   const chainText = getResponsiveText(
-    { full: walletInfo.chain?.name || 'Unknown', short: formattedChainName },
+    { full: walletInfo.chain?.name || "Unknown", short: formattedChainName },
     config
   );
   const accountText = getResponsiveText(
@@ -52,7 +52,7 @@ export function ConnectedWallet({
               width: styles.icon.size,
               height: styles.icon.size,
               borderRadius: 999,
-              overflow: 'hidden',
+              overflow: "hidden",
               marginRight: styles.icon.margin,
             }}
           >
@@ -61,13 +61,13 @@ export function ConnectedWallet({
                 width={styles.icon.size}
                 height={styles.icon.size}
                 src={walletInfo.chain.iconUrl}
-                alt={walletInfo.chain.name ?? 'Chain icon'}
+                alt={walletInfo.chain.name ?? "Chain icon"}
               />
             )}
           </div>
         )}
-        <span className={chainText.full ? 'inline' : 'hidden'}>{chainText.full}</span>
-        <span className={chainText.short ? 'inline' : 'hidden'}>{chainText.short}</span>
+        <span className={chainText.full ? "inline" : "hidden"}>{chainText.full}</span>
+        <span className={chainText.short ? "inline" : "hidden"}>{chainText.short}</span>
       </button>
 
       {/* アカウントボタン */}
@@ -77,11 +77,11 @@ export function ConnectedWallet({
         className="bg-gradient-to-r from-primary to-accent text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 glow-primary truncate"
         style={{
           ...styles.button,
-          maxWidth: config.isTablet ? 'none' : '120px',
+          maxWidth: config.isTablet ? "none" : "120px",
         }}
       >
-        <span className={accountText.full ? 'inline' : 'hidden'}>{accountText.full}</span>
-        <span className={accountText.short ? 'inline' : 'hidden'}>{accountText.short}</span>
+        <span className={accountText.full ? "inline" : "hidden"}>{accountText.full}</span>
+        <span className={accountText.short ? "inline" : "hidden"}>{accountText.short}</span>
       </button>
     </div>
   );

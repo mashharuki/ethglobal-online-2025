@@ -13,4 +13,3 @@ console.log("ChainID:", await publicClient.getChainId());
 console.log("Latest block number:", await publicClient.getBlockNumber());
 console.log("Balance:", await publicClient.getBalance({ address: senderClient.account.address }));
 console.log("========================= [END] =========================");
-

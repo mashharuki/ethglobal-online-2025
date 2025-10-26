@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useAccount, useBalance } from 'wagmi';
-import { mockUnifiedBalance } from '@/mockdatas';
-import type { UnifiedBalance } from '@/types';
-import { processNexusBalances } from '@/utils/balanceProcessor';
-import { getErrorMessage, withRetry } from '@/utils/errorHandler';
-import { useNexusSDK } from './useNexusSDK';
+import { mockUnifiedBalance } from "@/mockdatas";
+import type { UnifiedBalance } from "@/types";
+import { processNexusBalances } from "@/utils/balanceProcessor";
+import { getErrorMessage, withRetry } from "@/utils/errorHandler";
+import { useEffect, useState } from "react";
+import { useAccount, useBalance } from "wagmi";
+import { useNexusSDK } from "./useNexusSDK";
 
 export const useNexusBalance = () => {
   const { address, isConnected, chainId } = useAccount();
@@ -22,7 +22,7 @@ export const useNexusBalance = () => {
   const fetchUnifiedBalance = async () => {
     if (!isConnected || !address) {
       setUnifiedBalance(null);
-      setError('Please connect your wallet first');
+      setError("Please connect your wallet first");
       setLoading(false);
       return;
     }
@@ -49,7 +49,7 @@ export const useNexusBalance = () => {
         });
       }
     } catch (err) {
-      console.error('Nexus SDK error:', err);
+      console.error("Nexus SDK error:", err);
       const errorMessage = getErrorMessage(err);
       setUnifiedBalance(mockUnifiedBalance);
       setError(errorMessage);

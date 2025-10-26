@@ -1,5 +1,5 @@
-import { Card, CardContent } from '@/components/atoms/Card';
-import Nexus from '@/components/nexus/nexus';
+import { Card, CardContent } from "@/components/atoms/Card";
+import Nexus from "@/components/nexus/nexus";
 
 /**
  * CrossDonate Homepage - Exact V0 Design Replica

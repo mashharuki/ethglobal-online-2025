@@ -32,4 +32,3 @@ const tx = await senderClient.sendTransaction({
 await publicClient.waitForTransactionReceipt({ hash: tx });
 
 console.log("Transaction sent successfully");
-

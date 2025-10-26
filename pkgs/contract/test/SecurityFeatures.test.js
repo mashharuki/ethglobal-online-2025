@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("DonationPool - セキュリティ機能テスト", function () {
+describe("DonationPool - セキュリティ機能テスト", () => {
   let donationPool;
   let owner;
   let donor1;
@@ -10,7 +10,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
   let mockToken;
   let targetToken;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, donor1, donor2, attacker] = await ethers.getSigners();
 
     // モックERC20トークンをデプロイ
@@ -31,8 +31,8 @@ describe("DonationPool - セキュリティ機能テスト", function () {
     await donationPool.setSupportedToken(mockToken.address, true);
   });
 
-  describe("アクセス制御", function () {
-    it("所有者のみが管理者機能を実行できる", async function () {
+  describe("アクセス制御", () => {
+    it("所有者のみが管理者機能を実行できる", async () => {
       // 非所有者は管理者機能を実行できない
       await expect(
         donationPool.connect(donor1).setSupportedToken(mockToken.address, false)
@@ -47,7 +47,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "OwnableUnauthorizedAccount");
     });
 
-    it("所有者は管理者機能を実行できる", async function () {
+    it("所有者は管理者機能を実行できる", async () => {
       // 所有者は管理者機能を実行できる
       await expect(donationPool.setSupportedToken(mockToken.address, false))
         .to.emit(donationPool, "TokenSupported")
@@ -59,8 +59,8 @@ describe("DonationPool - セキュリティ機能テスト", function () {
     });
   });
 
-  describe("カスタムエラー", function () {
-    it("無効なアドレスでカスタムエラーが発生する", async function () {
+  describe("カスタムエラー", () => {
+    it("無効なアドレスでカスタムエラーが発生する", async () => {
       await expect(
         donationPool.setSupportedToken(ethers.ZeroAddress, true)
       ).to.be.revertedWithCustomError(donationPool, "InvalidAddress");
@@ -70,7 +70,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "InvalidAddress");
     });
 
-    it("無効な金額でカスタムエラーが発生する", async function () {
+    it("無効な金額でカスタムエラーが発生する", async () => {
       await expect(
         donationPool.connect(donor1).donateETH({ value: 0 })
       ).to.be.revertedWithCustomError(donationPool, "InvalidAmount");
@@ -80,7 +80,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "InvalidAmount");
     });
 
-    it("寄付が無効化されている時にカスタムエラーが発生する", async function () {
+    it("寄付が無効化されている時にカスタムエラーが発生する", async () => {
       await donationPool.updateDonationSettings(0, ethers.MaxUint256, false);
 
       await expect(
@@ -88,7 +88,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "DonationsDisabled");
     });
 
-    it("サポートされていないトークンでカスタムエラーが発生する", async function () {
+    it("サポートされていないトークンでカスタムエラーが発生する", async () => {
       const unsupportedToken = await ethers.deployContract("MockERC20", ["Unsupported", "UNS"]);
       await unsupportedToken.mint(donor1.address, ethers.parseEther("10"));
       await unsupportedToken.connect(donor1).approve(donationPool.address, ethers.MaxUint256);
@@ -99,8 +99,8 @@ describe("DonationPool - セキュリティ機能テスト", function () {
     });
   });
 
-  describe("緊急停止機能", function () {
-    it("緊急停止を発動できる", async function () {
+  describe("緊急停止機能", () => {
+    it("緊急停止を発動できる", async () => {
       await expect(donationPool.emergencyPause("Security breach detected"))
         .to.emit(donationPool, "EmergencyPaused")
         .withArgs(owner.address, await getBlockTimestamp(), "Security breach detected");
@@ -108,7 +108,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       expect(await donationPool.emergencyPaused()).to.be.true;
     });
 
-    it("緊急停止中は寄付ができない", async function () {
+    it("緊急停止中は寄付ができない", async () => {
       await donationPool.emergencyPause("Emergency stop");
 
       await expect(
@@ -120,7 +120,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "EmergencyPaused");
     });
 
-    it("緊急停止を解除できる", async function () {
+    it("緊急停止を解除できる", async () => {
       await donationPool.emergencyPause("Emergency stop");
       await donationPool.emergencyUnpause();
 
@@ -132,7 +132,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.emit(donationPool, "ETHDonationReceived");
     });
 
-    it("既に停止中の場合、エラーが発生する", async function () {
+    it("既に停止中の場合、エラーが発生する", async () => {
       await donationPool.emergencyPause("First pause");
 
       await expect(
@@ -140,20 +140,20 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
     });
 
-    it("停止されていない場合、解除でエラーが発生する", async function () {
+    it("停止されていない場合、解除でエラーが発生する", async () => {
       await expect(
         donationPool.emergencyUnpause()
       ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
     });
   });
 
-  describe("寄付者数制限", function () {
-    beforeEach(async function () {
+  describe("寄付者数制限", () => {
+    beforeEach(async () => {
       // 最大寄付者数を2に設定
       await donationPool.updateSecuritySettings(2);
     });
 
-    it("最大寄付者数に達すると寄付が拒否される", async function () {
+    it("最大寄付者数に達すると寄付が拒否される", async () => {
       // 最初の寄付者
       await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
 
@@ -166,7 +166,7 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
     });
 
-    it("既存の寄付者は制限に関係なく寄付できる", async function () {
+    it("既存の寄付者は制限に関係なく寄付できる", async () => {
       // 最初の寄付
       await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
 
@@ -180,8 +180,8 @@ describe("DonationPool - セキュリティ機能テスト", function () {
     });
   });
 
-  describe("リエントランシー攻撃対策", function () {
-    it("ReentrancyGuardが正しく動作する", async function () {
+  describe("リエントランシー攻撃対策", () => {
+    it("ReentrancyGuardが正しく動作する", async () => {
       // リエントランシー攻撃を試行するコントラクトをデプロイ
       const ReentrancyAttacker = await ethers.getContractFactory("ReentrancyAttacker");
       const attackerContract = await ReentrancyAttacker.deploy(donationPool.address);
@@ -193,8 +193,8 @@ describe("DonationPool - セキュリティ機能テスト", function () {
     });
   });
 
-  describe("設定値の検証", function () {
-    it("無効な設定値でエラーが発生する", async function () {
+  describe("設定値の検証", () => {
+    it("無効な設定値でエラーが発生する", async () => {
       // 最小値が最大値を超える場合
       await expect(
         donationPool.updateDonationSettings(ethers.parseEther("10"), ethers.parseEther("5"), true)
@@ -206,35 +206,35 @@ describe("DonationPool - セキュリティ機能テスト", function () {
       ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
     });
 
-    it("空のプロジェクト名でエラーが発生する", async function () {
+    it("空のプロジェクト名でエラーが発生する", async () => {
       await expect(
         donationPool.updateProjectInfo("", "Valid description")
       ).to.be.revertedWithCustomError(donationPool, "InvalidConfiguration");
     });
   });
 
-  describe("残高不足の検証", function () {
-    it("残高不足で緊急引き出しが失敗する", async function () {
+  describe("残高不足の検証", () => {
+    it("残高不足で緊急引き出しが失敗する", async () => {
       await expect(
         donationPool.emergencyWithdrawETH(owner.address, ethers.parseEther("1"))
       ).to.be.revertedWithCustomError(donationPool, "InsufficientBalance");
     });
 
-    it("トークン残高不足で緊急引き出しが失敗する", async function () {
+    it("トークン残高不足で緊急引き出しが失敗する", async () => {
       await expect(
         donationPool.emergencyWithdrawToken(mockToken.address, owner.address, ethers.parseEther("1"))
       ).to.be.revertedWithCustomError(donationPool, "InsufficientBalance");
     });
   });
 
-  describe("トークン転送の安全性", function () {
-    it("無効なアドレスへの転送が失敗する", async function () {
+  describe("トークン転送の安全性", () => {
+    it("無効なアドレスへの転送が失敗する", async () => {
       await expect(
         donationPool.emergencyWithdrawETH(ethers.ZeroAddress, ethers.parseEther("1"))
       ).to.be.revertedWithCustomError(donationPool, "InvalidAddress");
     });
 
-    it("ゼロ金額の転送が失敗する", async function () {
+    it("ゼロ金額の転送が失敗する", async () => {
       await expect(
         donationPool.emergencyWithdrawETH(owner.address, 0)
       ).to.be.revertedWithCustomError(donationPool, "InvalidAmount");
@@ -253,22 +253,19 @@ contract ReentrancyAttacker {
     address public target;
     bool public attacking;
 
-    constructor(address _target) {
+    constructor(address _target) 
         target = _target;
-    }
 
-    function attack() external payable {
+    function attack() external payable 
         attacking = true;
-        (bool success, ) = target.call{value: msg.value}("");
+        (bool success, ) = target.callvalue: msg.value("");
         require(success, "Attack failed");
-    }
 
-    receive() external payable {
+    receive() external payable 
         if (attacking && address(this).balance > 0) {
             attacking = false;
-            (bool success, ) = target.call{value: address(this).balance}("");
+            (bool success, ) = target.callvalue: address(this).balance("");
             require(success, "Reentrancy attack failed");
         }
-    }
 }
 

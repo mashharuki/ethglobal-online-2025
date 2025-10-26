@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/atoms/Button';
+import { Button } from "@/components/atoms/Button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/atoms/Dialog';
-import { Input } from '@/components/atoms/Input';
-import { Label } from '@/components/atoms/Label';
-import { useNexusSDK } from '@/hooks/useNexusSDK';
-import type { SUPPORTED_CHAINS_IDS } from '@avail-project/nexus-core';
-import { useCallback, useEffect, useId, useState } from 'react';
-import { useAccount } from 'wagmi';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/atoms/Dialog";
+import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
+import { useNexusSDK } from "@/hooks/useNexusSDK";
+import type { SUPPORTED_CHAINS_IDS } from "@avail-project/nexus-core";
+import { useCallback, useEffect, useId, useState } from "react";
+import { useAccount } from "wagmi";
 
 interface BridgeDialogProps {
   isOpen: boolean;
@@ -21,29 +21,29 @@ interface BridgeDialogProps {
 }
 
 // メインネットとテストネットで利用可能なトークンを分ける
-const MAINNET_TOKENS = ['ETH', 'USDC', 'USDT'] as const;
-const TESTNET_TOKENS = ['ETH', 'USDC', 'USDT'] as const;
+const MAINNET_TOKENS = ["ETH", "USDC", "USDT"] as const;
+const TESTNET_TOKENS = ["ETH", "USDC", "USDT"] as const;
 
 // メインネットチェーン
 const MAINNET_CHAINS = [
-  { id: 1, name: 'Ethereum' },
-  { id: 10, name: 'Optimism' },
-  { id: 137, name: 'Polygon' },
-  { id: 42161, name: 'Arbitrum' },
-  { id: 43114, name: 'Avalanche' },
-  { id: 8453, name: 'Base' },
-  { id: 534352, name: 'Scroll' },
-  { id: 56, name: 'BNB Chain' },
+  { id: 1, name: "Ethereum" },
+  { id: 10, name: "Optimism" },
+  { id: 137, name: "Polygon" },
+  { id: 42161, name: "Arbitrum" },
+  { id: 43114, name: "Avalanche" },
+  { id: 8453, name: "Base" },
+  { id: 534352, name: "Scroll" },
+  { id: 56, name: "BNB Chain" },
 ] as const;
 
 // テストネットチェーン（Nexus SDK公式サポートチェーン）
 const TESTNET_CHAINS = [
-  { id: 11155111, name: 'Sepolia' },
-  { id: 84532, name: 'Base Sepolia' },
-  { id: 421614, name: 'Arbitrum Sepolia' },
-  { id: 11155420, name: 'Optimism Sepolia' },
-  { id: 80002, name: 'Polygon Amoy' },
-  { id: 10143, name: 'Monad Testnet' },
+  { id: 11155111, name: "Sepolia" },
+  { id: 84532, name: "Base Sepolia" },
+  { id: 421614, name: "Arbitrum Sepolia" },
+  { id: 11155420, name: "Optimism Sepolia" },
+  { id: 80002, name: "Polygon Amoy" },
+  { id: 10143, name: "Monad Testnet" },
 ] as const;
 
 export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps) {
@@ -56,28 +56,28 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
   const targetChainId = useId();
   const networkModeId = useId();
 
-  const [token, setToken] = useState<'ETH' | 'USDC' | 'USDT'>('ETH');
-  const [amount, setAmount] = useState('');
+  const [token, setToken] = useState<"ETH" | "USDC" | "USDT">("ETH");
+  const [amount, setAmount] = useState("");
   const [targetChain, setTargetChain] = useState<SUPPORTED_CHAINS_IDS>(137);
-  const [networkMode, setNetworkMode] = useState<'mainnet' | 'testnet'>('mainnet');
+  const [networkMode, setNetworkMode] = useState<"mainnet" | "testnet">("mainnet");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
   // 現在のネットワークモードに応じてチェーンリストとトークンリストを取得
-  const currentChains = networkMode === 'mainnet' ? MAINNET_CHAINS : TESTNET_CHAINS;
-  const currentTokens = networkMode === 'mainnet' ? MAINNET_TOKENS : TESTNET_TOKENS;
+  const currentChains = networkMode === "mainnet" ? MAINNET_CHAINS : TESTNET_CHAINS;
+  const currentTokens = networkMode === "mainnet" ? MAINNET_TOKENS : TESTNET_TOKENS;
 
   // SDK初期化処理
   const handleInitializeSDK = useCallback(async () => {
     if (!isConnected || !address) {
-      setError('ウォレットが接続されていません。');
+      setError("ウォレットが接続されていません。");
       return;
     }
 
     if (isInitializing) {
-      console.log('BridgeDialog: 既に初期化中です。');
+      console.log("BridgeDialog: 既に初期化中です。");
       return;
     }
 
@@ -87,10 +87,10 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
 
     try {
       await initializeSDK();
-      setSuccess('Nexus SDKが正常に初期化されました。');
+      setSuccess("Nexus SDKが正常に初期化されました。");
     } catch (err) {
-      console.error('SDK initialization error:', err);
-      setError(`SDK初期化に失敗しました: ${err instanceof Error ? err.message : '不明なエラー'}`);
+      console.error("SDK initialization error:", err);
+      setError(`SDK初期化に失敗しました: ${err instanceof Error ? err.message : "不明なエラー"}`);
     } finally {
       setIsInitializing(false);
     }
@@ -104,13 +104,13 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
   }, [isOpen, isConnected, isInitialized, isInitializing, handleInitializeSDK]);
 
   const handleBridge = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      setError('有効な数量を入力してください。');
+    if (!amount || Number.parseFloat(amount) <= 0) {
+      setError("有効な数量を入力してください。");
       return;
     }
 
     if (!isConnected || !address) {
-      setError('ウォレットが接続されていません。');
+      setError("ウォレットが接続されていません。");
       return;
     }
 
@@ -121,17 +121,17 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
     try {
       // SDKが初期化されていない場合は自動初期化を実行
       if (!isInitialized) {
-        setSuccess('Nexus SDKを初期化中...');
+        setSuccess("Nexus SDKを初期化中...");
         try {
           await initializeSDK();
-          setSuccess('Nexus SDKの初期化が完了しました。ブリッジを開始します...');
+          setSuccess("Nexus SDKの初期化が完了しました。ブリッジを開始します...");
 
           // 初期化完了後、少し待機してからブリッジ処理を続行
           await new Promise((resolve) => setTimeout(resolve, 200));
         } catch (initError) {
-          console.error('SDK初期化エラー:', initError);
+          console.error("SDK初期化エラー:", initError);
           setError(
-            `SDK初期化に失敗しました: ${initError instanceof Error ? initError.message : '不明なエラー'}`
+            `SDK初期化に失敗しました: ${initError instanceof Error ? initError.message : "不明なエラー"}`
           );
           return;
         }
@@ -140,23 +140,23 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
       // ブリッジを実行
       const result = await nexusSDK.bridge({
         token,
-        amount: parseFloat(amount),
+        amount: Number.parseFloat(amount),
         chainId: targetChain,
       });
 
       if (result.success) {
         setSuccess(
-          `ブリッジが成功しました！${result.explorerUrl ? `トランザクション: ${result.explorerUrl}` : ''}`
+          `ブリッジが成功しました！${result.explorerUrl ? `トランザクション: ${result.explorerUrl}` : ""}`
         );
         // 成功後、フォームをリセット
-        setAmount('');
+        setAmount("");
       } else {
-        setError(`ブリッジが失敗しました: ${result.error || '不明なエラー'}`);
+        setError(`ブリッジが失敗しました: ${result.error || "不明なエラー"}`);
       }
     } catch (err) {
-      console.error('Bridge error:', err);
+      console.error("Bridge error:", err);
       setError(
-        `ブリッジ中にエラーが発生しました: ${err instanceof Error ? err.message : '不明なエラー'}`
+        `ブリッジ中にエラーが発生しました: ${err instanceof Error ? err.message : "不明なエラー"}`
       );
     } finally {
       setIsLoading(false);
@@ -167,18 +167,18 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
     onOpenChange(false);
     setError(null);
     setSuccess(null);
-    setAmount('');
+    setAmount("");
   };
 
   // ネットワークモードが変更された時にデフォルトチェーンとトークンを設定
-  const handleNetworkModeChange = (mode: 'mainnet' | 'testnet') => {
+  const handleNetworkModeChange = (mode: "mainnet" | "testnet") => {
     setNetworkMode(mode);
     // デフォルトチェーンを設定
-    const defaultChain = mode === 'mainnet' ? 137 : 11155111; // Polygon or Sepolia
+    const defaultChain = mode === "mainnet" ? 137 : 11155111; // Polygon or Sepolia
     setTargetChain(defaultChain as SUPPORTED_CHAINS_IDS);
     // テストネットではETHのみ利用可能
-    if (mode === 'testnet') {
-      setToken('ETH');
+    if (mode === "testnet") {
+      setToken("ETH");
     }
     // エラーメッセージのみクリア（成功メッセージは保持）
     setError(null);
@@ -214,23 +214,23 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
             </Label>
             <div className="flex gap-3">
               <Button
-                variant={networkMode === 'mainnet' ? 'default' : 'outline'}
-                onClick={() => handleNetworkModeChange('mainnet')}
+                variant={networkMode === "mainnet" ? "default" : "outline"}
+                onClick={() => handleNetworkModeChange("mainnet")}
                 className={`flex-1 py-3 transition-all duration-200 ${
-                  networkMode === 'mainnet'
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                    : 'hover:border-purple-300 hover:bg-purple-50'
+                  networkMode === "mainnet"
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                    : "hover:border-purple-300 hover:bg-purple-50"
                 }`}
               >
                 Mainnet
               </Button>
               <Button
-                variant={networkMode === 'testnet' ? 'default' : 'outline'}
-                onClick={() => handleNetworkModeChange('testnet')}
+                variant={networkMode === "testnet" ? "default" : "outline"}
+                onClick={() => handleNetworkModeChange("testnet")}
                 className={`flex-1 py-3 transition-all duration-200 ${
-                  networkMode === 'testnet'
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                    : 'hover:border-purple-300 hover:bg-purple-50'
+                  networkMode === "testnet"
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                    : "hover:border-purple-300 hover:bg-purple-50"
                 }`}
               >
                 Testnet
@@ -249,7 +249,7 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 <select
                   id={tokenId}
                   value={token}
-                  onChange={(e) => setToken(e.target.value as 'ETH' | 'USDC' | 'USDT')}
+                  onChange={(e) => setToken(e.target.value as "ETH" | "USDC" | "USDT")}
                   className="w-full h-12 p-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
                   {currentTokens.map((tokenOption) => (
@@ -305,7 +305,7 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                   id={targetChainId}
                   value={targetChain.toString()}
                   onChange={(e) =>
-                    setTargetChain(parseInt(e.target.value, 10) as SUPPORTED_CHAINS_IDS)
+                    setTargetChain(Number.parseInt(e.target.value, 10) as SUPPORTED_CHAINS_IDS)
                   }
                   className="w-full h-12 p-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
@@ -397,14 +397,14 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 className="flex-1 h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-lg transition-all duration-200"
               >
                 {isInitializing
-                  ? 'ブリッジ中...'
-                  : '✅ USDC用のNexus SDK初期化完了！ テストを開始できます'}
+                  ? "ブリッジ中..."
+                  : "✅ USDC用のNexus SDK初期化完了！ テストを開始できます"}
               </Button>
             )}
 
             <Button
               onClick={handleBridge}
-              disabled={isLoading || !isConnected || !amount || parseFloat(amount) <= 0}
+              disabled={isLoading || !isConnected || !amount || Number.parseFloat(amount) <= 0}
               className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-lg transition-all duration-200 shadow-lg"
             >
               {isLoading ? (
@@ -413,7 +413,7 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                   ブリッジ中...
                 </div>
               ) : (
-                'ブリッジ実行'
+                "ブリッジ実行"
               )}
             </Button>
 

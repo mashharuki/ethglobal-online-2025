@@ -31,10 +31,14 @@ const pyusdAddress = "0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1";
 const amount = BigInt(1e6); // 1 USDC = 1e6
 
 // swap 1 USDC to 1 PYUSD
-const tx = await contract.write.swapUsdcToPyusd([usdcAddress, pyusdAddress, amount, senderClient.account.address]);
+const tx = await contract.write.swapUsdcToPyusd([
+  usdcAddress,
+  pyusdAddress,
+  amount,
+  senderClient.account.address,
+]);
 await publicClient.waitForTransactionReceipt({ hash: tx });
 
 console.log(`Swap tx receipt: ${tx}`);
 
 console.log("========================= [END] =========================");
-

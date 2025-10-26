@@ -1,19 +1,19 @@
-import type { ApiError, RetryConfig } from '@/types';
+import type { ApiError, RetryConfig } from "@/types";
 
 /**
  * エラーメッセージを生成する関数
  */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    if (error.message.includes('timeout')) {
-      return 'Nexus SDK API timeout, showing demo data';
-    } else if (error.message.includes('Failed to fetch')) {
-      return 'Network error - Nexus SDK API unavailable, showing demo data';
+    if (error.message.includes("timeout")) {
+      return "Nexus SDK API timeout, showing demo data";
+    } else if (error.message.includes("Failed to fetch")) {
+      return "Network error - Nexus SDK API unavailable, showing demo data";
     } else {
       return `Nexus SDK error: ${error.message}, showing demo data`;
     }
   }
-  return 'Nexus SDK temporarily unavailable, showing demo data';
+  return "Nexus SDK temporarily unavailable, showing demo data";
 }
 
 /**

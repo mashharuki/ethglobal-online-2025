@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Menu, X } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
-import WalletConnectButton from '@/components/molecules/WalletConnectButton';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import WalletConnectButton from "@/components/molecules/WalletConnectButton";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -69,7 +69,7 @@ export default function Header() {
               className="fixed inset-0 bg-black/50 z-40 md:hidden"
               onClick={closeDrawer}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') {
+                if (e.key === "Escape") {
                   closeDrawer();
                 }
               }}
@@ -82,7 +82,7 @@ export default function Header() {
           {/* ドロワー */}
           <div
             className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-background border-l border-border z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
-              isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+              isDrawerOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="flex flex-col h-full">

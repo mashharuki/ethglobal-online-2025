@@ -6,7 +6,7 @@
  * @returns フォーマットされたアドレス（例: "0x1234...5678"）
  */
 export function formatAddress(address: string | undefined, startLength = 6, endLength = 4): string {
-  if (!address) return '';
+  if (!address) return "";
 
   if (address.length <= startLength + endLength) {
     return address;
@@ -21,6 +21,6 @@ export function formatAddress(address: string | undefined, startLength = 6, endL
  * @returns フォーマットされたチェーン名（最初の単語のみ）
  */
 export function formatChainName(chainName: string | undefined): string {
-  if (!chainName) return 'Unknown';
-  return chainName.split(' ')[0];
+  if (!chainName) return "Unknown";
+  return chainName.split(" ")[0];
 }

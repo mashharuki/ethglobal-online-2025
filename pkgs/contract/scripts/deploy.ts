@@ -43,14 +43,11 @@ async function main(): Promise<void> {
   const projectName = "CrossDonate Test Project";
   const projectDescription = "A test donation project for CrossDonate platform";
   const salt = ethers.keccak256(ethers.toUtf8Bytes("crossdonate-test-salt"));
- 
+
   // アドレスを事前計算
-  const calculatedAddress = await factory.calculateAddress(
-    salt,
-    deployer.address,
-  );
+  const calculatedAddress = await factory.calculateAddress(salt, deployer.address);
   console.log("Calculated address:", calculatedAddress);
- 
+
   // デプロイパラメータを準備
   const deploymentParams: DeploymentParams = {
     projectName: projectName,
@@ -59,15 +56,12 @@ async function main(): Promise<void> {
     owner: deployer.address,
     salt: salt,
   };
- 
+
   // CREATE2を使用してデプロイ
   const poolAddress = await factory.deployPool.call(deploymentParams);
   await factory.deployPool(deploymentParams);
   console.log("DonationPool deployed to:", poolAddress);
-  console.log(
-    "Address matches calculation:",
-    poolAddress === calculatedAddress,
-  );
+  console.log("Address matches calculation:", poolAddress === calculatedAddress);
 
   // 4. デプロイされたプールの情報を確認
   console.log("\n4. Verifying deployed pool...");
@@ -90,13 +84,10 @@ async function main(): Promise<void> {
     ethers.keccak256(ethers.toUtf8Bytes("chain2-salt")),
     ethers.keccak256(ethers.toUtf8Bytes("chain3-salt")),
   ];
- 
+
   const testOwners: string[] = [deployer.address, deployer.address, deployer.address];
-  const calculatedAddresses: string[] = await factory.calculateAddresses(
-    testSalts,
-    testOwners,
-  );
- 
+  const calculatedAddresses: string[] = await factory.calculateAddresses(testSalts, testOwners);
+
   console.log("Multi-chain addresses:");
   for (let i = 0; i < calculatedAddresses.length; i++) {
     console.log(`Chain ${i + 1}:`, calculatedAddresses[i]);

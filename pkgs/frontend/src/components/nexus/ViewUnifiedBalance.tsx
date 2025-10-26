@@ -1,8 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
-import { Button } from '@/components/atoms/Button';
+import { Button } from "@/components/atoms/Button";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/atoms/Dialog';
-import { useNexusBalance } from '@/hooks/useNexusBalance';
-import { useWeb3Context } from '@/providers/Web3Provider';
+} from "@/components/atoms/Dialog";
+import { useNexusBalance } from "@/hooks/useNexusBalance";
+import { useWeb3Context } from "@/providers/Web3Provider";
+import { useState } from "react";
+import { useAccount } from "wagmi";
 
 const ViewUnifiedBalance = () => {
   const { isConnected, address, chainId } = useAccount();
@@ -27,7 +27,7 @@ const ViewUnifiedBalance = () => {
       try {
         await refetch();
       } catch (error) {
-        console.error('Failed to fetch balance:', error);
+        console.error("Failed to fetch balance:", error);
       }
     }
   };
@@ -36,7 +36,7 @@ const ViewUnifiedBalance = () => {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="font-bold" disabled={!isConnected}>
-          {isConnected ? 'View Unified Balance' : 'Connect Wallet to View Balance'}
+          {isConnected ? "View Unified Balance" : "Connect Wallet to View Balance"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -51,7 +51,7 @@ const ViewUnifiedBalance = () => {
                 </span>
               </span>
             ) : (
-              'Please connect your wallet to view your unified balance using Nexus SDK.'
+              "Please connect your wallet to view your unified balance using Nexus SDK."
             )}
           </DialogDescription>
         </DialogHeader>
@@ -63,8 +63,8 @@ const ViewUnifiedBalance = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="text-sm text-gray-600 mt-2">
                   {unifiedBalance === null
-                    ? 'Initializing Nexus SDK...'
-                    : 'Fetching balances from all chains...'}
+                    ? "Initializing Nexus SDK..."
+                    : "Fetching balances from all chains..."}
                 </p>
               </div>
             )}
@@ -113,19 +113,19 @@ const ViewUnifiedBalance = () => {
                       <div className="mt-2 space-y-1">
                         <div>Total entries: {unifiedBalance.balances.length}</div>
                         <div>
-                          ETH entries:{' '}
-                          {unifiedBalance.balances.filter((b) => b.symbol === 'ETH').length}
+                          ETH entries:{" "}
+                          {unifiedBalance.balances.filter((b) => b.symbol === "ETH").length}
                         </div>
                         {unifiedBalance.balances
-                          .filter((b) => b.symbol === 'ETH')
+                          .filter((b) => b.symbol === "ETH")
                           .map((eth, i) => (
                             <div key={`eth-${eth.chain}-${eth.chainId || i}`} className="ml-2">
-                              ETH #{i + 1}: {eth.balance} on {eth.chain} (ID:{' '}
-                              {eth.chainId || 'undefined'})
+                              ETH #{i + 1}: {eth.balance} on {eth.chain} (ID:{" "}
+                              {eth.chainId || "undefined"})
                             </div>
                           ))}
                         <div className="mt-2 pt-2 border-t border-gray-300">
-                          <div>Current chain ID: {chainId || 'undefined'}</div>
+                          <div>Current chain ID: {chainId || "undefined"}</div>
                           <div>Current network: {network}</div>
                         </div>
                       </div>
@@ -136,11 +136,12 @@ const ViewUnifiedBalance = () => {
                   {(() => {
                     const ethBalances = unifiedBalance.balances
                       .filter(
-                        (balance) => balance.symbol === 'ETH' && parseFloat(balance.balance) > 0
+                        (balance) =>
+                          balance.symbol === "ETH" && Number.parseFloat(balance.balance) > 0
                       )
                       .reduce(
                         (acc, balance) => {
-                          const chainName = balance.chain || 'Unknown';
+                          const chainName = balance.chain || "Unknown";
                           if (!acc[chainName]) {
                             acc[chainName] = {
                               total: 0,
@@ -149,7 +150,7 @@ const ViewUnifiedBalance = () => {
                               count: 0,
                             };
                           }
-                          acc[chainName].total += parseFloat(balance.balance);
+                          acc[chainName].total += Number.parseFloat(balance.balance);
                           acc[chainName].totalUSD += balance.usdValue || 0;
                           acc[chainName].count += 1;
                           return acc;
@@ -193,7 +194,7 @@ const ViewUnifiedBalance = () => {
                                 <div className="text-blue-900">
                                   {Object.values(ethBalances)
                                     .reduce((sum, data) => sum + data.total, 0)
-                                    .toFixed(6)}{' '}
+                                    .toFixed(6)}{" "}
                                   ETH
                                 </div>
                                 <div className="text-xs text-blue-700">
@@ -236,21 +237,22 @@ const ViewUnifiedBalance = () => {
                       ))} */}
 
                     {/* 残高が0のトークンは折りたたみ式で表示 */}
-                    {unifiedBalance.balances.filter((balance) => parseFloat(balance.balance) === 0)
-                      .length > 0 && (
+                    {unifiedBalance.balances.filter(
+                      (balance) => Number.parseFloat(balance.balance) === 0
+                    ).length > 0 && (
                       <details className="mt-4">
                         <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
                           Show zero balances (
                           {
                             unifiedBalance.balances.filter(
-                              (balance) => parseFloat(balance.balance) === 0
+                              (balance) => Number.parseFloat(balance.balance) === 0
                             ).length
-                          }{' '}
+                          }{" "}
                           tokens)
                         </summary>
                         <div className="mt-2 space-y-1">
                           {unifiedBalance.balances
-                            .filter((balance) => parseFloat(balance.balance) === 0)
+                            .filter((balance) => Number.parseFloat(balance.balance) === 0)
                             .map((balance, index) => (
                               <div
                                 key={`zero-${balance.symbol}-${balance.chain}-${balance.chainId || index}`}

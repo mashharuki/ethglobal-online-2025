@@ -1,20 +1,20 @@
-import type { NexusBalance, NexusBalanceBreakdown, TokenBalance, UnifiedBalance } from '@/types';
+import type { NexusBalance, NexusBalanceBreakdown, TokenBalance, UnifiedBalance } from "@/types";
 
 // チェーン名のマッピング関数
 const getChainName = (chainId: number | string | undefined) => {
-  if (!chainId) return 'Unknown';
+  if (!chainId) return "Unknown";
 
   const chainMap: Record<number | string, string> = {
-    1: 'Ethereum',
-    11155111: 'Sepolia',
-    8453: 'Base',
-    84532: 'Base Sepolia',
-    42161: 'Arbitrum One',
-    421614: 'Arbitrum Sepolia',
-    10: 'Optimism',
-    11155420: 'Optimism Sepolia',
-    137: 'Polygon',
-    80002: 'Polygon Amoy',
+    1: "Ethereum",
+    11155111: "Sepolia",
+    8453: "Base",
+    84532: "Base Sepolia",
+    42161: "Arbitrum One",
+    421614: "Arbitrum Sepolia",
+    10: "Optimism",
+    11155420: "Optimism Sepolia",
+    137: "Polygon",
+    80002: "Polygon Amoy",
   };
   return chainMap[chainId] || `Chain ${chainId}`;
 };
@@ -38,12 +38,12 @@ export function processNexusBalances(
     // breakdown配列がある場合は、各チェーンの残高を個別に処理
     if (asset.breakdown && Array.isArray(asset.breakdown)) {
       asset.breakdown.forEach((breakdownItem: NexusBalanceBreakdown) => {
-        if (parseFloat(breakdownItem.balance) > 0) {
+        if (Number.parseFloat(breakdownItem.balance) > 0) {
           const chainInfo = breakdownItem.chain;
           const chainId =
-            (typeof chainInfo === 'object' ? chainInfo?.id : undefined) || breakdownItem.chainId;
+            (typeof chainInfo === "object" ? chainInfo?.id : undefined) || breakdownItem.chainId;
           const chainName =
-            (typeof chainInfo === 'object' ? chainInfo?.name : chainInfo) ||
+            (typeof chainInfo === "object" ? chainInfo?.name : chainInfo) ||
             breakdownItem.chainName ||
             getChainName(chainId);
 
@@ -54,10 +54,10 @@ export function processNexusBalances(
             symbol: asset.symbol,
             decimals: asset.decimals || 18,
             usdValue: asset.balanceInFiat
-              ? (parseFloat(breakdownItem.balance) / parseFloat(asset.balance)) *
+              ? (Number.parseFloat(breakdownItem.balance) / Number.parseFloat(asset.balance)) *
                 asset.balanceInFiat
               : 0,
-            chainId: typeof chainId === 'string' ? parseInt(chainId, 10) : chainId,
+            chainId: typeof chainId === "string" ? Number.parseInt(chainId, 10) : chainId,
             contractAddress: breakdownItem.contractAddress,
             rawBalance: breakdownItem.rawBalance,
           });
@@ -65,14 +65,14 @@ export function processNexusBalances(
       });
     } else {
       // breakdown配列がない場合は、統合された残高を処理
-      const chainId = asset.chainId ? parseInt(asset.chainId.toString(), 10) : undefined;
+      const chainId = asset.chainId ? Number.parseInt(asset.chainId.toString(), 10) : undefined;
 
       processedBalances.push({
         chain:
-          asset.chainName || asset.chain || asset.network || getChainName(chainId) || 'Unknown',
-        token: asset.symbol || asset.token || 'Unknown',
-        balance: asset.balance || asset.amount || asset.formattedBalance || '0',
-        symbol: asset.symbol || 'Unknown',
+          asset.chainName || asset.chain || asset.network || getChainName(chainId) || "Unknown",
+        token: asset.symbol || asset.token || "Unknown",
+        balance: asset.balance || asset.amount || asset.formattedBalance || "0",
+        symbol: asset.symbol || "Unknown",
         decimals: asset.decimals || 18,
         usdValue: asset.usdValue || asset.value || asset.priceUSD || asset.balanceInFiat || 0,
         chainId: chainId,

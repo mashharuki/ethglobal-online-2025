@@ -31,4 +31,3 @@ const after = await pool.read.balanceOf([PYUSD_ADDRESS]);
 
 console.log("[CONVERT] pool PYUSD balance before:", before);
 console.log("[CONVERT] pool PYUSD balance after :", after);
-

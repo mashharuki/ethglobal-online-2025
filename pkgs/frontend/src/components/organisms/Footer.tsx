@@ -1,5 +1,5 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -19,35 +19,35 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Web3寄付エコシステムの断片化問題を解決する次世代プラットフォーム
+              Next-generation platform solving Web3 donation ecosystem fragmentation
             </p>
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-4">プロダクト</h3>
+            <h3 className="font-bold text-lg mb-4">Product</h3>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
-                  機能
+                  Features
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
-                  料金
+                  Pricing
                 </Link>
               </li>
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
-                  セキュリティ
+                  Security
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-4">開発者</h3>
+            <h3 className="font-bold text-lg mb-4">Developers</h3>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
-                  ドキュメント
+                  Documentation
                 </Link>
               </li>
               <li>
@@ -63,7 +63,7 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-4">コミュニティ</h3>
+            <h3 className="font-bold text-lg mb-4">Community</h3>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
@@ -77,7 +77,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="#" className="hover:text-primary transition-colors font-medium">
-                  ブログ
+                  Blog
                 </Link>
               </li>
             </ul>

@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/atoms/Button';
-import { Input } from '@/components/atoms/Input';
-import { Label } from '@/components/atoms/Label';
-import { useNexusSDK } from '@/hooks/useNexusSDK';
-import { useWeb3Context } from '@/providers/Web3Provider';
+import { Button } from "@/components/atoms/Button";
+import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
+import { useNexusSDK } from "@/hooks/useNexusSDK";
+import { useWeb3Context } from "@/providers/Web3Provider";
 import type {
   BridgeAndExecuteParams,
   BridgeAndExecuteResult,
   BridgeAndExecuteSimulationResult,
-} from '@avail-project/nexus-core';
-import { useCallback, useEffect, useId, useState } from 'react';
-import { useAccount } from 'wagmi';
+} from "@avail-project/nexus-core";
+import { useCallback, useEffect, useId, useState } from "react";
+import { useAccount } from "wagmi";
 
 interface BridgeAndExecuteTestProps {
   className?: string;
-  selectedToken?: 'USDT' | 'USDC' | null;
-  defaultFunction?: 'donate' | 'swapUsdcToPyusd';
+  selectedToken?: "USDT" | "USDC" | null;
+  defaultFunction?: "donate" | "swapUsdcToPyusd";
 }
 
 export default function BridgeAndExecuteTest({
   className,
   selectedToken,
-  defaultFunction = 'donate',
+  defaultFunction = "donate",
 }: BridgeAndExecuteTestProps) {
   const { isConnected, address } = useAccount();
   const { nexusSDK, isInitialized, initializeSDK } = useNexusSDK();
@@ -31,15 +31,15 @@ export default function BridgeAndExecuteTest({
 
   // フォームの状態
   const [formData, setFormData] = useState({
-    token: selectedToken || 'USDC',
-    amount: '1',
-    toChainId: '421614', // Arbitrum Sepolia
-    sourceChains: '84532', // Base Sepolia
-    contractAddress: '0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3', // DonationPoolコントラクトアドレス（Arbitrum Sepolia）
+    token: selectedToken || "USDC",
+    amount: "1",
+    toChainId: "421614", // Arbitrum Sepolia
+    sourceChains: "84532", // Base Sepolia
+    contractAddress: "0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3", // DonationPoolコントラクトアドレス（Arbitrum Sepolia）
     functionName: defaultFunction,
-    recipient: '',
-    usdcAddress: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d', // USDCコントラクトアドレス（Arbitrum Sepolia）
-    pyusdAddress: '0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1', // PYUSDコントラクトアドレス（Arbitrum Sepolia）
+    recipient: "",
+    usdcAddress: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d", // USDCコントラクトアドレス（Arbitrum Sepolia）
+    pyusdAddress: "0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1", // PYUSDコントラクトアドレス（Arbitrum Sepolia）
   });
 
   // 実行状態
@@ -54,10 +54,10 @@ export default function BridgeAndExecuteTest({
     const networkMap: { [key: string]: number } = {
       ethereum: 1,
       base: 8453,
-      'base-sepolia': 84532,
+      "base-sepolia": 84532,
       polygon: 137,
       arbitrum: 42161,
-      'arbitrum-sepolia': 421614,
+      "arbitrum-sepolia": 421614,
       optimism: 10,
       avalanche: 43114,
     };
@@ -90,7 +90,7 @@ export default function BridgeAndExecuteTest({
   // コンポーネント表示時にSDK初期化を自動実行
   useEffect(() => {
     if (isConnected && !isInitialized && !isInitializing) {
-      console.log('Bridge & Execute: SDK初期化を開始します...');
+      console.log("Bridge & Execute: SDK初期化を開始します...");
       setIsInitializing(true);
       initializeSDK().finally(() => {
         setIsInitializing(false);
@@ -106,7 +106,7 @@ export default function BridgeAndExecuteTest({
   // シミュレーション実行
   const handleSimulate = async () => {
     if (!isInitialized || !nexusSDK) {
-      setError('Nexus SDKが初期化されていません');
+      setError("Nexus SDKが初期化されていません");
       return;
     }
 
@@ -116,9 +116,9 @@ export default function BridgeAndExecuteTest({
 
     try {
       const params: BridgeAndExecuteParams = {
-        token: formData.token as 'USDC' | 'USDT' | 'ETH',
+        token: formData.token as "USDC" | "USDT" | "ETH",
         amount: formData.amount,
-        toChainId: parseInt(formData.toChainId, 10) as
+        toChainId: Number.parseInt(formData.toChainId, 10) as
           | 1
           | 8453
           | 137
@@ -134,32 +134,32 @@ export default function BridgeAndExecuteTest({
           contractAbi: [
             {
               inputs: [
-                { internalType: 'address', name: 'token', type: 'address' },
-                { internalType: 'uint256', name: 'amount', type: 'uint256' },
+                { internalType: "address", name: "token", type: "address" },
+                { internalType: "uint256", name: "amount", type: "uint256" },
               ],
-              name: 'donate',
+              name: "donate",
               outputs: [],
-              stateMutability: 'nonpayable',
-              type: 'function',
+              stateMutability: "nonpayable",
+              type: "function",
             },
             {
               inputs: [
-                { internalType: 'address', name: 'usdc', type: 'address' },
-                { internalType: 'address', name: 'pyusd', type: 'address' },
-                { internalType: 'uint256', name: 'amount', type: 'uint256' },
-                { internalType: 'address', name: 'to', type: 'address' },
+                { internalType: "address", name: "usdc", type: "address" },
+                { internalType: "address", name: "pyusd", type: "address" },
+                { internalType: "uint256", name: "amount", type: "uint256" },
+                { internalType: "address", name: "to", type: "address" },
               ],
-              name: 'swapUsdcToPyusd',
+              name: "swapUsdcToPyusd",
               outputs: [],
-              stateMutability: 'nonpayable',
-              type: 'function',
+              stateMutability: "nonpayable",
+              type: "function",
             },
           ],
           functionName: formData.functionName,
           buildFunctionParams: (_token, amount, _chainId, _userAddress) => {
             const decimals = 6; // USDC decimals
-            const amountWei = BigInt(parseFloat(amount) * 10 ** decimals);
-            if (formData.functionName === 'donate') {
+            const amountWei = BigInt(Number.parseFloat(amount) * 10 ** decimals);
+            if (formData.functionName === "donate") {
               return {
                 functionParams: [formData.usdcAddress as `0x${string}`, amountWei],
               };
@@ -175,7 +175,7 @@ export default function BridgeAndExecuteTest({
             }
           },
           tokenApproval: {
-            token: formData.token as 'USDC' | 'USDT' | 'ETH',
+            token: formData.token as "USDC" | "USDT" | "ETH",
             amount: formData.amount,
           },
         },
@@ -185,7 +185,7 @@ export default function BridgeAndExecuteTest({
       const simulationResult = await nexusSDK.simulateBridgeAndExecute(params);
       setSimulation(simulationResult);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'シミュレーションに失敗しました');
+      setError(err instanceof Error ? err.message : "シミュレーションに失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -194,7 +194,7 @@ export default function BridgeAndExecuteTest({
   // 実際の実行
   const handleExecute = async () => {
     if (!isInitialized || !nexusSDK) {
-      setError('Nexus SDKが初期化されていません');
+      setError("Nexus SDKが初期化されていません");
       return;
     }
 
@@ -204,9 +204,9 @@ export default function BridgeAndExecuteTest({
 
     try {
       const params: BridgeAndExecuteParams = {
-        token: formData.token as 'USDC' | 'USDT' | 'ETH',
+        token: formData.token as "USDC" | "USDT" | "ETH",
         amount: formData.amount,
-        toChainId: parseInt(formData.toChainId, 10) as
+        toChainId: Number.parseInt(formData.toChainId, 10) as
           | 1
           | 8453
           | 137
@@ -222,32 +222,32 @@ export default function BridgeAndExecuteTest({
           contractAbi: [
             {
               inputs: [
-                { internalType: 'address', name: 'token', type: 'address' },
-                { internalType: 'uint256', name: 'amount', type: 'uint256' },
+                { internalType: "address", name: "token", type: "address" },
+                { internalType: "uint256", name: "amount", type: "uint256" },
               ],
-              name: 'donate',
+              name: "donate",
               outputs: [],
-              stateMutability: 'nonpayable',
-              type: 'function',
+              stateMutability: "nonpayable",
+              type: "function",
             },
             {
               inputs: [
-                { internalType: 'address', name: 'usdc', type: 'address' },
-                { internalType: 'address', name: 'pyusd', type: 'address' },
-                { internalType: 'uint256', name: 'amount', type: 'uint256' },
-                { internalType: 'address', name: 'to', type: 'address' },
+                { internalType: "address", name: "usdc", type: "address" },
+                { internalType: "address", name: "pyusd", type: "address" },
+                { internalType: "uint256", name: "amount", type: "uint256" },
+                { internalType: "address", name: "to", type: "address" },
               ],
-              name: 'swapUsdcToPyusd',
+              name: "swapUsdcToPyusd",
               outputs: [],
-              stateMutability: 'nonpayable',
-              type: 'function',
+              stateMutability: "nonpayable",
+              type: "function",
             },
           ],
           functionName: formData.functionName,
           buildFunctionParams: (_token, amount, _chainId, _userAddress) => {
             const decimals = 6; // USDC decimals
-            const amountWei = BigInt(parseFloat(amount) * 10 ** decimals);
-            if (formData.functionName === 'donate') {
+            const amountWei = BigInt(Number.parseFloat(amount) * 10 ** decimals);
+            if (formData.functionName === "donate") {
               return {
                 functionParams: [formData.usdcAddress as `0x${string}`, amountWei],
               };
@@ -263,7 +263,7 @@ export default function BridgeAndExecuteTest({
             }
           },
           tokenApproval: {
-            token: formData.token as 'USDC' | 'USDT' | 'ETH',
+            token: formData.token as "USDC" | "USDT" | "ETH",
             amount: formData.amount,
           },
         },
@@ -274,7 +274,7 @@ export default function BridgeAndExecuteTest({
       const result = await nexusSDK.bridgeAndExecute(params);
       setResult(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '実行に失敗しました');
+      setError(err instanceof Error ? err.message : "実行に失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -294,14 +294,14 @@ export default function BridgeAndExecuteTest({
             <p className="text-blue-800">
               {selectedToken
                 ? `${selectedToken}用のNexus SDKを初期化中...`
-                : 'Nexus SDKを初期化中...'}{' '}
+                : "Nexus SDKを初期化中..."}{" "}
               しばらくお待ちください
             </p>
             <div className="mt-2">
               <div className="w-full bg-blue-200 rounded-full h-2">
                 <div
                   className="bg-blue-600 h-2 rounded-full animate-pulse"
-                  style={{ width: '60%' }}
+                  style={{ width: "60%" }}
                 ></div>
               </div>
             </div>
@@ -311,10 +311,10 @@ export default function BridgeAndExecuteTest({
         {isInitialized && isConnected && (
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-green-800">
-              ✅{' '}
+              ✅{" "}
               {selectedToken
                 ? `${selectedToken}用のNexus SDK初期化完了！`
-                : 'Nexus SDK初期化完了！'}{' '}
+                : "Nexus SDK初期化完了！"}{" "}
               テストを開始できます
             </p>
           </div>
@@ -374,7 +374,7 @@ export default function BridgeAndExecuteTest({
                   id={`${id}-token`}
                   value={formData.token}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    handleInputChange('token', e.target.value)
+                    handleInputChange("token", e.target.value)
                   }
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
@@ -396,7 +396,7 @@ export default function BridgeAndExecuteTest({
                   id={`${id}-amount`}
                   type="number"
                   value={formData.amount}
-                  onChange={(e) => handleInputChange('amount', e.target.value)}
+                  onChange={(e) => handleInputChange("amount", e.target.value)}
                   placeholder="1"
                   className="p-3 text-lg"
                   step="0.000001"
@@ -413,7 +413,7 @@ export default function BridgeAndExecuteTest({
                   id={`${id}-functionName`}
                   value={formData.functionName}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    handleInputChange('functionName', e.target.value)
+                    handleInputChange("functionName", e.target.value)
                   }
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
@@ -430,8 +430,8 @@ export default function BridgeAndExecuteTest({
                 <Input
                   id={`${id}-recipient`}
                   value={formData.recipient}
-                  onChange={(e) => handleInputChange('recipient', e.target.value)}
-                  placeholder={address || '0x...'}
+                  onChange={(e) => handleInputChange("recipient", e.target.value)}
+                  placeholder={address || "0x..."}
                   className="p-3 font-mono text-sm"
                 />
               </div>
@@ -449,7 +449,7 @@ export default function BridgeAndExecuteTest({
                 <Input
                   id={`${id}-sourceChains`}
                   value={formData.sourceChains}
-                  onChange={(e) => handleInputChange('sourceChains', e.target.value)}
+                  onChange={(e) => handleInputChange("sourceChains", e.target.value)}
                   placeholder="84532 (Base Sepolia)"
                   className="p-3"
                 />
@@ -463,7 +463,7 @@ export default function BridgeAndExecuteTest({
                 <Input
                   id={`${id}-toChainId`}
                   value={formData.toChainId}
-                  onChange={(e) => handleInputChange('toChainId', e.target.value)}
+                  onChange={(e) => handleInputChange("toChainId", e.target.value)}
                   placeholder="421614 (Arbitrum Sepolia)"
                   className="p-3"
                 />
@@ -486,7 +486,7 @@ export default function BridgeAndExecuteTest({
                 <Input
                   id={`${id}-contractAddress`}
                   value={formData.contractAddress}
-                  onChange={(e) => handleInputChange('contractAddress', e.target.value)}
+                  onChange={(e) => handleInputChange("contractAddress", e.target.value)}
                   placeholder="0x..."
                   className="p-3 font-mono text-sm"
                 />
@@ -506,7 +506,7 @@ export default function BridgeAndExecuteTest({
                   <Input
                     id={`${id}-usdcAddress`}
                     value={formData.usdcAddress}
-                    onChange={(e) => handleInputChange('usdcAddress', e.target.value)}
+                    onChange={(e) => handleInputChange("usdcAddress", e.target.value)}
                     placeholder="0x..."
                     className="p-3 font-mono text-sm"
                   />
@@ -525,7 +525,7 @@ export default function BridgeAndExecuteTest({
                   <Input
                     id={`${id}-pyusdAddress`}
                     value={formData.pyusdAddress}
-                    onChange={(e) => handleInputChange('pyusdAddress', e.target.value)}
+                    onChange={(e) => handleInputChange("pyusdAddress", e.target.value)}
                     placeholder="0x..."
                     className="p-3 font-mono text-sm"
                   />
@@ -553,7 +553,7 @@ export default function BridgeAndExecuteTest({
                   シミュレーション中...
                 </div>
               ) : (
-                'シミュレーション実行'
+                "シミュレーション実行"
               )}
             </Button>
             <Button
@@ -567,7 +567,7 @@ export default function BridgeAndExecuteTest({
                   実行中...
                 </div>
               ) : (
-                '実際に実行'
+                "実際に実行"
               )}
             </Button>
           </div>
@@ -597,10 +597,10 @@ export default function BridgeAndExecuteTest({
                   <span className="font-medium text-blue-700">成功:</span>
                   <span
                     className={`px-2 py-1 rounded text-sm font-medium ${
-                      simulation.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      simulation.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {simulation.success ? 'はい' : 'いいえ'}
+                    {simulation.success ? "はい" : "いいえ"}
                   </span>
                 </div>
                 {simulation.totalEstimatedCost && (
@@ -665,10 +665,10 @@ export default function BridgeAndExecuteTest({
                   <span className="font-medium text-green-700">成功:</span>
                   <span
                     className={`px-2 py-1 rounded text-sm font-medium ${
-                      result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      result.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {result.success ? 'はい' : 'いいえ'}
+                    {result.success ? "はい" : "いいえ"}
                   </span>
                 </div>
                 {result.bridgeSkipped && (

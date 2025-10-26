@@ -30,10 +30,10 @@ export interface Balance {
 
 // 取引履歴の型
 export interface Transaction {
-  type: 'donation' | 'conversion' | 'withdrawal';
+  type: "donation" | "conversion" | "withdrawal";
   from: string;
   amount: string;
   chain: string;
   timestamp: string;
-  status: 'confirmed' | 'completed' | 'pending';
+  status: "confirmed" | "completed" | "pending";
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import type { WalletConnectionState } from '@/types';
+import type { WalletConnectionState } from "@/types";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 /**
  * ウォレット接続状態を管理するフック

@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("CREATE2Factory", function () {
+describe("CREATE2Factory", () => {
   let factory;
   let owner;
   let user1;
@@ -9,7 +9,7 @@ describe("CREATE2Factory", function () {
   let mockToken;
   let targetToken;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, user1, user2] = await ethers.getSigners();
 
     // モックERC20トークンをデプロイ
@@ -22,8 +22,8 @@ describe("CREATE2Factory", function () {
     factory = await CREATE2Factory.deploy();
   });
 
-  describe("CREATE2デプロイ機能", function () {
-    it("正常にプールをデプロイできる", async function () {
+  describe("CREATE2デプロイ機能", () => {
+    it("正常にプールをデプロイできる", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("test-salt"));
       const deploymentParams = {
         projectName: "Test Project",
@@ -40,13 +40,13 @@ describe("CREATE2Factory", function () {
           user1.address,
           "Test Project",
           salt,
-          await getBlockTimestamp(),
+          await getBlockTimestamp()
         );
 
       expect(await factory.getPoolCount()).to.equal(1);
     });
 
-    it("同じソルトで複数回デプロイしようとすると失敗する", async function () {
+    it("同じソルトで複数回デプロイしようとすると失敗する", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("duplicate-salt"));
       const deploymentParams = {
         projectName: "Test Project",
@@ -60,12 +60,13 @@ describe("CREATE2Factory", function () {
       await factory.deployPool(deploymentParams);
 
       // 同じソルトで再度デプロイ
-      await expect(
-        factory.deployPool(deploymentParams),
-      ).to.be.revertedWithCustomError(factory, "PoolAlreadyExists");
+      await expect(factory.deployPool(deploymentParams)).to.be.revertedWithCustomError(
+        factory,
+        "PoolAlreadyExists"
+      );
     });
 
-    it("無効なパラメータでデプロイが失敗する", async function () {
+    it("無効なパラメータでデプロイが失敗する", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("invalid-salt"));
 
       // 無効な所有者
@@ -76,7 +77,7 @@ describe("CREATE2Factory", function () {
           targetToken: targetToken.address,
           owner: ethers.ZeroAddress,
           salt: salt,
-        }),
+        })
       ).to.be.revertedWithCustomError(factory, "InvalidAddress");
 
       // 無効な目標トークン
@@ -87,7 +88,7 @@ describe("CREATE2Factory", function () {
           targetToken: ethers.ZeroAddress,
           owner: user1.address,
           salt: salt,
-        }),
+        })
       ).to.be.revertedWithCustomError(factory, "InvalidAddress");
 
       // 空のプロジェクト名
@@ -98,24 +99,21 @@ describe("CREATE2Factory", function () {
           targetToken: targetToken.address,
           owner: user1.address,
           salt: salt,
-        }),
+        })
       ).to.be.revertedWithCustomError(factory, "InvalidParameter");
     });
   });
 
-  describe("アドレス事前計算機能", function () {
-    it("アドレスを事前計算できる", async function () {
+  describe("アドレス事前計算機能", () => {
+    it("アドレスを事前計算できる", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("precalculate-salt"));
-      const calculatedAddress = await factory.calculateAddress(
-        salt,
-        user1.address,
-      );
+      const calculatedAddress = await factory.calculateAddress(salt, user1.address);
 
       expect(calculatedAddress).to.be.properAddress;
       expect(calculatedAddress).to.not.equal(ethers.ZeroAddress);
     });
 
-    it("複数のアドレスを事前計算できる", async function () {
+    it("複数のアドレスを事前計算できる", async () => {
       const salts = [
         ethers.keccak256(ethers.toUtf8Bytes("salt1")),
         ethers.keccak256(ethers.toUtf8Bytes("salt2")),
@@ -131,12 +129,9 @@ describe("CREATE2Factory", function () {
       expect(addresses[2]).to.be.properAddress;
     });
 
-    it("事前計算されたアドレスとデプロイ後のアドレスが一致する", async function () {
+    it("事前計算されたアドレスとデプロイ後のアドレスが一致する", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("consistency-salt"));
-      const calculatedAddress = await factory.calculateAddress(
-        salt,
-        user1.address,
-      );
+      const calculatedAddress = await factory.calculateAddress(salt, user1.address);
 
       const deploymentParams = {
         projectName: "Consistency Test",
@@ -152,11 +147,11 @@ describe("CREATE2Factory", function () {
     });
   });
 
-  describe("プール管理機能", function () {
+  describe("プール管理機能", () => {
     let poolAddress;
     let salt;
 
-    beforeEach(async function () {
+    beforeEach(async () => {
       salt = ethers.keccak256(ethers.toUtf8Bytes("management-salt"));
       const deploymentParams = {
         projectName: "Management Test",
@@ -170,7 +165,7 @@ describe("CREATE2Factory", function () {
       await factory.deployPool(deploymentParams);
     });
 
-    it("プールの詳細情報を取得できる", async function () {
+    it("プールの詳細情報を取得できる", async () => {
       const info = await factory.getPoolInfo(poolAddress);
 
       expect(info.owner).to.equal(user1.address);
@@ -180,7 +175,7 @@ describe("CREATE2Factory", function () {
       expect(info.isActive).to.be.true;
     });
 
-    it("プールを無効化できる", async function () {
+    it("プールを無効化できる", async () => {
       await expect(factory.connect(user1).deactivatePool(poolAddress))
         .to.emit(factory, "PoolDeactivated")
         .withArgs(poolAddress, user1.address, await getBlockTimestamp());
@@ -188,7 +183,7 @@ describe("CREATE2Factory", function () {
       expect(await factory.isPoolActive(poolAddress)).to.be.false;
     });
 
-    it("プールを再アクティブ化できる", async function () {
+    it("プールを再アクティブ化できる", async () => {
       // まず無効化
       await factory.connect(user1).deactivatePool(poolAddress);
 
@@ -200,23 +195,24 @@ describe("CREATE2Factory", function () {
       expect(await factory.isPoolActive(poolAddress)).to.be.true;
     });
 
-    it("所有者以外はプールを無効化できない", async function () {
+    it("所有者以外はプールを無効化できない", async () => {
       await expect(
-        factory.connect(user2).deactivatePool(poolAddress),
+        factory.connect(user2).deactivatePool(poolAddress)
       ).to.be.revertedWithCustomError(factory, "InvalidAddress");
     });
 
-    it("存在しないプールの情報を取得しようとすると失敗する", async function () {
+    it("存在しないプールの情報を取得しようとすると失敗する", async () => {
       const nonExistentPool = ethers.Wallet.createRandom().address;
 
-      await expect(
-        factory.getPoolInfo(nonExistentPool),
-      ).to.be.revertedWithCustomError(factory, "PoolDoesNotExist");
+      await expect(factory.getPoolInfo(nonExistentPool)).to.be.revertedWithCustomError(
+        factory,
+        "PoolDoesNotExist"
+      );
     });
   });
 
-  describe("プール一覧機能", function () {
-    beforeEach(async function () {
+  describe("プール一覧機能", () => {
+    beforeEach(async () => {
       // 複数のプールをデプロイ
       const salts = [
         ethers.keccak256(ethers.toUtf8Bytes("pool1")),
@@ -237,12 +233,12 @@ describe("CREATE2Factory", function () {
       }
     });
 
-    it("全プールのリストを取得できる", async function () {
+    it("全プールのリストを取得できる", async () => {
       const allPools = await factory.getAllPools();
       expect(allPools.length).to.equal(3);
     });
 
-    it("アクティブなプールのリストを取得できる", async function () {
+    it("アクティブなプールのリストを取得できる", async () => {
       const activePools = await factory.getActivePools();
       expect(activePools.length).to.equal(3);
 
@@ -254,7 +250,7 @@ describe("CREATE2Factory", function () {
       expect(activePoolsAfterDeactivation.length).to.equal(2);
     });
 
-    it("所有者別のプールリストを取得できる", async function () {
+    it("所有者別のプールリストを取得できる", async () => {
       const user1Pools = await factory.getPoolsByOwner(user1.address);
       const user2Pools = await factory.getPoolsByOwner(user2.address);
 
@@ -262,11 +258,11 @@ describe("CREATE2Factory", function () {
       expect(user2Pools.length).to.equal(1); // pool2
     });
 
-    it("プールの総数を取得できる", async function () {
+    it("プールの総数を取得できる", async () => {
       expect(await factory.getPoolCount()).to.equal(3);
     });
 
-    it("プールの存在確認ができる", async function () {
+    it("プールの存在確認ができる", async () => {
       const allPools = await factory.getAllPools();
       const firstPool = allPools[0];
       const nonExistentPool = ethers.Wallet.createRandom().address;
@@ -276,19 +272,15 @@ describe("CREATE2Factory", function () {
     });
   });
 
-  describe("ユーティリティ機能", function () {
-    it("ソルト値を生成できる", async function () {
-      const salt = await factory.generateSalt(
-        "Test Project",
-        user1.address,
-        123,
-      );
+  describe("ユーティリティ機能", () => {
+    it("ソルト値を生成できる", async () => {
+      const salt = await factory.generateSalt("Test Project", user1.address, 123);
 
       expect(salt).to.be.a("string");
       expect(salt).to.have.lengthOf(66); // 0x + 64 hex characters
     });
 
-    it("複数のソルト値を生成できる", async function () {
+    it("複数のソルト値を生成できる", async () => {
       const projectNames = ["Project 1", "Project 2", "Project 3"];
       const owners = [user1.address, user2.address, user1.address];
       const nonces = [1, 2, 3];
@@ -301,7 +293,7 @@ describe("CREATE2Factory", function () {
       expect(salts[2]).to.be.a("string");
     });
 
-    it("異なるパラメータで異なるソルトが生成される", async function () {
+    it("異なるパラメータで異なるソルトが生成される", async () => {
       const salt1 = await factory.generateSalt("Project A", user1.address, 1);
       const salt2 = await factory.generateSalt("Project B", user1.address, 1);
       const salt3 = await factory.generateSalt("Project A", user2.address, 1);
@@ -313,8 +305,8 @@ describe("CREATE2Factory", function () {
     });
   });
 
-  describe("マルチチェーン対応", function () {
-    it("同じパラメータで同じアドレスが生成される", async function () {
+  describe("マルチチェーン対応", () => {
+    it("同じパラメータで同じアドレスが生成される", async () => {
       const salt = ethers.keccak256(ethers.toUtf8Bytes("multichain-salt"));
       const address1 = await factory.calculateAddress(salt, user1.address);
       const address2 = await factory.calculateAddress(salt, user1.address);
@@ -322,13 +314,10 @@ describe("CREATE2Factory", function () {
       expect(address1).to.equal(address2);
     });
 
-    it("異なるチェーンでも同じアドレスが生成される", async function () {
+    it("異なるチェーンでも同じアドレスが生成される", async () => {
       // このテストは実際のマルチチェーンテストでは、異なるチェーンで同じFactoryをデプロイして確認
       const salt = ethers.keccak256(ethers.toUtf8Bytes("crosschain-salt"));
-      const calculatedAddress = await factory.calculateAddress(
-        salt,
-        user1.address,
-      );
+      const calculatedAddress = await factory.calculateAddress(salt, user1.address);
 
       // アドレスが一意であることを確認
       expect(calculatedAddress).to.be.properAddress;
@@ -336,8 +325,8 @@ describe("CREATE2Factory", function () {
     });
   });
 
-  describe("エラーハンドリング", function () {
-    it("無効なソルトでエラーが発生する", async function () {
+  describe("エラーハンドリング", () => {
+    it("無効なソルトでエラーが発生する", async () => {
       const deploymentParams = {
         projectName: "Test Project",
         projectDescription: "A test donation project",
@@ -346,25 +335,26 @@ describe("CREATE2Factory", function () {
         salt: ethers.ZeroHash, // 無効なソルト
       };
 
-      await expect(
-        factory.deployPool(deploymentParams),
-      ).to.be.revertedWithCustomError(factory, "InvalidSalt");
+      await expect(factory.deployPool(deploymentParams)).to.be.revertedWithCustomError(
+        factory,
+        "InvalidSalt"
+      );
     });
 
-    it("配列の長さが一致しない場合エラーが発生する", async function () {
+    it("配列の長さが一致しない場合エラーが発生する", async () => {
       const salts = [ethers.keccak256(ethers.toUtf8Bytes("salt1"))];
       const owners = [user1.address, user2.address]; // 長さが異なる
 
-      await expect(
-        factory.calculateAddresses(salts, owners),
-      ).to.be.revertedWith("Arrays length mismatch");
+      await expect(factory.calculateAddresses(salts, owners)).to.be.revertedWith(
+        "Arrays length mismatch"
+      );
     });
 
-    it("存在しないプールを無効化しようとするとエラーが発生する", async function () {
+    it("存在しないプールを無効化しようとするとエラーが発生する", async () => {
       const nonExistentPool = ethers.Wallet.createRandom().address;
 
       await expect(
-        factory.connect(user1).deactivatePool(nonExistentPool),
+        factory.connect(user1).deactivatePool(nonExistentPool)
       ).to.be.revertedWithCustomError(factory, "PoolDoesNotExist");
     });
   });
@@ -375,4 +365,3 @@ describe("CREATE2Factory", function () {
     return block.timestamp;
   }
 });
-

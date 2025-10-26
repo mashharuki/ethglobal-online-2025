@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import type { NexusNetwork } from '@avail-project/nexus-widgets';
-import { NexusProvider } from '@avail-project/nexus-widgets';
-import { lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { createConfig, http, WagmiProvider } from 'wagmi';
+import { initializeAnalyticsSuppression } from "@/utils/analyticsSuppressor";
+import type { NexusNetwork } from "@avail-project/nexus-widgets";
+import { NexusProvider } from "@avail-project/nexus-widgets";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { http, WagmiProvider, createConfig } from "wagmi";
 import {
   arbitrum,
   arbitrumSepolia,
@@ -17,11 +18,10 @@ import {
   polygon,
   polygonAmoy,
   sepolia,
-} from 'wagmi/chains';
-import { initializeAnalyticsSuppression } from '@/utils/analyticsSuppressor';
+} from "wagmi/chains";
 
-const defaultNetwork = (process.env.NEXT_PUBLIC_NETWORK ?? 'testnet') as NexusNetwork;
-const isTestnet = defaultNetwork === 'testnet';
+const defaultNetwork = (process.env.NEXT_PUBLIC_NETWORK ?? "testnet") as NexusNetwork;
+const isTestnet = defaultNetwork === "testnet";
 
 // 環境に応じてチェーンを選択
 const getChains = () => {
@@ -65,7 +65,7 @@ const Web3Context = createContext<Web3ContextValue | null>(null);
 export function useWeb3Context() {
   const context = useContext(Web3Context);
   if (!context) {
-    throw new Error('useWeb3Context must be used within a Web3Provider');
+    throw new Error("useWeb3Context must be used within a Web3Provider");
   }
   return context;
 }
@@ -92,14 +92,14 @@ const Web3Provider = ({ children }: { children: React.ReactNode }) => {
           <RainbowKitProvider
             modalSize="wide"
             theme={lightTheme({
-              accentColor: '#fe8b6c',
-              accentColorForeground: 'white',
-              borderRadius: 'medium',
-              fontStack: 'system',
+              accentColor: "#fe8b6c",
+              accentColorForeground: "white",
+              borderRadius: "medium",
+              fontStack: "system",
             })}
             showRecentTransactions={false}
             appInfo={{
-              appName: 'CrossDonate',
+              appName: "CrossDonate",
               learnMoreUrl: undefined,
             }}
             initialChain={isTestnet ? sepolia : mainnet}

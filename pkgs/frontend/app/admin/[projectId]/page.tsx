@@ -1,10 +1,10 @@
-import { Button } from '@/components/atoms/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
-import { AdminConversionCard } from '@/components/organisms/AdminConversionCard';
-import { SwapToPyusdCard } from '@/components/organisms/SwapToPyusdCard';
-import { getProjectById, mockBalances, mockTransactions } from '@/mockdatas';
-import { ExternalLink, TrendingUp, Users, Wallet } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { AdminConversionCard } from "@/components/organisms/AdminConversionCard";
+import { SwapToPyusdCard } from "@/components/organisms/SwapToPyusdCard";
+import { getProjectById, mockBalances, mockTransactions } from "@/mockdatas";
+import { ExternalLink, TrendingUp, Users, Wallet } from "lucide-react";
+import Link from "next/link";
 
 export default async function AdminDashboardPage({
   params,
@@ -78,7 +78,9 @@ export default async function AdminDashboardPage({
             <Card>
               <CardHeader>
                 <CardTitle>Balance by Chain</CardTitle>
-                <CardDescription>Real-time display of current balances across all chains</CardDescription>
+                <CardDescription>
+                  Real-time display of current balances across all chains
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -112,7 +114,9 @@ export default async function AdminDashboardPage({
             <Card>
               <CardHeader>
                 <CardTitle>Transaction History</CardTitle>
-                <CardDescription>History of donations, conversions, and withdrawals</CardDescription>
+                <CardDescription>
+                  History of donations, conversions, and withdrawals
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -125,18 +129,18 @@ export default async function AdminDashboardPage({
                         <div className="flex items-center gap-2">
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full ${
-                              tx.type === 'donation'
-                                ? 'bg-accent/10 text-accent'
-                                : tx.type === 'conversion'
-                                  ? 'bg-primary/10 text-primary'
-                                  : 'bg-chart-3/10 text-chart-3'
+                              tx.type === "donation"
+                                ? "bg-accent/10 text-accent"
+                                : tx.type === "conversion"
+                                  ? "bg-primary/10 text-primary"
+                                  : "bg-chart-3/10 text-chart-3"
                             }`}
                           >
-                            {tx.type === 'donation'
-                              ? 'Donation'
-                              : tx.type === 'conversion'
-                                ? 'Conversion'
-                                : 'Withdrawal'}
+                            {tx.type === "donation"
+                              ? "Donation"
+                              : tx.type === "conversion"
+                                ? "Conversion"
+                                : "Withdrawal"}
                           </span>
                           <code className="text-xs font-mono">{tx.from}</code>
                         </div>
@@ -148,16 +152,16 @@ export default async function AdminDashboardPage({
                       <div className="text-right">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${
-                            tx.status === 'confirmed' || tx.status === 'completed'
-                              ? 'bg-accent/10 text-accent'
-                              : 'bg-muted text-muted-foreground'
+                            tx.status === "confirmed" || tx.status === "completed"
+                              ? "bg-accent/10 text-accent"
+                              : "bg-muted text-muted-foreground"
                           }`}
                         >
-                          {tx.status === 'confirmed'
-                            ? '確認済み'
-                            : tx.status === 'completed'
-                              ? '完了'
-                              : '処理中'}
+                          {tx.status === "confirmed"
+                            ? "確認済み"
+                            : tx.status === "completed"
+                              ? "完了"
+                              : "処理中"}
                         </span>
                         <button
                           type="button"
@@ -215,8 +219,8 @@ export default async function AdminDashboardPage({
               </CardHeader>
               <CardContent>
                 <p className="text-sm opacity-90">
-                  This project is protected by EOA-based ownership management.
-                  Owner signature is required for conversion and withdrawal operations.
+                  This project is protected by EOA-based ownership management. Owner signature is
+                  required for conversion and withdrawal operations.
                 </p>
               </CardContent>
             </Card>

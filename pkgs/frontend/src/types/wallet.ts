@@ -11,8 +11,8 @@ export interface WalletConnectionState {
 export interface WalletConnectButtonProps {
   onConnectionChange?: (isConnected: boolean) => void;
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'outline' | 'ghost';
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "outline" | "ghost";
 }
 
 // レスポンシブ設定の型

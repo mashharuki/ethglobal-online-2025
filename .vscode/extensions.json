@@ -2,6 +2,6 @@
   "recommendations": [
     "biomejs.biome",
     "NomicFoundation.hardhat-solidity",
-    "tintinweb.solidity-visual-auditor",
+    "tintinweb.solidity-visual-auditor"
   ]
 }

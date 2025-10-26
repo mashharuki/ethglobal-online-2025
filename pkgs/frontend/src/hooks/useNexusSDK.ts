@@ -1,11 +1,11 @@
-import { NexusSDK } from '@avail-project/nexus-core';
-import { useCallback, useEffect, useState } from 'react';
-import { useAccount, useConnectorClient, useWalletClient } from 'wagmi';
-import { useSDKInitialization } from '@/contexts/SDKInitializationContext';
-import type { EthereumProvider, WindowWithEthereum } from '@/types';
+import { useSDKInitialization } from "@/contexts/SDKInitializationContext";
+import type { EthereumProvider, WindowWithEthereum } from "@/types";
+import { NexusSDK } from "@avail-project/nexus-core";
+import { useCallback, useEffect, useState } from "react";
+import { useAccount, useConnectorClient, useWalletClient } from "wagmi";
 
 // 環境変数からネットワーク設定を取得
-const networkMode = (process.env.NEXT_PUBLIC_NETWORK ?? 'testnet') as 'mainnet' | 'testnet';
+const networkMode = (process.env.NEXT_PUBLIC_NETWORK ?? "testnet") as "mainnet" | "testnet";
 
 // Nexus SDKのインスタンスを作成
 const nexusSDK = new NexusSDK({
@@ -23,12 +23,12 @@ export function useNexusSDK() {
 
   // 状態更新関数を安定化
   const updateInitializedState = useCallback((value: boolean) => {
-    console.log('updateInitializedState called with:', value);
+    console.log("updateInitializedState called with:", value);
     setIsInitialized(value);
   }, []);
 
   const updateLastConnectedAddress = useCallback((value: string | null) => {
-    console.log('updateLastConnectedAddress called with:', value);
+    console.log("updateLastConnectedAddress called with:", value);
     setLastConnectedAddress(value);
   }, []);
 
@@ -47,7 +47,7 @@ export function useNexusSDK() {
     }
 
     // window.ethereumに直接アクセス
-    if (typeof window !== 'undefined' && (window as WindowWithEthereum).ethereum) {
+    if (typeof window !== "undefined" && (window as WindowWithEthereum).ethereum) {
       return (window as WindowWithEthereum).ethereum as EthereumProvider;
     }
 
@@ -57,7 +57,7 @@ export function useNexusSDK() {
   // SDK初期化
   const initializeSDK = async (): Promise<void> => {
     if (!isConnected || !address) {
-      throw new Error('ウォレットが接続されていません');
+      throw new Error("ウォレットが接続されていません");
     }
 
     // アドレスが変更された場合、Nexus SDKを再初期化
@@ -70,7 +70,7 @@ export function useNexusSDK() {
       try {
         const clientToUse = await getWalletClient();
         if (!clientToUse) {
-          throw new Error('ウォレットクライアントが利用できません');
+          throw new Error("ウォレットクライアントが利用できません");
         }
 
         let ethereumProvider: EthereumProvider;
@@ -78,7 +78,7 @@ export function useNexusSDK() {
         if (clientToUse === (window as WindowWithEthereum).ethereum) {
           ethereumProvider = {
             ...clientToUse,
-            request: clientToUse.request.bind(clientToUse) as EthereumProvider['request'],
+            request: clientToUse.request.bind(clientToUse) as EthereumProvider["request"],
             on: (_event: string, _callback: (...args: unknown[]) => void) => {
               return ethereumProvider;
             },
@@ -89,7 +89,7 @@ export function useNexusSDK() {
         } else {
           ethereumProvider = {
             ...clientToUse,
-            request: clientToUse.request.bind(clientToUse) as EthereumProvider['request'],
+            request: clientToUse.request.bind(clientToUse) as EthereumProvider["request"],
             on: (_event: string, _callback: (...args: unknown[]) => void) => {
               return ethereumProvider;
             },
@@ -105,7 +105,7 @@ export function useNexusSDK() {
         updateInitializedState(true);
         updateLastConnectedAddress(address);
       } catch (error) {
-        console.error('Nexus SDK初期化エラー:', error);
+        console.error("Nexus SDK初期化エラー:", error);
         setIsInitialized(false);
         throw error; // エラーを再投げして呼び出し元で処理できるようにする
       } finally {

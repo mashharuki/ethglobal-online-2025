@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { network } from "hardhat";
 
-describe("USDC -> PYUSD swap (1:1)", async function () {
+describe("USDC -> PYUSD swap (1:1)", async () => {
   const { viem } = await network.connect();
   const publicClient = await viem.getPublicClient();
   const [owner, donor1, recipient] = await viem.getWalletClients();
 
-  it("should swap 1:1 from USDC to PYUSD and send to recipient", async function () {
+  it("should swap 1:1 from USDC to PYUSD and send to recipient", async () => {
     // Deploy mock tokens
     const pyusd = await viem.deployContract("PYUSDToken");
     const usdc = await viem.deployContract("USDCToken");
@@ -21,19 +21,28 @@ describe("USDC -> PYUSD swap (1:1)", async function () {
 
     // Prefund pool with PYUSD liquidity (owner -> donor1 -> donate)
     const pyusdLiquidity = 10_000_000n; // 10 PYUSD (6dec)
-    await pyusd.write.transfer([donor1.account.address, pyusdLiquidity], { account: owner.account });
+    await pyusd.write.transfer([donor1.account.address, pyusdLiquidity], {
+      account: owner.account,
+    });
     await pyusd.write.approve([pool.address, pyusdLiquidity], { account: donor1.account });
-    await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([pyusd.address, pyusdLiquidity], { account: donor1.account }) });
+    await publicClient.waitForTransactionReceipt({
+      hash: await pool.write.donate([pyusd.address, pyusdLiquidity], { account: donor1.account }),
+    });
 
     // Simulate bridged USDC arriving to pool via donate
     const usdcIncoming = 5_000_000n; // 5 USDC
     await usdc.write.transfer([donor1.account.address, usdcIncoming], { account: owner.account });
     await usdc.write.approve([pool.address, usdcIncoming], { account: donor1.account });
-    await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([usdc.address, usdcIncoming], { account: donor1.account }) });
+    await publicClient.waitForTransactionReceipt({
+      hash: await pool.write.donate([usdc.address, usdcIncoming], { account: donor1.account }),
+    });
 
     // Swap 5 USDC -> 5 PYUSD to recipient (1:1)
     const beforeRecipient = await pyusd.read.balanceOf([recipient.account.address]);
-    const txHash = await pool.write.swapUsdcToPyusd([usdc.address, pyusd.address, usdcIncoming, recipient.account.address], { account: owner.account });
+    const txHash = await pool.write.swapUsdcToPyusd(
+      [usdc.address, pyusd.address, usdcIncoming, recipient.account.address],
+      { account: owner.account }
+    );
     await publicClient.waitForTransactionReceipt({ hash: txHash });
     const afterRecipient = await pyusd.read.balanceOf([recipient.account.address]);
 
@@ -70,7 +79,7 @@ describe("USDC -> PYUSD swap (1:1)", async function () {
     assert.equal((events[0].args as any).amount, usdcIncoming);
   });
 
-  it("should revert when PYUSD liquidity is insufficient", async function () {
+  it("should revert when PYUSD liquidity is insufficient", async () => {
     const pyusd = await viem.deployContract("PYUSDToken");
     const usdc = await viem.deployContract("USDCToken");
     const pool = await viem.deployContract("DonationPool", [
@@ -82,15 +91,22 @@ describe("USDC -> PYUSD swap (1:1)", async function () {
     // Donate small PYUSD (1)
     await pyusd.write.transfer([donor1.account.address, 1_000_000n], { account: owner.account });
     await pyusd.write.approve([pool.address, 1_000_000n], { account: donor1.account });
-    await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([pyusd.address, 1_000_000n], { account: donor1.account }) });
+    await publicClient.waitForTransactionReceipt({
+      hash: await pool.write.donate([pyusd.address, 1_000_000n], { account: donor1.account }),
+    });
 
     // Donate larger USDC (2)
     await usdc.write.transfer([donor1.account.address, 2_000_000n], { account: owner.account });
     await usdc.write.approve([pool.address, 2_000_000n], { account: donor1.account });
-    await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([usdc.address, 2_000_000n], { account: donor1.account }) });
+    await publicClient.waitForTransactionReceipt({
+      hash: await pool.write.donate([usdc.address, 2_000_000n], { account: donor1.account }),
+    });
 
     try {
-      await pool.write.swapUsdcToPyusd([usdc.address, pyusd.address, 2_000_000n, recipient.account.address], { account: owner.account });
+      await pool.write.swapUsdcToPyusd(
+        [usdc.address, pyusd.address, 2_000_000n, recipient.account.address],
+        { account: owner.account }
+      );
       assert.fail("Expected revert: InsufficientBalance");
     } catch (err: any) {
       assert.equal(true, String(err.details || err.message).includes("InsufficientBalance"));

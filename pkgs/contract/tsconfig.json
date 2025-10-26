@@ -24,15 +24,6 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": [
-    "scripts/**/*",
-    "test/**/*",
-    "contracts/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "artifacts",
-    "cache"
-  ]
+  "include": ["scripts/**/*", "test/**/*", "contracts/**/*"],
+  "exclude": ["node_modules", "dist", "artifacts", "cache"]
 }

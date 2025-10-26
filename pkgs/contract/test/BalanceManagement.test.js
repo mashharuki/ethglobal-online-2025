@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("DonationPool - 残高管理機能の詳細テスト", function () {
+describe("DonationPool - 残高管理機能の詳細テスト", () => {
   let donationPool;
   let owner;
   let donor1;
@@ -10,7 +10,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
   let mockToken2;
   let targetToken;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, donor1, donor2] = await ethers.getSigners();
 
     // 複数のモックERC20トークンをデプロイ
@@ -25,7 +25,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       "Balance Test Project",
       "A project for testing balance management",
       targetToken.address,
-      owner.address,
+      owner.address
     );
 
     // 複数のトークンをサポートトークンとして追加
@@ -33,8 +33,8 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     await donationPool.setSupportedToken(mockToken2.address, true);
   });
 
-  describe("基本的な残高取得機能", function () {
-    it("ETH残高を正しく取得できる", async function () {
+  describe("基本的な残高取得機能", () => {
+    it("ETH残高を正しく取得できる", async () => {
       // 初期残高は0
       let balance = await donationPool.getBalance(ethers.ZeroAddress);
       expect(balance).to.equal(0);
@@ -50,7 +50,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(balance).to.equal(ethers.parseEther("2.5"));
     });
 
-    it("ERC20トークン残高を正しく取得できる", async function () {
+    it("ERC20トークン残高を正しく取得できる", async () => {
       // トークンをコントラクトに送金
       await mockToken1.mint(donationPool.address, ethers.parseEther("100"));
       await mockToken2.mint(donationPool.address, ethers.parseEther("50"));
@@ -63,13 +63,13 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(balance2).to.equal(ethers.parseEther("50"));
     });
 
-    it("存在しないトークンアドレスに対しては0を返す", async function () {
+    it("存在しないトークンアドレスに対しては0を返す", async () => {
       const nonExistentToken = ethers.Wallet.createRandom().address;
       const balance = await donationPool.getBalance(nonExistentToken);
       expect(balance).to.equal(0);
     });
 
-    it("無効なトークンコントラクトに対しては0を返す", async function () {
+    it("無効なトークンコントラクトに対しては0を返す", async () => {
       // 無効なアドレス（コントラクトではない）
       const invalidAddress = "0x0000000000000000000000000000000000000001";
       const balance = await donationPool.getBalance(invalidAddress);
@@ -77,8 +77,8 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 
-  describe("一括残高取得機能", function () {
-    beforeEach(async function () {
+  describe("一括残高取得機能", () => {
+    beforeEach(async () => {
       // テスト用の残高を設定
       await donor1.sendTransaction({
         to: donationPool.address,
@@ -89,7 +89,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       await mockToken2.mint(donationPool.address, ethers.parseEther("150"));
     });
 
-    it("全サポートトークンの残高を一括取得できる", async function () {
+    it("全サポートトークンの残高を一括取得できる", async () => {
       const [tokens, balances] = await donationPool.getAllBalances();
 
       // ETHのみがサポートされている状態
@@ -98,7 +98,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(balances[0]).to.equal(ethers.parseEther("3"));
     });
 
-    it("指定されたトークンリストの残高を取得できる", async function () {
+    it("指定されたトークンリストの残高を取得できる", async () => {
       const tokenList = [
         ethers.ZeroAddress, // ETH
         mockToken1.address, // Token 1
@@ -115,21 +115,21 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(balances[3]).to.equal(0); // 存在しないトークン
     });
 
-    it("空のトークンリストに対しては空の配列を返す", async function () {
+    it("空のトークンリストに対しては空の配列を返す", async () => {
       const balances = await donationPool.getBalances([]);
       expect(balances.length).to.equal(0);
     });
   });
 
-  describe("詳細な残高情報取得", function () {
-    beforeEach(async function () {
+  describe("詳細な残高情報取得", () => {
+    beforeEach(async () => {
       await donor1.sendTransaction({
         to: donationPool.address,
         value: ethers.parseEther("1.5"),
       });
     });
 
-    it("詳細な残高情報を正しく取得できる", async function () {
+    it("詳細な残高情報を正しく取得できる", async () => {
       const [tokenAddresses, tokenBalances, tokenNames, tokenSymbols] =
         await donationPool.getDetailedBalances();
 
@@ -141,8 +141,8 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 
-  describe("統計情報取得", function () {
-    beforeEach(async function () {
+  describe("統計情報取得", () => {
+    beforeEach(async () => {
       // 初期残高を設定
       await donor1.sendTransaction({
         to: donationPool.address,
@@ -152,7 +152,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       await mockToken1.mint(donationPool.address, ethers.parseEther("100"));
     });
 
-    it("特定トークンの統計情報を正しく取得できる", async function () {
+    it("特定トークンの統計情報を正しく取得できる", async () => {
       // ETHの統計
       const ethStats = await donationPool.getTokenStats(ethers.ZeroAddress);
       expect(ethStats.totalDonated).to.equal(0);
@@ -166,11 +166,9 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(token1Stats.isSupported).to.be.true;
     });
 
-    it("寄付後の統計が正しく更新される", async function () {
+    it("寄付後の統計が正しく更新される", async () => {
       // 寄付を実行
-      await donationPool
-        .connect(donor1)
-        .donateETH({ value: ethers.parseEther("0.5") });
+      await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("0.5") });
 
       // 統計を確認
       const ethStats = await donationPool.getTokenStats(ethers.ZeroAddress);
@@ -178,17 +176,13 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       expect(ethStats.currentBalance).to.equal(ethers.parseEther("2.5")); // 2 + 0.5
     });
 
-    it("ERC20寄付後の統計が正しく更新される", async function () {
+    it("ERC20寄付後の統計が正しく更新される", async () => {
       // 寄付者がトークンを取得
       await mockToken1.mint(donor1.address, ethers.parseEther("50"));
-      await mockToken1
-        .connect(donor1)
-        .approve(donationPool.address, ethers.MaxUint256);
+      await mockToken1.connect(donor1).approve(donationPool.address, ethers.MaxUint256);
 
       // 寄付を実行
-      await donationPool
-        .connect(donor1)
-        .donate(mockToken1.address, ethers.parseEther("25"));
+      await donationPool.connect(donor1).donate(mockToken1.address, ethers.parseEther("25"));
 
       // 統計を確認
       const tokenStats = await donationPool.getTokenStats(mockToken1.address);
@@ -197,8 +191,8 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 
-  describe("エラーハンドリング", function () {
-    it("無効なトークンアドレスに対して安全に処理する", async function () {
+  describe("エラーハンドリング", () => {
+    it("無効なトークンアドレスに対して安全に処理する", async () => {
       // 無効なアドレス
       const invalidAddresses = [
         "0x0000000000000000000000000000000000000000", // ゼロアドレス
@@ -212,7 +206,7 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
       }
     });
 
-    it("大量のトークンリストに対して安全に処理する", async function () {
+    it("大量のトークンリストに対して安全に処理する", async () => {
       // 大量のトークンアドレスを作成
       const tokenList = [];
       for (let i = 0; i < 10; i++) {
@@ -229,19 +223,15 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 
-  describe("ガス効率性", function () {
-    it("view関数はガスを消費しない", async function () {
+  describe("ガス効率性", () => {
+    it("view関数はガスを消費しない", async () => {
       // 残高取得はview関数なのでガスを消費しない
       const tx = await donationPool.getBalance(ethers.ZeroAddress);
       expect(tx).to.be.a("bigint");
     });
 
-    it("複数の残高取得を効率的に実行できる", async function () {
-      const tokenList = [
-        ethers.ZeroAddress,
-        mockToken1.address,
-        mockToken2.address,
-      ];
+    it("複数の残高取得を効率的に実行できる", async () => {
+      const tokenList = [ethers.ZeroAddress, mockToken1.address, mockToken2.address];
 
       // 複数の残高取得を並行して実行
       const promises = tokenList.map((token) => donationPool.getBalance(token));
@@ -251,31 +241,24 @@ describe("DonationPool - 残高管理機能の詳細テスト", function () {
     });
   });
 
-  describe("残高の整合性", function () {
-    it("寄付前後の残高が正しく更新される", async function () {
+  describe("残高の整合性", () => {
+    it("寄付前後の残高が正しく更新される", async () => {
       const initialBalance = await donationPool.getBalance(ethers.ZeroAddress);
 
       // 寄付を実行
-      await donationPool
-        .connect(donor1)
-        .donateETH({ value: ethers.parseEther("1") });
+      await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
 
       const finalBalance = await donationPool.getBalance(ethers.ZeroAddress);
       expect(finalBalance).to.equal(initialBalance + ethers.parseEther("1"));
     });
 
-    it("複数回の寄付が正しく累積される", async function () {
+    it("複数回の寄付が正しく累積される", async () => {
       // 複数回寄付
-      await donationPool
-        .connect(donor1)
-        .donateETH({ value: ethers.parseEther("1") });
-      await donationPool
-        .connect(donor2)
-        .donateETH({ value: ethers.parseEther("2") });
+      await donationPool.connect(donor1).donateETH({ value: ethers.parseEther("1") });
+      await donationPool.connect(donor2).donateETH({ value: ethers.parseEther("2") });
 
       const totalBalance = await donationPool.getBalance(ethers.ZeroAddress);
       expect(totalBalance).to.equal(ethers.parseEther("3"));
     });
   });
 });
-

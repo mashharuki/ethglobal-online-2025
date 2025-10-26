@@ -37,4 +37,3 @@ export function getContractAddress(chainId: string, contractName: string): strin
     return undefined;
   }
 }
-

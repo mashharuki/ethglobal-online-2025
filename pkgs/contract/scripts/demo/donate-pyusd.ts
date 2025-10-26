@@ -28,4 +28,3 @@ const txHash = await pool.write.donate([PYUSD_ADDRESS, amount], { account: donor
 await publicClient.waitForTransactionReceipt({ hash: txHash });
 
 console.log("[DONATE] pool PYUSD balance:", await pool.read.balanceOf([PYUSD_ADDRESS]));
-

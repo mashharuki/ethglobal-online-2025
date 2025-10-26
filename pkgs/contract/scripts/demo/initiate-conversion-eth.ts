@@ -32,4 +32,3 @@ const txHash = await pool.write.initiateConversion(
 await publicClient.waitForTransactionReceipt({ hash: txHash });
 
 console.log("[CONVERT-ETH] submitted ConversionInitiated. Check the nexus listener.");
-

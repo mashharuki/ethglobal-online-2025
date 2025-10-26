@@ -22,12 +22,17 @@ const withdraw = 2_000_000n; // 2 USDC
 
 console.log("[WITHDRAW] deposit USDC into pool via donate");
 await usdc.write.approve([pool.address, deposit], { account: owner.account });
-await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([USDC_ADDRESS, deposit], { account: owner.account }) });
+await publicClient.waitForTransactionReceipt({
+  hash: await pool.write.donate([USDC_ADDRESS, deposit], { account: owner.account }),
+});
 
 console.log("[WITHDRAW] pool USDC balance:", await pool.read.balanceOf([USDC_ADDRESS]));
 
 console.log("[WITHDRAW] withdrawing to:", recipient.account.address);
-await publicClient.waitForTransactionReceipt({ hash: await pool.write.withdrawFunds([USDC_ADDRESS, withdraw, recipient.account.address], { account: owner.account }) });
+await publicClient.waitForTransactionReceipt({
+  hash: await pool.write.withdrawFunds([USDC_ADDRESS, withdraw, recipient.account.address], {
+    account: owner.account,
+  }),
+});
 
 console.log("[WITHDRAW] done. pool USDC balance:", await pool.read.balanceOf([USDC_ADDRESS]));
-

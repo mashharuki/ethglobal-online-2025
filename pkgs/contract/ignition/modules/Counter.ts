@@ -3,7 +3,7 @@ import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 /**
  * Counterコントラクトのデプロイスクリプト
  */
-export default buildModule("CounterModule", m => {
+export default buildModule("CounterModule", (m) => {
   // Counterコントラクトをデプロイ
   const counter = m.contract("Counter");
   // incBy関数を呼び出してカウンターを5増加させる
@@ -11,4 +11,3 @@ export default buildModule("CounterModule", m => {
 
   return { counter };
 });
-

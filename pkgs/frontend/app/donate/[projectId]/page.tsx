@@ -1,9 +1,9 @@
-import { Button } from '@/components/atoms/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
-import { DonatePageClient } from '@/components/organisms/DonatePageClient';
-import { getProjectById, mockRecentDonations, mockSupportedTokens } from '@/mockdatas';
-import { Coins, ExternalLink, Shield, TrendingUp, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { DonatePageClient } from "@/components/organisms/DonatePageClient";
+import { getProjectById, mockRecentDonations, mockSupportedTokens } from "@/mockdatas";
+import { Coins, ExternalLink, Shield, TrendingUp, Zap } from "lucide-react";
+import Link from "next/link";
 
 export default async function DonatePage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;
@@ -50,13 +50,16 @@ export default async function DonatePage({ params }: { params: Promise<{ project
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-2">
                       <Zap className="w-5 h-5 text-accent" />
-                      <p className="font-bold text-lg text-foreground">Auto Conversion & Aggregation</p>
+                      <p className="font-bold text-lg text-foreground">
+                        Auto Conversion & Aggregation
+                      </p>
                     </div>
                     <p className="text-sm text-foreground/80 mb-1">
                       <strong>Target:</strong> {project.targetToken} on {project.targetChain}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      All donations are automatically converted to {project.targetToken} and aggregated on {project.targetChain}
+                      All donations are automatically converted to {project.targetToken} and
+                      aggregated on {project.targetChain}
                     </p>
                   </div>
                 </div>
@@ -103,9 +106,7 @@ export default async function DonatePage({ params }: { params: Promise<{ project
                   <TrendingUp className="w-6 h-6 text-accent" />
                   <div>
                     <CardTitle className="text-2xl">Recent Donations</CardTitle>
-                    <CardDescription className="text-base">
-                      Updated in real-time
-                    </CardDescription>
+                    <CardDescription className="text-base">Updated in real-time</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -176,7 +177,9 @@ export default async function DonatePage({ params }: { params: Promise<{ project
                     </div>
                     <div>
                       <p className="font-bold text-base mb-1">Auto Conversion & Aggregation</p>
-                      <p className="text-sm text-muted-foreground">Automatically convert to target token</p>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically convert to target token
+                      </p>
                     </div>
                   </div>
                 </div>

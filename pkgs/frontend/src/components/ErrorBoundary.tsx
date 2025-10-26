@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Button } from '@/components/atoms/Button';
+import { Button } from "@/components/atoms/Button";
+import React from "react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -24,7 +24,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   resetError = () => {
@@ -42,7 +42,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         <div className="flex flex-col items-center justify-center min-h-[200px] p-8 text-center">
           <h2 className="text-xl font-semibold text-destructive mb-4">エラーが発生しました</h2>
           <p className="text-muted-foreground mb-6">
-            {this.state.error?.message || '予期しないエラーが発生しました。'}
+            {this.state.error?.message || "予期しないエラーが発生しました。"}
           </p>
           <Button onClick={this.resetError} variant="outline">
             再試行
@@ -67,7 +67,7 @@ export function DefaultErrorFallback({
     <div className="flex flex-col items-center justify-center min-h-[200px] p-8 text-center">
       <h2 className="text-xl font-semibold text-destructive mb-4">エラーが発生しました</h2>
       <p className="text-muted-foreground mb-6">
-        {error.message || '予期しないエラーが発生しました。'}
+        {error.message || "予期しないエラーが発生しました。"}
       </p>
       <Button onClick={resetError} variant="outline">
         再試行

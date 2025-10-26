@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { createContext, type ReactNode, useContext, useState } from 'react';
+import { type ReactNode, createContext, useContext, useState } from "react";
 
 interface SDKInitializationContextType {
   isSDKInitializing: boolean;
@@ -22,7 +22,7 @@ export function SDKInitializationProvider({ children }: { children: ReactNode })
 export function useSDKInitialization() {
   const context = useContext(SDKInitializationContext);
   if (context === undefined) {
-    throw new Error('useSDKInitialization must be used within a SDKInitializationProvider');
+    throw new Error("useSDKInitialization must be used within a SDKInitializationProvider");
   }
   return context;
 }

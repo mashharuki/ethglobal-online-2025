@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useEffect } from 'react';
-import { useSDKInitialization } from '@/contexts/SDKInitializationContext';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
-import type { ResponsiveConfig, WalletConnectButtonProps, WalletInfo } from '@/types';
-import { ConnectButton as ConnectButtonComponent } from './WalletConnectButton/ConnectButton';
-import { ConnectedWallet } from './WalletConnectButton/ConnectedWallet';
-import { UnsupportedChainButton } from './WalletConnectButton/UnsupportedChainButton';
+import { useSDKInitialization } from "@/contexts/SDKInitializationContext";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useWalletConnection } from "@/hooks/useWalletConnection";
+import type { ResponsiveConfig, WalletConnectButtonProps, WalletInfo } from "@/types";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useEffect } from "react";
+import { ConnectButton as ConnectButtonComponent } from "./WalletConnectButton/ConnectButton";
+import { ConnectedWallet } from "./WalletConnectButton/ConnectedWallet";
+import { UnsupportedChainButton } from "./WalletConnectButton/UnsupportedChainButton";
 
 export default function WalletConnectButton({ onConnectionChange }: WalletConnectButtonProps) {
   const { isTablet, isMobile, isDesktop, isLargeDesktop } = useMediaQuery();
@@ -48,12 +48,12 @@ export default function WalletConnectButton({ onConnectionChange }: WalletConnec
             authenticationStatus,
             mounted,
           }) => {
-            const ready = mounted && authenticationStatus !== 'loading';
+            const ready = mounted && authenticationStatus !== "loading";
             const connected =
               ready &&
               account &&
               chain &&
-              (!authenticationStatus || authenticationStatus === 'authenticated');
+              (!authenticationStatus || authenticationStatus === "authenticated");
 
             const walletInfo: WalletInfo = {
               address: account?.address,
@@ -62,7 +62,7 @@ export default function WalletConnectButton({ onConnectionChange }: WalletConnec
               chain: chain
                 ? {
                     id: chain.id,
-                    name: chain.name || 'Unknown',
+                    name: chain.name || "Unknown",
                     unsupported: chain.unsupported,
                     hasIcon: chain.hasIcon,
                     iconUrl: chain.iconUrl,
@@ -74,25 +74,27 @@ export default function WalletConnectButton({ onConnectionChange }: WalletConnec
             return (
               <div
                 {...(!ready && {
-                  'aria-hidden': true,
+                  "aria-hidden": true,
                   style: {
                     opacity: 0,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
+                    pointerEvents: "none",
+                    userSelect: "none",
                   },
                 })}
               >
-                {!connected ? (
-                  <ConnectButtonComponent onConnect={openConnectModal} config={config} />
-                ) : chain?.unsupported ? (
-                  <UnsupportedChainButton onSwitchChain={openChainModal} config={config} />
+                {connected ? (
+                  chain?.unsupported ? (
+                    <UnsupportedChainButton onSwitchChain={openChainModal} config={config} />
+                  ) : (
+                    <ConnectedWallet
+                      walletInfo={walletInfo}
+                      onSwitchChain={openChainModal}
+                      onOpenAccount={openAccountModal}
+                      config={config}
+                    />
+                  )
                 ) : (
-                  <ConnectedWallet
-                    walletInfo={walletInfo}
-                    onSwitchChain={openChainModal}
-                    onOpenAccount={openAccountModal}
-                    config={config}
-                  />
+                  <ConnectButtonComponent onConnect={openConnectModal} config={config} />
                 )}
               </div>
             );

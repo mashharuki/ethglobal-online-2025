@@ -1,44 +1,44 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/atoms/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
-import { Input } from '@/components/atoms/Input';
-import { Label } from '@/components/atoms/Label';
-import { ArrowLeftRight, CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { parseUnits } from 'viem';
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
+import { ArrowLeftRight, CheckCircle2, ExternalLink, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { parseUnits } from "viem";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 // DonationPool contract ABI (swapUsdcToPyusd function only)
 const DONATION_POOL_ABI = [
   {
     inputs: [
-      { internalType: 'address', name: 'usdc', type: 'address' },
-      { internalType: 'address', name: 'pyusd', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: "address", name: "usdc", type: "address" },
+      { internalType: "address", name: "pyusd", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "address", name: "to", type: "address" },
     ],
-    name: 'swapUsdcToPyusd',
+    name: "swapUsdcToPyusd",
     outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [],
-    name: 'getAllBalances',
+    name: "getAllBalances",
     outputs: [
-      { internalType: 'address[]', name: 'tokens', type: 'address[]' },
-      { internalType: 'uint256[]', name: 'balances', type: 'uint256[]' },
+      { internalType: "address[]", name: "tokens", type: "address[]" },
+      { internalType: "uint256[]", name: "balances", type: "uint256[]" },
     ],
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
   },
 ] as const;
 
 // Contract addresses (Arbitrum Sepolia)
-const DONATION_POOL_ADDRESS = '0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3' as const;
-const USDC_ADDRESS = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d' as const;
-const PYUSD_ADDRESS = '0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1' as const;
+const DONATION_POOL_ADDRESS = "0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3" as const;
+const USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as const;
+const PYUSD_ADDRESS = "0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1" as const;
 
 interface SwapToPyusdCardProps {
   className?: string;
@@ -46,8 +46,8 @@ interface SwapToPyusdCardProps {
 
 export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
   const { address, isConnected } = useAccount();
-  const [amount, setAmount] = useState('');
-  const [recipient, setRecipient] = useState('');
+  const [amount, setAmount] = useState("");
+  const [recipient, setRecipient] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -63,17 +63,17 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
 
   const handleSwap = async () => {
     if (!isConnected || !address) {
-      setError('Wallet is not connected');
+      setError("Wallet is not connected");
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
-      setError('Please enter a valid amount');
+    if (!amount || Number.parseFloat(amount) <= 0) {
+      setError("Please enter a valid amount");
       return;
     }
 
-    if (!recipient || recipient.length !== 42 || !recipient.startsWith('0x')) {
-      setError('Please enter a valid recipient address');
+    if (!recipient || recipient.length !== 42 || !recipient.startsWith("0x")) {
+      setError("Please enter a valid recipient address");
       return;
     }
 
@@ -86,12 +86,12 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
       writeContract({
         address: DONATION_POOL_ADDRESS,
         abi: DONATION_POOL_ABI,
-        functionName: 'swapUsdcToPyusd',
+        functionName: "swapUsdcToPyusd",
         args: [USDC_ADDRESS, PYUSD_ADDRESS, amountWei, recipient as `0x${string}`],
       });
     } catch (err) {
-      console.error('Swap error:', err);
-      setError(`Swap execution error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      console.error("Swap error:", err);
+      setError(`Swap execution error: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   };
 
@@ -139,9 +139,7 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
         {/* Error Message */}
         {(error || writeError) && (
           <div className="bg-red-50 border-2 border-red-200 p-4 rounded-xl">
-            <p className="text-sm font-semibold text-red-800">
-              {error || writeError?.message}
-            </p>
+            <p className="text-sm font-semibold text-red-800">{error || writeError?.message}</p>
           </div>
         )}
 
@@ -177,9 +175,7 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
               onChange={(e) => setRecipient(e.target.value)}
               className="font-mono text-sm h-12"
             />
-            <p className="text-xs text-gray-500">
-              Enter the address to receive the swapped PYUSD
-            </p>
+            <p className="text-xs text-gray-500">Enter the address to receive the swapped PYUSD</p>
           </div>
         </div>
 
@@ -226,13 +222,13 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Confirming...
             </>
-          ) : !isConnected ? (
-            'Please connect wallet'
-          ) : (
+          ) : isConnected ? (
             <>
               <ArrowLeftRight className="w-5 h-5 mr-2" />
               Execute USDC → PYUSD Swap
             </>
+          ) : (
+            "Please connect wallet"
           )}
         </Button>
 

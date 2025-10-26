@@ -24,4 +24,3 @@ const after = await pool.read.balanceOf(["0x000000000000000000000000000000000000
 
 console.log("[DONATE-ETH] pool ETH balance before:", before);
 console.log("[DONATE-ETH] pool ETH balance after :", after);
-

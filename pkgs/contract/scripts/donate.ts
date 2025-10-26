@@ -26,10 +26,8 @@ console.log(`Donating to contract ${contractName} at address: ${contractAddress}
 const contract = await viem.getContractAt("DonationPool", contractAddress as `0x${string}`);
 
 // token address from comand line args or default to USDC on Arbitrum Sepolia
-const tokenAddress =
-  process.argv[6] ||
-  "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"; // USDC on Arbitrum Sepolia
-  // "0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1"; // PYUSD on Arbitrum Sepolia
+const tokenAddress = process.argv[6] || "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"; // USDC on Arbitrum Sepolia
+// "0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1"; // PYUSD on Arbitrum Sepolia
 const amount = BigInt(1e6); // 1 USDC = 1e6
 
 // create ERC20 contract instance using direct viem approach
@@ -55,4 +53,3 @@ await publicClient.waitForTransactionReceipt({ hash: tx });
 console.log(`Donate tx receipt: ${tx}`);
 
 console.log("========================= [END] =========================");
-

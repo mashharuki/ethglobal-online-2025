@@ -1,5 +1,5 @@
-import type { ResponsiveConfig } from '@/types';
-import { getResponsiveButtonStyles, getResponsiveText } from '@/utils/responsive';
+import type { ResponsiveConfig } from "@/types";
+import { getResponsiveButtonStyles, getResponsiveText } from "@/utils/responsive";
 
 interface ConnectButtonProps {
   onConnect: () => void;
@@ -8,7 +8,7 @@ interface ConnectButtonProps {
 
 export function ConnectButton({ onConnect, config }: ConnectButtonProps) {
   const styles = getResponsiveButtonStyles(config);
-  const text = getResponsiveText({ full: 'ウォレットを接続', short: 'ウォレット接続' }, config);
+  const text = getResponsiveText({ full: "ウォレットを接続", short: "ウォレット接続" }, config);
 
   return (
     <button
@@ -17,8 +17,8 @@ export function ConnectButton({ onConnect, config }: ConnectButtonProps) {
       className="bg-gradient-to-r from-primary to-accent text-white px-4 tablet:px-12 py-2 tablet:py-4 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 glow-primary"
       style={styles.button}
     >
-      <span className={text.full ? 'inline' : 'hidden'}>{text.full}</span>
-      <span className={text.short ? 'inline' : 'hidden'}>{text.short}</span>
+      <span className={text.full ? "inline" : "hidden"}>{text.full}</span>
+      <span className={text.short ? "inline" : "hidden"}>{text.short}</span>
     </button>
   );
 }

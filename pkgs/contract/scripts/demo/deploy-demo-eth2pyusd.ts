@@ -30,4 +30,3 @@ console.log("Export env for next steps:");
 console.log(`export PYUSD_ADDRESS=${pyusd.address}`);
 console.log(`export POOL_ADDRESS=${pool.address}`);
 console.log(`export SINK_ADDRESS=${sink.account.address}`);
-

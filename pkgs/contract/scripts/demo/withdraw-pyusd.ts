@@ -22,12 +22,20 @@ const withdraw = 2_000_000n; // 2 PYUSD
 
 console.log("[WITHDRAW-PYUSD] deposit PYUSD into pool via donate");
 await pyusd.write.approve([pool.address, deposit], { account: owner.account });
-await publicClient.waitForTransactionReceipt({ hash: await pool.write.donate([PYUSD_ADDRESS, deposit], { account: owner.account }) });
+await publicClient.waitForTransactionReceipt({
+  hash: await pool.write.donate([PYUSD_ADDRESS, deposit], { account: owner.account }),
+});
 
 console.log("[WITHDRAW-PYUSD] pool PYUSD balance:", await pool.read.balanceOf([PYUSD_ADDRESS]));
 
 console.log("[WITHDRAW-PYUSD] withdrawing to:", recipient.account.address);
-await publicClient.waitForTransactionReceipt({ hash: await pool.write.withdrawFunds([PYUSD_ADDRESS, withdraw, recipient.account.address], { account: owner.account }) });
+await publicClient.waitForTransactionReceipt({
+  hash: await pool.write.withdrawFunds([PYUSD_ADDRESS, withdraw, recipient.account.address], {
+    account: owner.account,
+  }),
+});
 
-console.log("[WITHDRAW-PYUSD] done. pool PYUSD balance:", await pool.read.balanceOf([PYUSD_ADDRESS]));
-
+console.log(
+  "[WITHDRAW-PYUSD] done. pool PYUSD balance:",
+  await pool.read.balanceOf([PYUSD_ADDRESS])
+);

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Coins, Globe, Loader2, Sparkles, Zap } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useId, useState } from 'react';
-import { Button } from '@/components/atoms/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
-import { Input } from '@/components/atoms/Input';
-import { Label } from '@/components/atoms/Label';
-import { Textarea } from '@/components/atoms/Textarea';
+import { Button } from "@/components/atoms/Button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { Input } from "@/components/atoms/Input";
+import { Label } from "@/components/atoms/Label";
+import { Textarea } from "@/components/atoms/Textarea";
+import { Coins, Globe, Loader2, Sparkles, Zap } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useId, useState } from "react";
 
 export default function CreateProjectPage() {
   const router = useRouter();
@@ -18,10 +18,10 @@ export default function CreateProjectPage() {
   const targetChainId = useId();
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    targetToken: 'USDC',
-    targetChain: 'Arbitrum Sepolia',
+    name: "",
+    description: "",
+    targetToken: "USDC",
+    targetChain: "Arbitrum Sepolia",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
