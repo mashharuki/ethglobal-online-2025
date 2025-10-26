@@ -16,9 +16,6 @@
       },
       "style": {
         "useImportType": "error"
-      },
-      "performance": {
-        "noImgElement": "warn"
       }
     }
   },
@@ -42,33 +39,6 @@
     },
     "parser": { "allowTrailingCommas": true }
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
-  "files": {
-    "includes": [
-      "**",
-      "!**/.next",
-      "!**/node_modules",
-      "!**/out",
-      "!**/.yarn",
-      "!**/dist",
-      "!**/build",
-      "!**/coverage",
-      "!**/*.min.js",
-      "!**/*.bundle.js"
-    ]
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.css"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noUnknownAtRules": "off"
-          }
-        }
-      }
-    }
-  ],
   "vcs": {
     "enabled": true,
     "clientKind": "git",

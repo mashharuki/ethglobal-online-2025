@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect, useId, useCallback } from 'react';
-import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
 import { Label } from '@/components/atoms/Label';
@@ -12,6 +10,8 @@ import type {
   BridgeAndExecuteResult,
   BridgeAndExecuteSimulationResult,
 } from '@avail-project/nexus-core';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 interface BridgeAndExecuteTestProps {
   className?: string;

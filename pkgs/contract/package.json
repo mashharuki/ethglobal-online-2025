@@ -23,10 +23,9 @@
     "demo:initiate-eth": "pnpm hardhat run scripts/demo/initiate-conversion-eth.ts",
     "demo:withdraw-usdc": "pnpm hardhat run scripts/demo/withdraw-usdc.ts",
     "demo:withdraw-pyusd": "pnpm hardhat run scripts/demo/withdraw-pyusd.ts",
-    "demo:nexus-listener": "pnpm hardhat run scripts/nexus-listener.ts"
+    "demo:nexus-listener": "pnpm hardhat run scripts/nexus-listener.ts",
     "donate": "pnpm hardhat run scripts/donate.ts",
     "swapUsdcToPyusd": "pnpm hardhat run scripts/swapUsdcToPyusd.ts",
-    "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
     "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
     "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"
   },

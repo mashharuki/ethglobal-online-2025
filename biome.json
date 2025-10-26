@@ -1,24 +1,57 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
-  "vcs": { "enabled": false },
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
   "files": {
-    "ignoreUnknown": false,
-    "includes": ["**/*"]
+    "ignoreUnknown": false
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    },
+    "parser": {
+      "allowTrailingCommas": true
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn"
+      },
+      "style": {
+        "useImportType": "error",
+        "useConst": "error",
+        "noNegationElse": "error"
+      },
+      "complexity": {
+        "noUselessFragments": "error"
+      }
     }
-  },
-  "overrides": [
-    {
-      "files": ["**/contract/test/**"],
-      "linter": { "enabled": false }
-    }
-  ]
+  }
 }
