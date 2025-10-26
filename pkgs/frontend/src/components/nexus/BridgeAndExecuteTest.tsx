@@ -127,7 +127,7 @@ export default function BridgeAndExecuteTest({
           | 43114
           | 421614
           | 84532,
-        sourceChains: formData.sourceChains.split(',').map((id) => parseInt(id.trim(), 10)),
+        // sourceChains: formData.sourceChains.split(',').map((id) => parseInt(id.trim(), 10)),
         recipient: (formData.recipient || address) as `0x${string}`,
         execute: {
           contractAddress: formData.contractAddress as `0x${string}`,
@@ -215,7 +215,7 @@ export default function BridgeAndExecuteTest({
           | 43114
           | 421614
           | 84532,
-        sourceChains: formData.sourceChains.split(',').map((id) => parseInt(id.trim(), 10)),
+        // sourceChains: formData.sourceChains.split(',').map((id) => parseInt(id.trim(), 10)),
         recipient: (formData.recipient || address) as `0x${string}`,
         execute: {
           contractAddress: formData.contractAddress as `0x${string}`,
