@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/atoms/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
 import { AdminConversionCard } from '@/components/organisms/AdminConversionCard';
+import { SwapToPyusdCard } from '@/components/organisms/SwapToPyusdCard';
 import { getProjectById, mockBalances, mockTransactions } from '@/mockdatas';
 
 export default async function AdminDashboardPage({
@@ -180,6 +181,9 @@ export default async function AdminDashboardPage({
               targetChain={project.targetChain}
               totalUsdValue={totalUsdValue}
             />
+
+            {/* USDC to PYUSD Swap Card */}
+            <SwapToPyusdCard />
 
             {/* Project Info */}
             <Card>
