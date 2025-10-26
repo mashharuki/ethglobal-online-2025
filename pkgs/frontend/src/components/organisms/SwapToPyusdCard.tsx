@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { parseUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 
-// DonationPoolコントラクトのABI（swapUsdcToPyusd関数のみ）
+// DonationPool contract ABI (swapUsdcToPyusd function only)
 const DONATION_POOL_ABI = [
   {
     inputs: [
@@ -35,7 +35,7 @@ const DONATION_POOL_ABI = [
   },
 ] as const;
 
-// コントラクトアドレス（Arbitrum Sepolia）
+// Contract addresses (Arbitrum Sepolia)
 const DONATION_POOL_ADDRESS = '0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3' as const;
 const USDC_ADDRESS = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d' as const;
 const PYUSD_ADDRESS = '0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1' as const;
@@ -63,24 +63,24 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
 
   const handleSwap = async () => {
     if (!isConnected || !address) {
-      setError('ウォレットが接続されていません');
+      setError('Wallet is not connected');
       return;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      setError('有効な金額を入力してください');
+      setError('Please enter a valid amount');
       return;
     }
 
     if (!recipient || recipient.length !== 42 || !recipient.startsWith('0x')) {
-      setError('有効な受信者アドレスを入力してください');
+      setError('Please enter a valid recipient address');
       return;
     }
 
     setError(null);
 
     try {
-      // 金額をWei単位に変換（USDC/PYUSDは6桁の小数点）
+      // Convert amount to Wei units (USDC/PYUSD has 6 decimal places)
       const amountWei = parseUnits(amount, 6);
 
       writeContract({
@@ -91,7 +91,7 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
       });
     } catch (err) {
       console.error('Swap error:', err);
-      setError(`スワップ実行エラー: ${err instanceof Error ? err.message : '不明なエラー'}`);
+      setError(`Swap execution error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -103,21 +103,21 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
             <ArrowLeftRight className="w-6 h-6 text-white" />
           </div>
           <div>
-            <CardTitle className="text-2xl">USDC → PYUSD スワップ</CardTitle>
+            <CardTitle className="text-2xl">USDC → PYUSD Swap</CardTitle>
             <CardDescription className="text-base">
-              寄付プールのUSDCをPYUSDに変換して送金
+              Convert USDC from donation pool to PYUSD and send
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* 成功メッセージ */}
+        {/* Success Message */}
         {isConfirmed && (
           <div className="bg-green-50 border-2 border-green-200 p-4 rounded-xl flex items-center gap-3 shadow-lg">
             <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-green-800">スワップが完了しました！</p>
+              <p className="text-sm font-semibold text-green-800">Swap completed successfully!</p>
               {hash && (
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-green-600">Tx Hash:</span>
@@ -136,7 +136,7 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
           </div>
         )}
 
-        {/* エラーメッセージ */}
+        {/* Error Message */}
         {(error || writeError) && (
           <div className="bg-red-50 border-2 border-red-200 p-4 rounded-xl">
             <p className="text-sm font-semibold text-red-800">
@@ -145,11 +145,11 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
           </div>
         )}
 
-        {/* フォーム */}
+        {/* Form */}
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="amount" className="text-sm font-medium">
-              スワップ金額 (USDC)
+              Swap Amount (USDC)
             </Label>
             <Input
               id="amount"
@@ -162,13 +162,13 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
               className="text-lg h-12"
             />
             <p className="text-xs text-gray-500">
-              寄付プール内のUSDC残高から指定した金額をPYUSDに1:1でスワップします
+              Swap the specified amount from donation pool USDC balance to PYUSD at 1:1 ratio
             </p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="recipient" className="text-sm font-medium">
-              受信者アドレス
+              Recipient Address
             </Label>
             <Input
               id="recipient"
@@ -178,25 +178,25 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
               className="font-mono text-sm h-12"
             />
             <p className="text-xs text-gray-500">
-              スワップされたPYUSDを受け取るアドレスを入力してください
+              Enter the address to receive the swapped PYUSD
             </p>
           </div>
         </div>
 
-        {/* 情報ボックス */}
+        {/* Information Box */}
         <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 space-y-3">
-          <h4 className="font-semibold text-blue-800">重要な情報</h4>
+          <h4 className="font-semibold text-blue-800">Important Information</h4>
           <div className="space-y-2 text-sm text-blue-700">
             <div className="flex justify-between">
-              <span>スワップレート:</span>
+              <span>Swap Rate:</span>
               <span className="font-semibold">1 USDC = 1 PYUSD</span>
             </div>
             <div className="flex justify-between">
-              <span>ネットワーク:</span>
+              <span>Network:</span>
               <span className="font-semibold">Arbitrum Sepolia</span>
             </div>
             <div className="flex justify-between">
-              <span>コントラクト:</span>
+              <span>Contract:</span>
               <a
                 href={`https://sepolia.arbiscan.io/address/${DONATION_POOL_ADDRESS}`}
                 target="_blank"
@@ -210,7 +210,7 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
           </div>
         </div>
 
-        {/* 実行ボタン */}
+        {/* Execute Button */}
         <Button
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl text-base h-12"
           onClick={handleSwap}
@@ -219,25 +219,25 @@ export function SwapToPyusdCard({ className }: SwapToPyusdCardProps) {
           {isWritePending ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              トランザクション送信中...
+              Sending transaction...
             </>
           ) : isConfirming ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              確認中...
+              Confirming...
             </>
           ) : !isConnected ? (
-            'ウォレットを接続してください'
+            'Please connect wallet'
           ) : (
             <>
               <ArrowLeftRight className="w-5 h-5 mr-2" />
-              USDC → PYUSD スワップ実行
+              Execute USDC → PYUSD Swap
             </>
           )}
         </Button>
 
         <p className="text-xs text-center text-gray-500 leading-relaxed">
-          このスワップはDonationPoolコントラクトのオーナー権限でのみ実行可能です
+          This swap can only be executed with DonationPool contract owner permissions
         </p>
       </CardContent>
     </Card>

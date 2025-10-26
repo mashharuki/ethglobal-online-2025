@@ -5,45 +5,45 @@ import "./DonationPool.sol";
 
 /**
  * @title CREATE2Factory
- * @dev CREATE2を使用して統一アドレスでDonationPoolをデプロイするFactoryコントラクト
- * @notice マルチチェーンで同一アドレスを実現するコア機能
+ * @dev Factory contract that deploys DonationPool with unified addresses using CREATE2
+ * @notice Core functionality for achieving same addresses across multiple chains
  */
 contract CREATE2Factory {
-    // ============ カスタムエラー ============
+    // ============ Custom Errors ============
 
-    /// @dev 無効なアドレスエラー
+    /// @dev Invalid address error
     error InvalidAddress(string message);
 
-    /// @dev 無効なパラメータエラー
+    /// @dev Invalid parameter error
     error InvalidParameter(string message);
 
-    /// @dev プールが既に存在するエラー
+    /// @dev Pool already exists error
     error PoolAlreadyExists(address poolAddress);
 
-    /// @dev プールが存在しないエラー
+    /// @dev Pool does not exist error
     error PoolDoesNotExist(address poolAddress);
 
-    /// @dev デプロイに失敗したエラー
+    /// @dev Deployment failed error
     error DeploymentFailed(address expectedAddress);
 
-    /// @dev 無効なソルトエラー
+    /// @dev Invalid salt error
     error InvalidSalt(bytes32 salt);
 
-    // ============ 状態変数 ============
+    // ============ State Variables ============
 
-    /// @dev デプロイ済みプールのマッピング
+    /// @dev Mapping of deployed pools
     mapping(address => bool) public deployedPools;
 
-    /// @dev プールの詳細情報
+    /// @dev Pool detailed information
     mapping(address => PoolInfo) public poolInfo;
 
-    /// @dev プールの総数
+    /// @dev Total number of pools
     uint256 public totalPools;
 
-    /// @dev プールのリスト
+    /// @dev List of pools
     address[] public poolList;
 
-    /// @dev プールの詳細情報構造体
+    /// @dev Pool detailed information struct
     struct PoolInfo {
         address owner;
         string projectName;
@@ -54,7 +54,7 @@ contract CREATE2Factory {
         bool isActive;
     }
 
-    /// @dev デプロイ用のパラメータ構造体
+    /// @dev Deployment parameters struct
     struct DeploymentParams {
         string projectName;
         string projectDescription;
@@ -63,9 +63,9 @@ contract CREATE2Factory {
         bytes32 salt;
     }
 
-    // ============ イベント ============
+    // ============ Events ============
 
-    /// @dev プールがデプロイされた時に発行
+    /// @dev Emitted when a pool is deployed
     event PoolDeployed(
         address indexed poolAddress,
         address indexed owner,
@@ -74,7 +74,7 @@ contract CREATE2Factory {
         uint256 deploymentTime
     );
 
-    /// @dev プールが無効化された時に発行
+    /// @dev Emitted when a pool is deactivated
     event PoolDeactivated(
         address indexed poolAddress,
         address indexed by,

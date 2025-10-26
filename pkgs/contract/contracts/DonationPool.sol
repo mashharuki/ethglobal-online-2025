@@ -9,28 +9,28 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {IDonationPool} from "./interfaces/IDonationPool.sol";
 
 /// @title DonationPool (v1, merged)
-/// @notice ETH / ERC20 の寄付受領・残高管理に加え、将来のコンバージョン連携を想定
-/// - `IDonationPool` に準拠
-/// - OZ v5 系の ReentrancyGuard / Ownable を使用
-/// - README 記載の「緊急引き出し」関数をラッパとして追加（withdrawFunds を内部利用）
+/// @notice ETH / ERC20 donation receiving and balance management, designed for future conversion integration
+/// - Compliant with `IDonationPool` interface
+/// - Uses OZ v5 ReentrancyGuard / Ownable
+/// - Adds emergency withdrawal function as wrapper (using internal withdrawFunds) as documented in README
 contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    /// @notice 変換先トークン（将来のコンバージョン機能向け）
+    /// @notice Target token for conversion (for future conversion features)
     address public targetToken;
 
-    /// @notice サポートするトークンの許可リスト（ETH は address(0)）
+    /// @notice Allowlist of supported tokens (ETH is address(0))
     mapping(address => bool) public supportedTokens;
 
     /// @dev token => total balance in pool
     mapping(address => uint256) private _balances;
 
-    /// @dev 追跡中のトークン（getAllBalances 用）
+    /// @dev Tracked tokens (for getAllBalances)
     address[] private _trackedTokens;
     mapping(address => bool) private _isTracked;
 
-    /// @dev 変換関連
-    address public conversionSink; // Avail Nexus SDK を実行するエージェント/ブリッジ先
+    /// @dev Conversion related
+    address public conversionSink; // Agent/bridge destination that executes Avail Nexus SDK
     uint256 private _conversionNonce;
 
     // -------- Errors --------
@@ -45,9 +45,9 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     error InsufficientEthBalance();
     error NotSupported();
 
-    /// @param initialOwner オーナー
-    /// @param targetToken_ 変換先トークンアドレス
-    /// @param initialSupported 初期サポートトークン配列（ETH を許可する場合は address(0) を含める）
+    /// @param initialOwner Owner
+    /// @param targetToken_ Target token address for conversion
+    /// @param initialSupported Initial supported token array (include address(0) to allow ETH)
     constructor(
         address initialOwner,
         address targetToken_,
@@ -55,7 +55,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     ) Ownable(initialOwner) {
         if (initialOwner == address(0)) revert ZeroAddress();
         targetToken = targetToken_;
-        // 初期サポートトークン設定
+        // Set initial supported tokens
         for (uint256 i = 0; i < initialSupported.length; i++) {
             address token = initialSupported[i];
             supportedTokens[token] = true;
@@ -63,13 +63,13 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
         }
     }
 
-    /// @notice targetToken の更新
+    /// @notice Update targetToken
     function setTargetToken(address newTarget) external onlyOwner {
         if (newTarget == address(0)) revert ZeroAddress();
         targetToken = newTarget;
     }
 
-    /// @notice 変換の出力先シンクを設定
+    /// @notice Set conversion output sink
     function setConversionSink(address sink) external override onlyOwner {
         if (sink == address(0)) revert ZeroAddress();
         conversionSink = sink;
@@ -164,20 +164,20 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     if (amount == 0) revert ZeroAmount();
     if (!supportedTokens[usdc] || !supportedTokens[pyusd]) revert NotSupported();
 
-    // プール内の内部残高を確認（1:1スワップ）
+    // Check internal balance in pool (1:1 swap)
     if (_balances[usdc] < amount) revert InsufficientBalance();
     // if (_balances[pyusd] < amount) revert InsufficientBalance();
 
-    // CEI: 内部残高を先に更新し、その後送金
-    _balances[usdc] -= amount; // 受領USDCを消費
-    // _balances[pyusd] -= amount; // プールのPYUSD流動性を消費
+    // CEI: Update internal balance first, then transfer
+    _balances[usdc] -= amount; // Consume received USDC
+    // _balances[pyusd] -= amount; // Consume pool's PYUSD liquidity
 
     IERC20(pyusd).safeTransfer(to, amount);
 
     emit Swapped(usdc, pyusd, to, amount);
   }
 
-  /// @dev 受動的に ETH を受領した場合も寄付扱いにする
+  /// @dev Treat passive ETH receipt as donations too
   receive() external payable {
     if (msg.value > 0 && supportedTokens[address(0)]) {
       _balances[address(0)] += msg.value;
@@ -210,12 +210,12 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
         emit FundsWithdrawn(token, amount, to);
     }
 
-    /// @notice README互換の緊急引き出し（ETH）
+    /// @notice README-compatible emergency withdrawal (ETH)
     function emergencyWithdrawETH(address payable to, uint256 amount) external onlyOwner {
         withdrawFunds(address(0), amount, to);
     }
 
-    /// @notice README互換の緊急引き出し（ERC20）
+    /// @notice README-compatible emergency withdrawal (ERC20)
     function emergencyWithdrawToken(address token, address to, uint256 amount) external onlyOwner {
         if (token == address(0)) revert ZeroAddress();
         withdrawFunds(token, amount, payable(to));
@@ -226,7 +226,7 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
 
     // -------- Internal --------
 
-    /// @dev トークンを追跡対象に追加（重複排除）
+    /// @dev Add token to tracking list (with deduplication)
     function _trackToken(address token) internal {
         if (!_isTracked[token]) {
             _isTracked[token] = true;
@@ -235,8 +235,8 @@ contract DonationPool is IDonationPool, Ownable, ReentrancyGuard {
     }
 
   /**
-   * @Todo: ブリッジされてきたUSDCをPYUSDに変換する機能
-   * ブリッジは Nexus SDK を利用して行う想定
-   * Nexus SDK側で Bridge AND Exchangeをメソッドを呼び出して ブリッジとswapを同時に行う
+   * @Todo: Feature to convert bridged USDC to PYUSD
+   * Bridging is planned to use Nexus SDK
+   * Nexus SDK side will call Bridge AND Exchange methods to perform bridging and swap simultaneously
    */
 }

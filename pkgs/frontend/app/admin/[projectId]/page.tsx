@@ -25,9 +25,9 @@ export default async function AdminDashboardPage({
       <main className="container mx-auto px-4 py-12 max-w-7xl">
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
-            <h1 className="text-4xl font-bold">管理者ダッシュボード</h1>
+            <h1 className="text-4xl font-bold">Admin Dashboard</h1>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/donate/${projectId}`}>寄付ページを見る</Link>
+              <Link href={`/donate/${projectId}`}>View Donation Page</Link>
             </Button>
           </div>
           <p className="text-muted-foreground text-lg">{project.name}</p>
@@ -37,36 +37,36 @@ export default async function AdminDashboardPage({
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">総資産価値</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Asset Value</CardTitle>
               <Wallet className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-accent">
                 ${totalUsdValue.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">全チェーン合計</p>
+              <p className="text-xs text-muted-foreground mt-1">All chains combined</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">総寄付回数</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">234</div>
-              <p className="text-xs text-muted-foreground mt-1">+12 今月</p>
+              <p className="text-xs text-muted-foreground mt-1">+12 this month</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">ユニーク寄付者</CardTitle>
+              <CardTitle className="text-sm font-medium">Unique Donors</CardTitle>
               <Users className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">156</div>
-              <p className="text-xs text-muted-foreground mt-1">+8 今月</p>
+              <p className="text-xs text-muted-foreground mt-1">+8 this month</p>
             </CardContent>
           </Card>
         </div>
@@ -77,8 +77,8 @@ export default async function AdminDashboardPage({
             {/* Balance Overview */}
             <Card>
               <CardHeader>
-                <CardTitle>チェーン別残高</CardTitle>
-                <CardDescription>全チェーンの現在残高をリアルタイム表示</CardDescription>
+                <CardTitle>Balance by Chain</CardTitle>
+                <CardDescription>Real-time display of current balances across all chains</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -111,8 +111,8 @@ export default async function AdminDashboardPage({
             {/* Transaction History */}
             <Card>
               <CardHeader>
-                <CardTitle>取引履歴</CardTitle>
-                <CardDescription>寄付・変換・引き出しの履歴</CardDescription>
+                <CardTitle>Transaction History</CardTitle>
+                <CardDescription>History of donations, conversions, and withdrawals</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -133,10 +133,10 @@ export default async function AdminDashboardPage({
                             }`}
                           >
                             {tx.type === 'donation'
-                              ? '寄付'
+                              ? 'Donation'
                               : tx.type === 'conversion'
-                                ? '変換'
-                                : '引き出し'}
+                                ? 'Conversion'
+                                : 'Withdrawal'}
                           </span>
                           <code className="text-xs font-mono">{tx.from}</code>
                         </div>
@@ -188,21 +188,21 @@ export default async function AdminDashboardPage({
             {/* Project Info */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">プロジェクト情報</CardTitle>
+                <CardTitle className="text-lg">Project Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">統一アドレス</p>
+                  <p className="text-xs text-muted-foreground mb-1">Unified Address</p>
                   <code className="text-xs font-mono break-all bg-secondary p-2 rounded block">
                     {project.unifiedAddress}
                   </code>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">集約先トークン</span>
+                  <span className="text-muted-foreground">Target Token</span>
                   <span className="font-semibold">{project.targetToken}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">集約先チェーン</span>
+                  <span className="text-muted-foreground">Target Chain</span>
                   <span className="font-semibold">{project.targetChain}</span>
                 </div>
               </CardContent>
@@ -211,12 +211,12 @@ export default async function AdminDashboardPage({
             {/* Security Info */}
             <Card className="bg-primary text-primary-foreground">
               <CardHeader>
-                <CardTitle className="text-lg">セキュリティ</CardTitle>
+                <CardTitle className="text-lg">Security</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm opacity-90">
-                  このプロジェクトはEOAベースの所有権管理により保護されています。
-                  変換・引き出し操作には所有者の署名が必要です。
+                  This project is protected by EOA-based ownership management.
+                  Owner signature is required for conversion and withdrawal operations.
                 </p>
               </CardContent>
             </Card>
