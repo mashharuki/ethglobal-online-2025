@@ -32,10 +32,7 @@ export const useNexusBalance = () => {
 
     try {
       // SDK初期化
-      const initialized = await initializeSDK();
-      if (!initialized) {
-        throw new Error('Failed to initialize Nexus SDK');
-      }
+      await initializeSDK();
 
       // 残高取得をリトライ付きで実行
       const balances = await withRetry(async () => {

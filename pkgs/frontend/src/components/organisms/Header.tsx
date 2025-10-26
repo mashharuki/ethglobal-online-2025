@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, Menu, X } from 'lucide-react';
+import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import WalletConnectButton from '@/components/molecules/WalletConnectButton';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -29,15 +30,15 @@ export default function Header() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center shadow-lg glow-primary">
-                <Coins className="w-6 h-6 text-white" />
+              <div className="h-8 sm:h-12 flex items-center justify-center">
+                <Image
+                  src="/assets/crossdonate_logo_black_type.png"
+                  alt="CrossDonate Logo"
+                  width={isMobile ? (isWalletConnected ? 121.75 : 195) : 243.5}
+                  height={isMobile ? (isWalletConnected ? 13.25 : 16) : 26.5}
+                />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                <span className={`${isWalletConnected && isMobile ? 'hidden' : 'inline'}`}>
-                  <span className="hidden sm:inline">CrossDonate</span>
-                  <span className="sm:hidden">CrossDonate</span>
-                </span>
-              </span>
+              {/* 268,29 */}
             </div>
           </Link>
 
