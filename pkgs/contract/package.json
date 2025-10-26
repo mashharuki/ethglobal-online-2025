@@ -14,6 +14,7 @@
     "get-balance": "pnpm hardhat run scripts/get-balance.ts",
     "increment-counter": "pnpm hardhat run scripts/inc.ts",
     "donate": "pnpm hardhat run scripts/donate.ts",
+    "swapUsdcToPyusd": "pnpm hardhat run scripts/swapUsdcToPyusd.ts",
     "deploy:Counter": "pnpm hardhat ignition deploy ignition/modules/Counter.ts",
     "deploy:ExampleToken": "pnpm hardhat ignition deploy ignition/modules/ExampleToken.ts",
     "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts"

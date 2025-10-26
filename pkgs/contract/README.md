@@ -76,4 +76,19 @@ Donate tx receipt: 0xd273a484ae10795b2833ca6097f3a0038f6ca8455254ad1688533270740
 ========================= [END] =========================
 ```
 
-###
+### swapUsdcToPyusd
+
+```bash
+pnpm contract run swapUsdcToPyusd --network arbitrumSepolia
+```
+
+以下のようになればOK!
+
+```bash
+========================= [START] =========================
+Sender address: 0x51908f598a5e0d8f1a3babfa6df76f9704dad072
+ChainID: 421614
+Donating to contract DonationPoolModule#DonationPool at address: 0x677fA3F54bab17C4654A534683F1CEab94278632
+Swap tx receipt: 0x4e6cd4713ca135da3521bb1ac37e2b569842774d9dc4b2d1555ce2936fb735ae
+========================= [END] =========================
+```
