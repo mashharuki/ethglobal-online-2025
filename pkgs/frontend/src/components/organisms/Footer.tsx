@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Coins } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -8,10 +8,15 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                <Coins className="w-6 h-6 text-white" />
+              <div className="h-10 flex items-center justify-center">
+                <Image
+                  src="/assets/crossdonate_logo_black_type.png"
+                  alt="CrossDonate Logo"
+                  width={195}
+                  height={21}
+                  className="object-contain h-10"
+                />
               </div>
-              <span className="text-xl font-bold">CrossDonate</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Web3寄付エコシステムの断片化問題を解決する次世代プラットフォーム
