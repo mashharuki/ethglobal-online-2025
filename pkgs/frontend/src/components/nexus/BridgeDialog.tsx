@@ -1,19 +1,19 @@
 'use client';
 
-import type { SUPPORTED_CHAINS_IDS } from '@avail-project/nexus-core';
-import { useCallback, useEffect, useId, useState } from 'react';
-import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/atoms/Dialog';
 import { Input } from '@/components/atoms/Input';
 import { Label } from '@/components/atoms/Label';
 import { useNexusSDK } from '@/hooks/useNexusSDK';
+import type { SUPPORTED_CHAINS_IDS } from '@avail-project/nexus-core';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 interface BridgeDialogProps {
   isOpen: boolean;

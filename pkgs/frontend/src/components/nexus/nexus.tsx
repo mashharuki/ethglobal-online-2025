@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import { Card, CardContent } from '@/components/atoms/Card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/atoms/Dialog';
 import { useNexusSDK } from '@/hooks/useNexusSDK';
 import { useWeb3Context } from '@/providers/Web3Provider';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import BridgeAndExecuteTest from './BridgeAndExecuteTest';
 
 const Nexus = () => {
