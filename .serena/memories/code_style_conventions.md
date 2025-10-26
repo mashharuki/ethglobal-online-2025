@@ -1,9 +1,11 @@
-# コードスタイル・規約 (2025年10月最新版)
+# コードスタイル・規約 (2025年10月26日最新版)
 
 ## 全般的な規約
 ### ファイル・プロジェクト形式
-- **TypeScript**: すべてのJavaScript系ファイルはTypeScript使用 (5.8.0)
-- **ESModule**: package.jsonで\"type\": \"module\"指定 (全パッケージ)
+- **TypeScript**: すべてのJavaScript系ファイルはTypeScript使用
+  - フロントエンド: 5.7.2
+  - コントラクト: 5.8.0
+- **ESModule**: package.jsonで"type": "module"指定 (全パッケージ)
 - **エンコーディング**: UTF-8
 - **改行コード**: LF (Unix形式)
 
@@ -20,11 +22,11 @@
 
 #### Solidity
 - **コントラクト**: PascalCase (例: `DonationPool`, `ExampleToken`)
-- **関数**: camelCase (例: `setSupportedToken`, `withdrawDonations`)
-- **変数**: camelCase (例: `totalDonated`, `supportedTokens`)
+- **関数**: camelCase (例: `donateETH`, `withdrawFunds`)
+- **変数**: camelCase (例: `totalDonated`, `conversionSink`)
 - **定数**: UPPER_SNAKE_CASE (例: `MAX_DONATION_AMOUNT`)
 - **プライベート変数**: アンダースコアプレフィックス (例: `_balances`, `_owner`)
-- **イベント**: PascalCase (例: `DonationReceived`, `TokenAdded`)
+- **イベント**: PascalCase (例: `DonationReceived`, `ConversionInitiated`)
 - **エラー**: PascalCase (例: `ZeroAddress`, `UnsupportedToken`)
 
 ## ディレクトリ構造規約
@@ -33,33 +35,39 @@
 src/
 ├── components/
 │   ├── atoms/          # 基本UI要素 (Button, Input, Card)
-│   ├── molecules/      # 複合コンポーネント (SearchBox, TokenSelector)
-│   ├── organisms/      # 複雑なコンポーネント (ProjectCard, DonationForm)
+│   ├── molecules/      # 複合コンポーネント (WalletConnectButton, ConnectWallet)
+│   ├── organisms/      # 複雑なコンポーネント (ProjectList, AdminPermissionGuard)
 │   ├── nexus/          # Nexus SDK専用コンポーネント
-│   └── providers/      # Context Providers (Web3Provider)
+│   └── providers/      # Context Providers (Web3ProviderWrapper)
 ├── hooks/              # カスタムフック (useNexusSDK, useWalletConnection)
-├── types/              # TypeScript型定義 (project.ts, nexus.ts)
+├── types/              # TypeScript型定義 (project.ts, nexus.ts, wallet.ts, api.ts)
 ├── utils/              # ユーティリティ関数 (web3/, errorHandler.ts)
-├── providers/          # グローバルProviders
+├── providers/          # グローバルProviders (Web3Provider.tsx)
 ├── mockdatas/          # 開発用モックデータ
 └── themes/             # テーマ・スタイル設定
+    ├── settings/       # テーマ設定 (color.ts)
+    └── styles/         # グローバルスタイル (globals.css)
 ```
 
 ### コントラクト (Hardhat V3 + セキュリティパターン)
 ```
 contracts/
 ├── interfaces/         # インターフェース定義 (IDonationPool.sol)
-├── mocks/              # テスト用モック (ReentrantToken.sol)
-└── *.sol               # メインコントラクト (DonationPool.sol)
+├── mocks/              # テスト用モック (PYUSDToken.sol, USDCToken.sol, ReentrantToken.sol)
+└── *.sol               # メインコントラクト (DonationPool.sol, CREATE2Factory.sol)
 ```
 
 ## Biome設定準拠
 ### フォーマット・リント規則
-- **インデント**: スペース2個 (indentStyle: \"space\", indentWidth: 2)
+- **インデント**: スペース2個 (indentStyle: "space", indentWidth: 2)
 - **推奨ルール**: 有効 (rules.recommended: true)
 - **セミコロン**: 自動挿入
 - **クォート**: ダブルクォート優先
 - **末尾カンマ**: 可能な場合は追加
+
+### 使用バージョン
+- **フロントエンド**: @biomejs/biome 2.2.6
+- **ルート**: @biomejs/biome 1.9.4
 
 ### Biome除外設定
 - **テストファイル**: リンター部分無効 (contract/test/**)
@@ -90,18 +98,16 @@ const executeCrossChainDonation = async (
 /**
  * @title DonationPool - クロスチェーン寄付プール
  * @notice PYUSD対応のクロスチェーン寄付機能を提供
- * @dev OpenZeppelin ReentrancyGuard + Ownable使用
+ * @dev OpenZeppelin ReentrancyGuard + Ownable2Step使用
  */
-contract DonationPool is ReentrancyGuard, Ownable {
+contract DonationPool is ReentrancyGuard, Ownable2Step {
     /**
      * @notice 新しい寄付を受け付ける
-     * @param projectId プロジェクトの一意識別子
      * @param token 寄付に使用するトークンアドレス
      * @param amount 寄付金額 (最小1wei以上)
      * @dev ZeroAddress, ZeroAmount, UnsupportedTokenエラーの可能性
      */
     function donate(
-        bytes32 projectId,
         address token,
         uint256 amount
     ) external nonReentrant validAmount(amount) {
@@ -117,7 +123,7 @@ contract DonationPool is ReentrancyGuard, Ownable {
 import { useQuery } from "@tanstack/react-query";
 import { useAccount, useConnect } from "wagmi";
 
-// 2. 内部コンポーネント (@/ prefix使用)
+// 2. 内部コンポーネント
 import { Button } from "@/components/atoms/Button";
 import { useNexusSDK } from "@/hooks/useNexusSDK";
 
@@ -222,3 +228,78 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = 'Button';
 ```
+
+## Git・開発フロー規約
+### Git Hooks (simple-git-hooks)
+```json
+{
+  "simple-git-hooks": {
+    "pre-commit": "pnpm -C pkgs/frontend format && pnpm -C pkgs/frontend lint",
+    "pre-push": "pnpm -C pkgs/frontend typecheck && pnpm -C pkgs/frontend check"
+  }
+}
+```
+
+### コミットメッセージ規約 (ETHGlobal対応)
+```
+feat: implement Nexus SDK integration for cross-chain donations
+fix: resolve USDC to PYUSD conversion issue in DonationPool
+docs: update deployment guide for Hardhat V3
+test: add comprehensive security tests for DonationPool
+refactor: optimize gas usage in CREATE2Factory deployment
+chore: update dependencies to latest stable versions
+```
+
+## スクリプト・コマンド規約
+### フロントエンドスクリプト
+```json
+{
+  "dev": "next dev",
+  "build": "next build", 
+  "start": "next start",
+  "lint": "biome lint --write .",
+  "format": "biome format --write .",
+  "check": "biome check --write .",
+  "typecheck": "tsc --noEmit"
+}
+```
+
+### コントラクトスクリプト
+```json
+{
+  "build": "pnpm hardhat build",
+  "test": "pnpm hardhat test",
+  "deploy:DonationPool": "pnpm hardhat ignition deploy ignition/modules/DonationPool.ts",
+  "donate": "pnpm hardhat run scripts/donate.ts",
+  "swapUsdcToPyusd": "pnpm hardhat run scripts/swapUsdcToPyusd.ts"
+}
+```
+
+## ファイル・ディレクトリ除外設定
+### .gitignore (フロントエンド)
+```gitignore
+node_modules/
+.next/
+.env*.local
+*.log
+.DS_Store
+```
+
+### .gitignore (コントラクト)
+```gitignore
+node_modules/
+artifacts/
+cache/
+typechain-types/
+```
+
+## 依存関係管理
+### ロックファイル
+- **フロントエンド**: 独自のpnpm-lock.yaml
+- **ルート**: 共通のpnpm-lock.yaml
+- **エンジン制約**: Node.js 22+ 強制
+
+### パッケージマネージャー
+- **pnpm**: 10.13.1 指定
+- **workspace**: モノレポ効率管理
+- **engines**: 厳密なNode.jsバージョン管理

@@ -3,13 +3,13 @@
 ## 開発環境要件
 - **Node.js**: 22+ (engines指定)
 - **パッケージマネージャ**: pnpm 10.13.1
-- **TypeScript**: ~5.8.0 (最新安定版)
+- **TypeScript**: ~5.8.0 (コントラクト), ^5.7.2 (フロントエンド)
 
 ## フロントエンド技術スタック
 ### 最新フレームワーク
 - **Next.js**: 15.0.0 (最新安定版、App Router)
 - **React**: 19.0.0 (最新リリース、Server Components対応)
-- **TypeScript**: ESModule完全対応
+- **TypeScript**: ESModule完全対応、5.7.2
 
 ### Web3・ブロックチェーン統合
 - **Avail Nexus SDK**: 
@@ -42,7 +42,9 @@
 ### 追加機能ライブラリ
 - **QRコード**: qrcode 1.5.4 + @types/qrcode 1.5.5
 - **React Hooks**: react-use 17.6.0
-- **Git Hooks**: simple-git-hooks (開発者体験向上)
+- **Git Hooks**: simple-git-hooks 2.13.1 (開発者体験向上)
+- **アニメーション**: tw-animate-css 1.3.4
+- **PostCSS**: autoprefixer 10.4.20, postcss 8.4.49
 
 ## バックエンド・スマートコントラクト
 ### Hardhat V3エコシステム
@@ -56,6 +58,7 @@
 - **Solidity**: 0.8.28 (最新安定版)
 - **OpenZeppelin**: 5.0.0 (最新メジャー版)
 - **Viem**: 2.30.0 (TypeScript Ethereum client)
+- **Prettier**: 3.0.0 + prettier-plugin-solidity 1.2.0
 
 ## 主要コントラクト実装
 ### DonationPool.sol
@@ -64,6 +67,12 @@
 - **インターフェース**: IDonationPool準拠
 - **トークン管理**: SafeERC20使用、自動残高追跡
 - **変換準備**: Nexus SDK連携のためのconversionSink設定
+- **主要メソッド**: 
+  - donateETH, donate (寄付受付)
+  - withdrawFunds, emergencyWithdrawETH/Token (資金管理)
+  - swapUsdcToPyusd, initiateConversion (トークン変換)
+  - setConversionSink, setTargetToken (設定管理)
+  - getAllBalances, getBalance, balanceOf (残高管理)
 
 ### CREATE2Factory.sol
 - **統一アドレス**: 複数チェーンで同一アドレス展開
@@ -77,7 +86,7 @@
 - **統一設定**: ESLint/Prettier代替による高速lint/format
 
 ### 型システム
-- **TypeScript**: ~5.8.0 完全統合
+- **TypeScript**: 5.7.2 (フロントエンド), 5.8.0 (コントラクト) 完全統合
 - **型定義**:
   - @types/node: 24.0.4 (フロントエンド), 22.8.5 (コントラクト)
   - @types/react: 19.0.8
@@ -98,6 +107,12 @@
 - **ウォレット管理**: 接続状態、アドレス、チェーン管理
 - **エラーハンドリング**: 接続エラー、チェーン切り替えエラー対応
 
+### useErrorHandler
+- **エラー管理**: アプリケーション全体のエラーハンドリング
+
+### useMediaQuery
+- **レスポンシブ対応**: モバイル・デスクトップ対応
+
 ## ネットワーク・デプロイメント
 ### 対応ネットワーク
 - **メインネット**: Ethereum, Arbitrum, Base
@@ -116,3 +131,33 @@
 - **ロックファイル**: pnpm-lock.yaml (決定論的インストール)
 - **エンジン制約**: Node.js 22+ 強制
 - **モノレポ**: 共通設定の効率的管理
+
+## 開発者体験向上
+### Git Hooks
+- **pre-commit**: format → lint の自動実行
+- **pre-push**: typecheck → check の自動実行
+- **simple-git-hooks**: 軽量なGitフック管理
+
+### スクリプト統合
+#### フロントエンド
+- dev, build, start (基本開発フロー)
+- lint, format, check, typecheck (品質管理)
+
+#### コントラクト
+- build, clean, test (基本開発フロー)
+- deploy:Counter, deploy:ExampleToken, deploy:DonationPool (デプロイメント)
+- send-op-tx, get-balance, increment-counter, donate, swapUsdcToPyusd (実行スクリプト)
+
+## セキュリティ・テスト
+### テストスイート
+- DonationPool.test.ts/.js (メインコントラクトテスト)
+- SecurityFeatures.test.js (セキュリティテスト)
+- BalanceManagement.test.js (残高管理テスト)
+- USDCtoPYUSD.test.ts (USDC-PYUSD変換テスト)
+- CREATE2Factory.test.js (CREATE2ファクトリテスト)
+
+### セキュリティ機能
+- ReentrancyGuard (リエントランシー攻撃対策)
+- Ownable2Step (オーナー権限の安全な移譲)
+- カスタムエラー (ガス効率とデバッグ性の向上)
+- SafeERC20 (ERC20トークンの安全な取り扱い)

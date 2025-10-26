@@ -8,7 +8,7 @@ CrossDonateは、Web3寄付の断片化問題を解決する革新的なクロ�
 - **自動変換・集約**: Avail Nexus SDKによる自動的なトークン変換・集約
 - **クロスチェーン対応**: 複数のブロックチェーン間での寄付受付・処理
 - **PYUSD統合**: PayPalのステーブルコインPYUSDを活用した安定した寄付体験
-- **分散型セキュリティ**: 将来的なLit Protocol統合によるマルチシグ対応
+- **分散型セキュリティ**: ReentrancyGuard、Ownable2Step等による堅牢なセキュリティ
 
 ### 解決する課題
 **寄付者の課題:**
@@ -36,16 +36,16 @@ pnpmワークスペースベースのモノレポ構成：
 - **ウォレット統合**: RainbowKit 2.2.8 + Wagmi 2.17.2 + Viem 2.37.7
 - **UI Framework**: Tailwind CSS 4.0.6 + Radix UI エコシステム
 - **状態管理**: TanStack Query 5.90.1 + Context API
-- **開発体験**: TypeScript 5.8 + Biome 2.2.6
+- **開発体験**: TypeScript 5.7.2 + Biome 2.2.6
 
 ### pkgs/contract (Hardhat V3 + Solidity)
 - **開発環境**: Hardhat 3.0.7 (V3最新版) + Viem 2.30.0統合
 - **スマートコントラクト**: Solidity 0.8.28 + OpenZeppelin 5.0.0
 - **デプロイメント**: Hardhat Ignition 3.0.0
-- **セキュリティ**: ReentrancyGuard, Ownable, カスタムエラー
+- **セキュリティ**: ReentrancyGuard, Ownable2Step, カスタムエラー
 - **テスト**: Node.js 組み込みテストランナー + Viem統合
 
-## 主要機能
+## 主要機能実装
 1. **プロジェクト作成**: 寄付プロジェクトの作成・管理（CREATE2アドレス生成）
 2. **クロスチェーン寄付**: Nexus SDKによる複数チェーンからの寄付受付
 3. **PYUSD統合**: PayPal USDでの安定した寄付体験
@@ -53,6 +53,60 @@ pnpmワークスペースベースのモノレポ構成：
 5. **管理ダッシュボード**: プロジェクト管理者向けリアルタイム管理画面
 6. **統一アドレス**: すべてのチェーンで同一アドレスでの寄付受付
 7. **レスポンシブデザイン**: モバイル・デスクトップ対応
+
+## スマートコントラクト詳細
+
+### DonationPool.sol (メインコントラクト)
+**セキュリティ機能:**
+- ReentrancyGuard: リエントランシー攻撃対策
+- Ownable2Step: 安全なオーナー権限移譲
+- カスタムエラー: ガス効率的なエラーハンドリング
+- SafeERC20: ERC20トークンの安全な取り扱い
+
+**主要メソッド:**
+- `donateETH()`: ETH寄付受付
+- `donate(token, amount)`: ERC20トークン寄付受付
+- `withdrawFunds(token, amount)`: 資金出金
+- `emergencyWithdrawETH()`: 緊急ETH出金
+- `emergencyWithdrawToken(token)`: 緊急トークン出金
+- `swapUsdcToPyusd(amount)`: USDC→PYUSD変換
+- `initiateConversion(token, amount)`: Nexus変換開始
+- `setConversionSink(sink)`: 変換先設定
+- `setTargetToken(token)`: ターゲットトークン設定
+- `getAllBalances()`: 全残高取得
+- `getBalance(token)`: 特定トークン残高取得
+- `balanceOf(token, account)`: アカウント別残高取得
+
+### CREATE2Factory.sol
+- 決定論的アドレス生成による統一アドレス実現
+- 複数チェーンで同一アドレス展開
+
+### テスト・モックコントラクト
+- **PYUSDToken.sol**: PYUSD モックトークン
+- **USDCToken.sol**: USDC モックトークン
+- **ReentrantToken.sol**: リエントランシーテスト用
+- **ExampleToken.sol**: 汎用テスト用ERC20
+
+## フロントエンド実装詳細
+
+### カスタムフック
+- **useNexusSDK**: Nexus SDK統合・初期化
+- **useNexusBalance**: 統一残高管理
+- **useWalletConnection**: ウォレット接続状態管理
+- **useErrorHandler**: アプリケーション全体のエラーハンドリング
+- **useMediaQuery**: レスポンシブ対応
+
+### コンポーネント構成
+- **Atomic Design**: atoms/molecules/organisms 構成
+- **Nexus統合**: 専用コンポーネント群
+- **ウォレット接続**: RainbowKit統合コンポーネント
+- **管理者機能**: 権限ガード・変換カード
+
+### ページ構成
+- **ホーム** (`/`): プロジェクト一覧・検索
+- **プロジェクト作成** (`/create`): 新規プロジェクト作成フォーム
+- **寄付実行** (`/donate/[projectId]`): 寄付インターフェース
+- **管理ダッシュボード** (`/admin/[projectId]`): プロジェクト管理
 
 ## 技術的な特徴
 - **CREATE2活用**: 決定論的アドレス生成による統一寄付アドレス
@@ -62,6 +116,32 @@ pnpmワークスペースベースのモノレポ構成：
 - **最新フレームワーク**: React 19, Next.js 15, Hardhat V3の採用
 - **セキュリティファースト**: OpenZeppelin ベースのセキュアな実装
 - **ガス最適化**: Solidity 0.8.28 + カスタムエラーによる効率的な実装
+
+## 開発者体験
+### Git Hooks統合
+- **pre-commit**: format → lint 自動実行
+- **pre-push**: typecheck → check 自動実行
+- **simple-git-hooks**: 軽量なGitフック管理
+
+### 開発フロー
+- **Hot Reload**: Next.js 15高速開発サーバー
+- **型安全性**: TypeScript 5.7.2/5.8.0完全統合
+- **テスト**: Node.js組み込みテストランナー + Viem
+- **デプロイ**: Hardhat Ignition宣言的デプロイメント
+
+## テスト・セキュリティ
+### テストスイート
+- **DonationPool.test.ts/.js**: メインコントラクトテスト
+- **SecurityFeatures.test.js**: セキュリティ機能テスト
+- **BalanceManagement.test.js**: 残高管理テスト
+- **USDCtoPYUSD.test.ts**: USDC-PYUSD変換テスト
+- **CREATE2Factory.test.js**: CREATE2ファクトリテスト
+
+### セキュリティ対策
+- **リエントランシー対策**: ReentrancyGuard使用
+- **アクセス制御**: Ownable2Step使用
+- **安全なトークン操作**: SafeERC20使用
+- **エラーハンドリング**: カスタムエラーによる詳細情報
 
 ## プロダクトのゴール
 **寄付者体験の究極的な向上**: どのチェーンのどんなトークンを持っていても、単一の統一アドレスに送金するだけでシームレスに寄付が完了
@@ -74,3 +154,10 @@ pnpmワークスペースベースのモノレポ構成：
 - **審査員対応**: わかりやすい英語コミットメッセージ
 - **プライズ要件**: Avail Nexus SDK、PYUSD、Hardhat V3の完全統合
 - **デモ準備**: 動作する本格的なクロスチェーン寄付システム
+
+## 将来展望
+- **マルチシグ統合**: Lit Protocol連携によるマルチシグ対応
+- **ガバナンストークン**: DAOによる分散型ガバナンス
+- **高度な変換**: より多くのDEX/ブリッジプロトコル統合
+- **プライバシー強化**: zk-SNARK等を活用した匿名寄付
+- **レポート機能**: 寄付証明書・税務レポート自動生成
