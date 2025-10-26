@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     siteName: 'crossdonate.org',
     images: [
       {
-        url: '/logo.svg',
-        width: 800,
-        height: 600,
+        url: '/assets/crossdonate_logo_black_type.png',
+        width: 243,
+        height: 26,
       },
     ],
     locale: 'ja_JP',
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CrossDonate',
     description: 'Web3寄付エコシステムの断片化問題を解決する次世代プラットフォーム',
-    images: ['/logo.svg'],
+    images: ['/assets/crossdonate_logo_black_type.png'],
   },
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: 'oklch(0.98 0.005 270)' },
     { media: '(prefers-color-scheme: dark)', color: 'oklch(0.08 0.015 270)' },
   ],
   icons: {
-    icon: '/favicon.svg',
+    icon: '/assets/favicon/favicon.svg',
   },
   robots: {
     index: true,

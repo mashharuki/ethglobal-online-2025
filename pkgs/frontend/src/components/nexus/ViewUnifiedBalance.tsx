@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import {
@@ -19,63 +19,44 @@ const ViewUnifiedBalance = () => {
   const { network } = useWeb3Context();
   const { unifiedBalance, loading, error, refetch } = useNexusBalance();
   const [isOpen, setIsOpen] = useState(false);
-  const [isWalletReady, setIsWalletReady] = useState(false);
 
-  // ウォレット接続状態の安定を待つ
-  useEffect(() => {
-    if (isConnected && address) {
-      // ウォレット接続後、少し待ってから準備完了とする
-      const timer = setTimeout(() => {
-        setIsWalletReady(true);
-      }, 1000); // 1秒待機
-      return () => clearTimeout(timer);
-    } else {
-      setIsWalletReady(false);
-    }
-  }, [isConnected, address]);
-
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = async (open: boolean) => {
     setIsOpen(open);
-    if (open && isWalletReady) {
+    if (open && isConnected) {
       // モーダルが開かれた時に残高取得を実行
-      // ウォレットが準備完了してから実行
-      setTimeout(() => {
-        refetch();
-      }, 200); // 少し長めの遅延を設定
+      try {
+        await refetch();
+      } catch (error) {
+        console.error('Failed to fetch balance:', error);
+      }
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="font-bold" disabled={!isWalletReady}>
-          {isWalletReady
-            ? 'View Unified Balance'
-            : isConnected
-              ? 'Preparing Wallet...'
-              : 'Connect Wallet to View Balance'}
+        <Button className="font-bold" disabled={!isConnected}>
+          {isConnected ? 'View Unified Balance' : 'Connect Wallet to View Balance'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-bold">Unified Balance</DialogTitle>
           <DialogDescription className="font-semibold">
-            {isWalletReady ? (
+            {isConnected ? (
               <span className="flex justify-between items-center">
                 <span>Network: {network}</span>
                 <span>
                   Address: {address?.slice(0, 6)}...{address?.slice(-4)}
                 </span>
               </span>
-            ) : isConnected ? (
-              'Wallet is connecting, please wait...'
             ) : (
               'Please connect your wallet to view your unified balance using Nexus SDK.'
             )}
           </DialogDescription>
         </DialogHeader>
 
-        {isWalletReady && (
+        {isConnected && (
           <div className="space-y-4 mt-4">
             {loading && (
               <div className="text-center py-4">

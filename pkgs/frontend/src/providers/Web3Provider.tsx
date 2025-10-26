@@ -2,31 +2,47 @@
 
 import type { NexusNetwork } from '@avail-project/nexus-widgets';
 import { NexusProvider } from '@avail-project/nexus-widgets';
-import { getDefaultConfig, lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { WagmiProvider } from 'wagmi';
-import { arbitrumSepolia, baseSepolia, optimismSepolia, polygonAmoy, sepolia } from 'wagmi/chains';
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import {
+  mainnet,
+  arbitrum,
+  base,
+  optimism,
+  polygon,
+  sepolia,
+  arbitrumSepolia,
+  baseSepolia,
+  optimismSepolia,
+  polygonAmoy,
+} from 'wagmi/chains';
 import { initializeAnalyticsSuppression } from '@/utils/analyticsSuppressor';
 
-const walletConnectProjectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo-project-id';
-
 const defaultNetwork = (process.env.NEXT_PUBLIC_NETWORK ?? 'testnet') as NexusNetwork;
+const isTestnet = defaultNetwork === 'testnet';
 
-if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
-  console.warn('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not set. Using demo project ID.');
-}
+// 環境に応じてチェーンを選択
+const getChains = () => {
+  if (isTestnet) {
+    return [sepolia, arbitrumSepolia, baseSepolia, optimismSepolia, polygonAmoy];
+  } else {
+    return [mainnet, base, arbitrum, optimism, polygon];
+  }
+};
 
-const config = getDefaultConfig({
-  appName: 'Nexus Sample App',
-  projectId: walletConnectProjectId,
-  chains: [sepolia, baseSepolia, arbitrumSepolia, optimismSepolia, polygonAmoy],
+const config = createConfig({
+  // biome-ignore lint/suspicious/noExplicitAny: wagmiの型定義の制限によりanyが必要
+  chains: getChains() as any,
+  transports: getChains().reduce(
+    (acc, chain) => {
+      acc[chain.id] = http();
+      return acc;
+    },
+    {} as Record<number, ReturnType<typeof http>>
+  ),
   ssr: false,
-  batch: {
-    multicall: false,
-  },
-  pollingInterval: 0,
 });
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -86,7 +102,7 @@ const Web3Provider = ({ children }: { children: React.ReactNode }) => {
               appName: 'CrossDonate',
               learnMoreUrl: undefined,
             }}
-            initialChain={sepolia}
+            initialChain={isTestnet ? sepolia : mainnet}
           >
             <NexusProvider config={{ network }}>{children}</NexusProvider>
           </RainbowKitProvider>
