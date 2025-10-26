@@ -1,7 +1,7 @@
 import Image from 'next/image';
-import type { WalletInfo, ResponsiveConfig } from '@/types';
-import { getResponsiveButtonStyles, getResponsiveText } from '@/utils/responsive';
+import type { ResponsiveConfig, WalletInfo } from '@/types';
 import { formatAddress, formatChainName } from '@/utils/addressFormatter';
+import { getResponsiveButtonStyles, getResponsiveText } from '@/utils/responsive';
 
 interface ConnectedWalletProps {
   walletInfo: WalletInfo;

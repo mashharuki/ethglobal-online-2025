@@ -1,8 +1,8 @@
 'use client';
 
+import { Check, Copy, QrCode } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/atoms/Button';
-import { Copy, Check, QrCode } from 'lucide-react';
 
 export function DonatePageClient({ unifiedAddress }: { unifiedAddress: string }) {
   const [copied, setCopied] = useState(false);

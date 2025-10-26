@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useId, useEffect, useCallback } from 'react';
+import type { SUPPORTED_CHAINS_IDS } from '@avail-project/nexus-core';
+import { useCallback, useEffect, useId, useState } from 'react';
+import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import {
   Dialog,
@@ -12,8 +14,6 @@ import {
 import { Input } from '@/components/atoms/Input';
 import { Label } from '@/components/atoms/Label';
 import { useNexusSDK } from '@/hooks/useNexusSDK';
-import { useAccount } from 'wagmi';
-import type { SUPPORTED_CHAINS_IDS } from '@avail-project/nexus-core';
 
 interface BridgeDialogProps {
   isOpen: boolean;
@@ -194,7 +194,7 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
           <DialogDescription className="text-center text-lg text-gray-600">
             Nexus SDKを使用してトークンを異なるチェーン間でブリッジします。
           </DialogDescription>
-          
+
           {/* 成功メッセージ - より目立つデザイン */}
           {success && (
             <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg shadow-sm">
@@ -217,8 +217,8 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 variant={networkMode === 'mainnet' ? 'default' : 'outline'}
                 onClick={() => handleNetworkModeChange('mainnet')}
                 className={`flex-1 py-3 transition-all duration-200 ${
-                  networkMode === 'mainnet' 
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg' 
+                  networkMode === 'mainnet'
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
                     : 'hover:border-purple-300 hover:bg-purple-50'
                 }`}
               >
@@ -228,8 +228,8 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 variant={networkMode === 'testnet' ? 'default' : 'outline'}
                 onClick={() => handleNetworkModeChange('testnet')}
                 className={`flex-1 py-3 transition-all duration-200 ${
-                  networkMode === 'testnet' 
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg' 
+                  networkMode === 'testnet'
+                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
                     : 'hover:border-purple-300 hover:bg-purple-50'
                 }`}
               >
@@ -246,21 +246,18 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 <Label htmlFor={tokenId} className="text-lg font-semibold text-gray-700">
                   ブリッジトークン
                 </Label>
-                <Select
+                <select
+                  id={tokenId}
                   value={token}
-                  onValueChange={(value: 'ETH' | 'USDC' | 'USDT') => setToken(value)}
+                  onChange={(e) => setToken(e.target.value as 'ETH' | 'USDC' | 'USDT')}
+                  className="w-full h-12 p-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  <SelectTrigger className="w-full h-12 text-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currentTokens.map((tokenOption) => (
-                      <SelectItem key={tokenOption} value={tokenOption} className="text-lg">
-                        {tokenOption}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {currentTokens.map((tokenOption) => (
+                    <option key={tokenOption} value={tokenOption}>
+                      {tokenOption}
+                    </option>
+                  ))}
+                </select>
                 <p className="text-sm text-gray-500">
                   Base SepoliaからArbitrum Sepoliaにブリッジするトークンを選択
                 </p>
@@ -281,9 +278,7 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                   step="0.000001"
                   min="0"
                 />
-                <p className="text-sm text-gray-500">
-                  ブリッジする{token}の数量を入力してください
-                </p>
+                <p className="text-sm text-gray-500">ブリッジする{token}の数量を入力してください</p>
               </div>
             </div>
 
@@ -291,15 +286,12 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
             <div className="space-y-6">
               {/* 送信元チェーン */}
               <div className="space-y-3">
-                <Label className="text-lg font-semibold text-gray-700">
-                  送信元チェーン
-                </Label>
+                <Label className="text-lg font-semibold text-gray-700">送信元チェーン</Label>
                 <div className="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                  <p className="text-center text-gray-600 font-medium">
-                    Base Sepolia (84532)
-                  </p>
+                  <p className="text-center text-gray-600 font-medium">Base Sepolia (84532)</p>
                   <p className="text-center text-sm text-gray-500 mt-1">
-                    注意: テスト前にBase SepoliaでUSDCを取得し、Arbitrum SepoliaでETHを取得してください
+                    注意: テスト前にBase SepoliaでUSDCを取得し、Arbitrum
+                    SepoliaでETHを取得してください
                   </p>
                 </div>
               </div>
@@ -309,21 +301,20 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 <Label htmlFor={targetChainId} className="text-lg font-semibold text-gray-700">
                   送信先チェーン
                 </Label>
-                <Select
+                <select
+                  id={targetChainId}
                   value={targetChain.toString()}
-                  onValueChange={(value) => setTargetChain(parseInt(value) as SUPPORTED_CHAINS_IDS)}
+                  onChange={(e) =>
+                    setTargetChain(parseInt(e.target.value, 10) as SUPPORTED_CHAINS_IDS)
+                  }
+                  className="w-full h-12 p-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 >
-                  <SelectTrigger className="w-full h-12 text-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currentChains.map((chain) => (
-                      <SelectItem key={chain.id} value={chain.id.toString()} className="text-lg">
-                        {chain.name} ({chain.id})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {currentChains.map((chain) => (
+                    <option key={chain.id} value={chain.id.toString()}>
+                      {chain.name} ({chain.id})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -334,12 +325,19 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
               🌉 Base Sepolia → Arbitrium Sepolia ブリッジ & 実行テスト
             </h3>
             <div className="space-y-2 text-sm text-blue-700">
-              <p><strong>テスト内容:</strong> Base SepoliaのUSDCをArbitrium Sepoliaにブリッジ後、DonationPoolコントラクトでdonateまたはswapUsdcToPyusdを実行</p>
+              <p>
+                <strong>テスト内容:</strong> Base SepoliaのUSDCをArbitrium
+                Sepoliaにブリッジ後、DonationPoolコントラクトでdonateまたはswapUsdcToPyusdを実行
+              </p>
               <div className="mt-3">
                 <p className="font-medium">利用可能な関数:</p>
                 <ul className="list-disc list-inside ml-4 space-y-1">
-                  <li><strong>donate:</strong> トークンを寄付（USDCをDonationPoolに寄付）</li>
-                  <li><strong>swapUsdcToPyusd:</strong> USDCをPYUSDにスワップ</li>
+                  <li>
+                    <strong>donate:</strong> トークンを寄付（USDCをDonationPoolに寄付）
+                  </li>
+                  <li>
+                    <strong>swapUsdcToPyusd:</strong> USDCをPYUSDにスワップ
+                  </li>
                 </ul>
               </div>
             </div>
@@ -350,28 +348,32 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
             <h3 className="text-lg font-semibold text-gray-800 mb-4">必要な設定:</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="font-medium text-gray-700">DonationPoolコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-medium text-gray-700">
+                  DonationPoolコントラクトアドレス (Arbitrium Sepolia)
+                </p>
                 <p className="font-mono text-xs bg-white p-2 rounded border break-all">
                   0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3
                 </p>
               </div>
               <div>
-                <p className="font-medium text-gray-700">USDCコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-medium text-gray-700">
+                  USDCコントラクトアドレス (Arbitrium Sepolia)
+                </p>
                 <p className="font-mono text-xs bg-white p-2 rounded border break-all">
                   0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d
                 </p>
               </div>
               <div>
-                <p className="font-medium text-gray-700">PYUSDコントラクトアドレス (Arbitrium Sepolia)</p>
+                <p className="font-medium text-gray-700">
+                  PYUSDコントラクトアドレス (Arbitrium Sepolia)
+                </p>
                 <p className="font-mono text-xs bg-white p-2 rounded border break-all">
                   0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1
                 </p>
               </div>
               <div>
                 <p className="font-medium text-gray-700">関数名</p>
-                <p className="bg-white p-2 rounded border">
-                  donate - トークンを寄付
-                </p>
+                <p className="bg-white p-2 rounded border">donate - トークンを寄付</p>
               </div>
             </div>
           </div>
@@ -394,10 +396,12 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 disabled={isInitializing}
                 className="flex-1 h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-lg transition-all duration-200"
               >
-                {isInitializing ? 'ブリッジ中...' : '✅ USDC用のNexus SDK初期化完了！ テストを開始できます'}
+                {isInitializing
+                  ? 'ブリッジ中...'
+                  : '✅ USDC用のNexus SDK初期化完了！ テストを開始できます'}
               </Button>
             )}
-            
+
             <Button
               onClick={handleBridge}
               disabled={isLoading || !isConnected || !amount || parseFloat(amount) <= 0}
@@ -412,129 +416,13 @@ export default function BridgeDialog({ isOpen, onOpenChange }: BridgeDialogProps
                 'ブリッジ実行'
               )}
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={handleClose}
               className="h-12 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-semibold text-lg transition-all duration-200"
             >
               閉じる
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-                className="flex-1"
-              >
-                メインネット
-              </Button>
-              <Button
-                variant={networkMode === 'testnet' ? 'default' : 'outline'}
-                onClick={() => handleNetworkModeChange('testnet')}
-                className="flex-1"
-              >
-                テストネット
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500">
-              {networkMode === 'mainnet'
-                ? '本番環境のチェーンでブリッジを実行します'
-                : 'テスト環境のチェーンでブリッジを実行します（テスト用トークンが必要）'}
-            </p>
-            {networkMode === 'testnet' && (
-              <div className="p-2 bg-blue-50 border border-blue-200 rounded-md">
-                <p className="text-blue-700 text-xs">
-                  テストネットではETH、USDC、USDTがブリッジ可能です。
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* トークン選択 */}
-          <div className="space-y-2">
-            <Label htmlFor={tokenId}>トークン</Label>
-            <select
-              id={tokenId}
-              value={token}
-              onChange={(e) => setToken(e.target.value as 'ETH' | 'USDC' | 'USDT')}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {currentTokens.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 数量入力 */}
-          <div className="space-y-2">
-            <Label htmlFor={amountId}>数量</Label>
-            <Input
-              id={amountId}
-              type="number"
-              step="0.000001"
-              placeholder="例: 100"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full"
-            />
-          </div>
-
-          {/* ターゲットチェーン選択 */}
-          <div className="space-y-2">
-            <Label htmlFor={targetChainId}>送信先チェーン</Label>
-            <select
-              id={targetChainId}
-              value={targetChain}
-              onChange={(e) => setTargetChain(Number(e.target.value) as SUPPORTED_CHAINS_IDS)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {currentChains.map((chain) => (
-                <option key={chain.id} value={chain.id}>
-                  {chain.name} (Chain ID: {chain.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* エラー表示 */}
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* SDK初期化状態の表示 */}
-          {!isInitialized && (
-            <div className="p-2 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-blue-700 text-xs">
-                SDKが未初期化です。ブリッジ実行時に自動初期化されます。
-              </p>
-            </div>
-          )}
-
-          {/* アクションボタン */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleBridge}
-              disabled={isLoading || !amount || parseFloat(amount) <= 0 || !isConnected}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-            >
-              {isLoading
-                ? isInitialized
-                  ? 'ブリッジ中...'
-                  : 'SDK初期化中...'
-                : !isConnected
-                  ? 'ウォレット未接続'
-                  : !amount || parseFloat(amount) <= 0
-                    ? '数量を入力してください'
-                    : 'ブリッジ実行'}
-            </Button>
-            <Button onClick={handleClose} variant="outline" className="flex-1">
-              キャンセル
             </Button>
           </div>
         </div>

@@ -5,18 +5,18 @@ import { NexusProvider } from '@avail-project/nexus-widgets';
 import { lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { WagmiProvider, createConfig, http } from 'wagmi';
+import { createConfig, http, WagmiProvider } from 'wagmi';
 import {
-  mainnet,
   arbitrum,
-  base,
-  optimism,
-  polygon,
-  sepolia,
   arbitrumSepolia,
+  base,
   baseSepolia,
+  mainnet,
+  optimism,
   optimismSepolia,
+  polygon,
   polygonAmoy,
+  sepolia,
 } from 'wagmi/chains';
 import { initializeAnalyticsSuppression } from '@/utils/analyticsSuppressor';
 

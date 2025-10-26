@@ -1,6 +1,6 @@
 import { NexusSDK } from '@avail-project/nexus-core';
-import { useEffect, useState, useCallback } from 'react';
-import { useAccount, useWalletClient, useConnectorClient } from 'wagmi';
+import { useCallback, useEffect, useState } from 'react';
+import { useAccount, useConnectorClient, useWalletClient } from 'wagmi';
 import { useSDKInitialization } from '@/contexts/SDKInitializationContext';
 import type { EthereumProvider, WindowWithEthereum } from '@/types';
 

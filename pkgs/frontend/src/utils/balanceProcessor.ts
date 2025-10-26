@@ -1,4 +1,4 @@
-import type { TokenBalance, UnifiedBalance, NexusBalance, NexusBalanceBreakdown } from '@/types';
+import type { NexusBalance, NexusBalanceBreakdown, TokenBalance, UnifiedBalance } from '@/types';
 
 // チェーン名のマッピング関数
 const getChainName = (chainId: number | string | undefined) => {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '@/themes/styles/globals.css';
-import Header from '@/components/organisms/Header';
 import Footer from '@/components/organisms/Footer';
+import Header from '@/components/organisms/Header';
 import Web3ProviderWrapper from '@/components/providers/Web3ProviderWrapper';
 
 export const metadata: Metadata = {

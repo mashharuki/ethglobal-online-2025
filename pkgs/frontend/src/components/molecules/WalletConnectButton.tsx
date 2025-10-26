@@ -2,13 +2,13 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useEffect } from 'react';
+import { useSDKInitialization } from '@/contexts/SDKInitializationContext';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
-import { useSDKInitialization } from '@/contexts/SDKInitializationContext';
+import type { ResponsiveConfig, WalletConnectButtonProps, WalletInfo } from '@/types';
 import { ConnectButton as ConnectButtonComponent } from './WalletConnectButton/ConnectButton';
-import { UnsupportedChainButton } from './WalletConnectButton/UnsupportedChainButton';
 import { ConnectedWallet } from './WalletConnectButton/ConnectedWallet';
-import type { WalletConnectButtonProps, WalletInfo, ResponsiveConfig } from '@/types';
+import { UnsupportedChainButton } from './WalletConnectButton/UnsupportedChainButton';
 
 export default function WalletConnectButton({ onConnectionChange }: WalletConnectButtonProps) {
   const { isTablet, isMobile, isDesktop, isLargeDesktop } = useMediaQuery();

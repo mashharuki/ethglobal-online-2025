@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAccount, useBalance } from 'wagmi';
-import { useNexusSDK } from './useNexusSDK';
-import { processNexusBalances } from '@/utils/balanceProcessor';
-import { getErrorMessage, withRetry } from '@/utils/errorHandler';
 import { mockUnifiedBalance } from '@/mockdatas';
 import type { UnifiedBalance } from '@/types';
+import { processNexusBalances } from '@/utils/balanceProcessor';
+import { getErrorMessage, withRetry } from '@/utils/errorHandler';
+import { useNexusSDK } from './useNexusSDK';
 
 export const useNexusBalance = () => {
   const { address, isConnected, chainId } = useAccount();

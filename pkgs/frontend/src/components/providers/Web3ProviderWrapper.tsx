@@ -1,8 +1,8 @@
 'use client';
 
-import Web3Provider from '@/providers/Web3Provider';
-import { SDKInitializationProvider } from '@/contexts/SDKInitializationContext';
 import type { ReactNode } from 'react';
+import { SDKInitializationProvider } from '@/contexts/SDKInitializationContext';
+import Web3Provider from '@/providers/Web3Provider';
 
 interface Web3ProviderWrapperProps {
   children: ReactNode;

@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Button } from '@/components/atoms/Button';
 import { Card, CardContent } from '@/components/atoms/Card';
-import { useWeb3Context } from '@/providers/Web3Provider';
-import { useNexusSDK } from '@/hooks/useNexusSDK';
-import BridgeAndExecuteTest from './BridgeAndExecuteTest';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/atoms/Dialog';
+import { useNexusSDK } from '@/hooks/useNexusSDK';
+import { useWeb3Context } from '@/providers/Web3Provider';
+import BridgeAndExecuteTest from './BridgeAndExecuteTest';
 
 const Nexus = () => {
   const { isConnected } = useAccount();
