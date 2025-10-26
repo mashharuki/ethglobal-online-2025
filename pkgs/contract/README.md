@@ -54,6 +54,12 @@ CREATE2 により **チェーンを跨いでも同一のデプロイアドレス
 pnpm install
 ```
 
+## verify
+
+```bash
+pnpm contract run verify --network arbitrumSepolia 0x025755dfebe6eEF0a58cEa71ba3A417f4175CAa3
+```
+
 ## スクリプト系
 
 ### donate

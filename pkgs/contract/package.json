@@ -8,6 +8,7 @@
     "build": "pnpm hardhat build",
     "clean": "pnpm hardhat clean",
     "test": "pnpm hardhat test",
+    "verify": "npx hardhat verify",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "send-op-tx": "pnpm hardhat run scripts/send-op-tx.ts",
