@@ -1,11 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
 import WalletConnectButton from '@/components/molecules/WalletConnectButton';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Header() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -41,20 +41,6 @@ export default function Header() {
               {/* 268,29 */}
             </div>
           </Link>
-
-          {/* デスクトップナビゲーション */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/create"
-              className="text-sm font-semibold hover:text-primary transition-colors"
-            >
-              プロジェクト作成
-            </Link>
-            <Link href="#" className="text-sm font-semibold hover:text-primary transition-colors">
-              ドキュメント
-            </Link>
-          </nav>
-
           {/* ウォレットボタン（常時表示） */}
           <div className="flex items-center gap-2">
             <WalletConnectButton onConnectionChange={handleWalletConnectionChange} />

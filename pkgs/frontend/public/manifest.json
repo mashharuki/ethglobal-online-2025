@@ -1,0 +1,25 @@
+{
+  "short_name": "CrossDonate",
+  "name": "CrossDonate - Web3寄付プラットフォーム",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "oklch(0.5 0.22 270)",
+  "background_color": "oklch(0.98 0.005 270)"
+}
